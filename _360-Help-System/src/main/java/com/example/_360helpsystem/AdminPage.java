@@ -31,7 +31,7 @@ public class AdminPage extends Application {
         inviteUserButton.setOnAction(e -> showInviteUserScreen(primaryStage));
 
         // Other buttons
-        Button userModificationsButton = new Button("User Modifications");
+        Button userModificationsButton = new Button("User Accounts & Modifications");
         userModificationsButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         userModificationsButton.setFont(Font.font("Arial", 18));
         userModificationsButton.setPrefWidth(250);
@@ -110,7 +110,7 @@ public class AdminPage extends Application {
         userModificationsLayout.setAlignment(Pos.CENTER);
 
 
-        Text userModificationsTitle = new Text("User Modifications");
+        Text userModificationsTitle = new Text("User Accounts & Modifications");
         userModificationsTitle.setFont(Font.font("Arial", 36));
         userModificationsLayout.add(userModificationsTitle, 0, 0, 4, 1);
 
