@@ -1,4 +1,5 @@
 package com.example._360helpsystem;
+
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,17 +19,17 @@ public class ResetPassword extends Application {
     public void start(Stage primaryStage) {
         // Create background
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(500, 500, Color.web("#f8f5f3")); // Very light grey background
+        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey background, adjusted to 600x600
         backgroundPane.getChildren().add(background);
 
         // Create labels and password fields
-        Label newPasswordLabel = new Label("New Password");
+        Label newPasswordLabel = WindowUtil.createStyledLabel("New Password", 16);
         PasswordField newPasswordField = new PasswordField();
-        newPasswordField.setPrefWidth(250); // Set consistent width for the input field
+        newPasswordField.setPrefWidth(250);  // Set consistent width for the input field
 
-        Label confirmPasswordLabel = new Label("Confirm Password");
+        Label confirmPasswordLabel = WindowUtil.createStyledLabel("Confirm Password", 16);
         PasswordField confirmPasswordField = new PasswordField();
-        confirmPasswordField.setPrefWidth(250); // Set consistent width for the input field
+        confirmPasswordField.setPrefWidth(250);  // Set consistent width for the input field
 
         // Set label width to ensure proper alignment
         newPasswordLabel.setPrefWidth(150);
@@ -40,38 +41,38 @@ public class ResetPassword extends Application {
         newPasswordBox.getChildren().addAll(newPasswordLabel, newPasswordField);
 
         // HBox for Confirm Password
-        HBox confirmPasswordBox = new HBox(10); // Center the confirm password box
+        HBox confirmPasswordBox = new HBox(10);  // 10 is the spacing between label and field
         confirmPasswordBox.setAlignment(Pos.CENTER);  // Center the whole box
         confirmPasswordBox.getChildren().addAll(confirmPasswordLabel, confirmPasswordField);
 
-        // Create Update button
-        Button updateButton = new Button("Update Password");
+        // Create Update button using WindowUtil for consistent styling
+        Button updateButton = WindowUtil.createStyledButton("Update Password");
         updateButton.setPrefWidth(150);
-        updateButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
 
         // VBox layout
-        VBox layout = new VBox(20);
-        layout.setAlignment(Pos.CENTER);
+        VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
+        layout.setSpacing(20);  // Add spacing between elements for better visibility
+        layout.setAlignment(Pos.CENTER);  // Center the VBox elements
         layout.getChildren().addAll(newPasswordBox, confirmPasswordBox, updateButton);
 
         // Add layout to background pane
         backgroundPane.getChildren().add(layout);
 
-        // Create scene and set stage
-        Scene scene = new Scene(backgroundPane, 500, 500);
-        primaryStage.setScene(scene);
+        // Create scene and set stage using the adjusted window size
+        Scene scene = new Scene(backgroundPane, 600, 600);  // Set scene size to 600x600
         primaryStage.setTitle("Reset Password");
+        primaryStage.setScene(scene);
         primaryStage.show();
 
+        // Set button action to go to the Sign In screen
         updateButton.setOnAction(e -> showSignInScreen(primaryStage));
     }
 
     private void showSignInScreen(Stage primaryStage) {
         SignIn signIn = new SignIn();
-        try{
+        try {
             signIn.start(primaryStage);
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

@@ -79,7 +79,7 @@ public class AdminPage extends Application {
         root.setCenter(layout);  // Center the VBox with buttons
 
         // Scene setup
-        Scene adminScene = new Scene(root, 500, 500);
+        Scene adminScene = new Scene(root, 600, 600);
 
         // Set up the stage
         primaryStage.setTitle("Admin Dashboard");
@@ -88,19 +88,17 @@ public class AdminPage extends Application {
     }
 
     // Method to show the "User Modifications" screen
-    // Method to show the "User Modifications" screen
     private void showUserModificationsScreen(Stage primaryStage) {
-        // Create a GridPane layout for displaying user details and role modifications
         GridPane userModificationsLayout = new GridPane();
         userModificationsLayout.setPadding(new Insets(20));
-        userModificationsLayout.setVgap(20);  // Increase the vertical spacing for bigger layout
-        userModificationsLayout.setHgap(20);  // Increase the horizontal spacing for bigger layout
+        userModificationsLayout.setVgap(20);
+        userModificationsLayout.setHgap(20);
         userModificationsLayout.setAlignment(Pos.CENTER);
 
         // Title Text
         Text userModificationsTitle = new Text("User Modifications");
-        userModificationsTitle.setFont(Font.font("Arial", 36));  // Make the title text bigger
-        userModificationsLayout.add(userModificationsTitle, 0, 0, 4, 1);  // Span 4 columns
+        userModificationsTitle.setFont(Font.font("Arial", 36));
+        userModificationsLayout.add(userModificationsTitle, 0, 0, 4, 1);
 
         // Table headers
         Label usernameHeader = new Label("Username");
@@ -123,15 +121,15 @@ public class AdminPage extends Application {
         Label nameLabel1 = new Label("");
         Label roleLabel1 = new Label("");
 
-// Add Role and Delete Role buttons
+        // Add Role and Delete Role buttons
         Button addRoleButton1 = new Button("Add Role");
         Button deleteRoleButton1 = new Button("Delete Role");
 
-// Setting the same style for both buttons
+        // Setting the same style for both buttons
         addRoleButton1.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteRoleButton1.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
 
-        HBox buttonBox1 = new HBox(10);  // 10px spacing between buttons
+        HBox buttonBox1 = new HBox(10);
         buttonBox1.getChildren().addAll(addRoleButton1, deleteRoleButton1);
 
         userModificationsLayout.add(usernameLabel1, 0, 2);
@@ -140,15 +138,12 @@ public class AdminPage extends Application {
         userModificationsLayout.add(buttonBox1, 3, 2);
 
         // Create the new scene for user modifications
-        Scene userModificationsScene = new Scene(userModificationsLayout, 700, 500);  // Set larger dimensions
+        Scene userModificationsScene = new Scene(userModificationsLayout, 600, 600);
         primaryStage.setScene(userModificationsScene);
     }
 
-
-    // Method to show the "Invite User" screen
     // Method to show the "Invite User" screen
     private void showInviteUserScreen(Stage primaryStage) {
-        // Create a GridPane layout for better control
         GridPane inviteLayout = new GridPane();
         inviteLayout.setPadding(new Insets(20));
         inviteLayout.setVgap(10);
@@ -158,13 +153,12 @@ public class AdminPage extends Application {
         // Title Text
         Text inviteTitle = new Text("Invite User");
         inviteTitle.setFont(Font.font("Arial", 24));
-        inviteLayout.add(inviteTitle, 0, 0, 2, 1);  // Span 2 columns
+        inviteLayout.add(inviteTitle, 0, 0, 2, 1);
 
         // Email Label and TextField
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
         emailField.setPrefWidth(200);
-        emailField.setMaxWidth(250);
         inviteLayout.add(emailLabel, 0, 1);
         inviteLayout.add(emailField, 1, 1);
 
@@ -176,7 +170,7 @@ public class AdminPage extends Application {
         Button inviteButton = new Button("Invite");
         inviteButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         inviteButton.setFont(Font.font("Arial", 18));
-        inviteLayout.add(inviteButton, 0, 3, 2, 1);  // Span 2 columns
+        inviteLayout.add(inviteButton, 0, 3, 2, 1);
 
         // Action for Invite Button
         inviteButton.setOnAction(e -> {
@@ -185,9 +179,7 @@ public class AdminPage extends Application {
         });
 
         // Create the new scene
-        Scene inviteScene = new Scene(inviteLayout, 400, 400);
-
-        // Set the new scene on the stage
+        Scene inviteScene = new Scene(inviteLayout, 600, 600);
         primaryStage.setScene(inviteScene);
     }
 
@@ -206,16 +198,14 @@ public class AdminPage extends Application {
         confirmationLayout.getChildren().add(confirmationMessage);
 
         // Create the new scene for the confirmation page
-        Scene confirmationScene = new Scene(confirmationLayout, 400, 200);
+        Scene confirmationScene = new Scene(confirmationLayout, 600, 600);
 
         // Set the new scene on the stage
         primaryStage.setScene(confirmationScene);
     }
 
-
     // Method to show the "Delete User" screen
     private void showDeleteUserScreen(Stage primaryStage) {
-        // Create a GridPane layout for the delete screen
         GridPane deleteLayout = new GridPane();
         deleteLayout.setPadding(new Insets(20));
         deleteLayout.setVgap(10);
@@ -225,13 +215,12 @@ public class AdminPage extends Application {
         // Title Text
         Text deleteTitle = new Text("Delete User");
         deleteTitle.setFont(Font.font("Arial", 24));
-        deleteLayout.add(deleteTitle, 0, 0, 2, 1);  // Span 2 columns
+        deleteLayout.add(deleteTitle, 0, 0, 2, 1);
 
         // Username Label and TextField
         Label usernameLabel = new Label("Username:");
         TextField usernameField = new TextField();
         usernameField.setPrefWidth(200);
-        usernameField.setMaxWidth(250);
         deleteLayout.add(usernameLabel, 0, 1);
         deleteLayout.add(usernameField, 1, 1);
 
@@ -239,13 +228,13 @@ public class AdminPage extends Application {
         Button deleteUserButton = new Button("Delete User");
         deleteUserButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteUserButton.setFont(Font.font("Arial", 18));
-        deleteLayout.add(deleteUserButton, 0, 2, 2, 1);  // Span 2 columns
+        deleteLayout.add(deleteUserButton, 0, 2, 2, 1);
 
         // Set the action for the Delete User button
         deleteUserButton.setOnAction(e -> showConfirmationDialog(primaryStage, usernameField.getText()));
 
         // Create the new scene
-        Scene deleteScene = new Scene(deleteLayout, 400, 300);
+        Scene deleteScene = new Scene(deleteLayout, 600, 600);
 
         // Set the new scene on the stage
         primaryStage.setScene(deleteScene);
@@ -277,7 +266,7 @@ public class AdminPage extends Application {
             confirmationStage.close();
             // Implement the deletion logic here
             System.out.println("User " + username + " deleted.");
-            primaryStage.setScene(new Scene(new VBox(new Text("User " + username + " deleted.")), 400, 300));
+            primaryStage.setScene(new Scene(new VBox(new Text("User " + username + " deleted.")), 600, 600));
         });
 
         noButton.setOnAction(e -> confirmationStage.close());
@@ -298,7 +287,6 @@ public class AdminPage extends Application {
 
     // Method to show the Reset Account screen
     private void showResetAccountScreen(Stage primaryStage) {
-        // Create a GridPane layout for the reset account screen
         GridPane resetLayout = new GridPane();
         resetLayout.setPadding(new Insets(20));
         resetLayout.setVgap(10);
@@ -308,7 +296,7 @@ public class AdminPage extends Application {
         // Title Text for Reset Account Screen
         Text resetTitle = new Text("Reset Account");
         resetTitle.setFont(Font.font("Arial", 24));
-        resetLayout.add(resetTitle, 0, 0, 2, 1);  // Span 2 columns
+        resetLayout.add(resetTitle, 0, 0, 2, 1);
 
         // Username Label and TextField
         Label usernameLabel = new Label("Username:");
@@ -321,7 +309,7 @@ public class AdminPage extends Application {
         Button resetUserAccountButton = new Button("Reset User Account");
         resetUserAccountButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         resetUserAccountButton.setFont(Font.font("Arial", 16));
-        resetLayout.add(resetUserAccountButton, 2, 1); // Placing it next to the username field
+        resetLayout.add(resetUserAccountButton, 2, 1);
 
         // Set action for the Reset User Account Button
         resetUserAccountButton.setOnAction(e -> {
@@ -330,7 +318,7 @@ public class AdminPage extends Application {
         });
 
         // Create the new scene for resetting the account
-        Scene resetScene = new Scene(resetLayout, 400, 200);
+        Scene resetScene = new Scene(resetLayout, 600, 600);
         primaryStage.setScene(resetScene);
     }
 
@@ -349,10 +337,9 @@ public class AdminPage extends Application {
         confirmationLayout.getChildren().add(confirmationMessage);
 
         // Create the new scene for the confirmation page
-        Scene confirmationScene = new Scene(confirmationLayout, 400, 200);
+        Scene confirmationScene = new Scene(confirmationLayout, 600, 600);
         primaryStage.setScene(confirmationScene);
     }
-
 
     // Method to show the SignIn page when Logout is clicked
     private void showSignInPage(Stage primaryStage) {

@@ -1,4 +1,5 @@
 package com.example._360helpsystem;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,7 +9,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 // Main class to handle initial Login/Signup buttons and navigation
@@ -18,32 +18,31 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         // StackPane to hold the background
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(500, 500, Color.web("#f8f5f3"));  // Very light grey
+        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey, size adjusted to 600x600
         backgroundPane.getChildren().add(background);
 
         // VBox layout to hold the "Sign In" and "Sign Up" buttons
-        VBox layout = new VBox(20);  // 20 is the spacing between elements
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(25, 25, 25, 25));
+        VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
+        layout.setSpacing(20);  // Add spacing between buttons for better layout
+        layout.setAlignment(Pos.CENTER);  // Center align the buttons
+        layout.setPadding(new Insets(20));  // Add padding to avoid edges
 
         // Create "Sign In" Button
-        Button signInOption = new Button("Sign In");
-        signInOption.setPrefWidth(200);
-        signInOption.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        signInOption.setFont(Font.font("Arial", 18));
+        Button signInOption = WindowUtil.createStyledButton("Sign In");
+        signInOption.setPrefWidth(250);  // Set button width to fit larger window
 
-        // Create "Sign Up" Button (For future implementation)
-        Button signUpOption = new Button("Sign Up");
-        signUpOption.setPrefWidth(200);
-        signUpOption.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        signUpOption.setFont(Font.font("Arial", 18));
+        // Create "Sign Up" Button
+        Button signUpOption = WindowUtil.createStyledButton("Sign Up");
+        signUpOption.setPrefWidth(250);  // Set button width to fit larger window
 
         // Add buttons to the layout
         layout.getChildren().addAll(signInOption, signUpOption);
         backgroundPane.getChildren().add(layout);
 
-        // Create scene for the initial screen
-        Scene scene = new Scene(backgroundPane, 500, 500);
+        // Create scene for the initial screen and set the window size to 600x600
+        Scene scene = new Scene(backgroundPane, 600, 600);
+
+        primaryStage.setTitle("Login/Signup");
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -51,15 +50,14 @@ public class Main extends Application {
         signInOption.setOnAction(e -> showSignInScreen(primaryStage));
 
         // "Sign Up" functionality is currently a placeholder
-       signUpOption.setOnAction(e -> showNewUserOtpScreen(primaryStage));
-        
+        signUpOption.setOnAction(e -> showNewUserOtpScreen(primaryStage));
     }
 
     // Method to show the Sign In screen (Main.java login form)
     private void showSignInScreen(Stage primaryStage) {
         SignIn mainLogin = new SignIn();
         try {
-            mainLogin.start(primaryStage);  // Open the Main.java login screen
+            mainLogin.start(primaryStage);  // Open the SignIn screen
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -67,15 +65,14 @@ public class Main extends Application {
 
     private void showNewUserOtpScreen(Stage primaryStage){
         NewUserOtp mainOtp = new NewUserOtp();
-            try{
+        try {
             mainOtp.start(primaryStage);
-            }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        launch(args);  // Ensure you're running LoginSignup as the entry point
+        launch(args);  // Ensure you're running Main.java as the entry point
     }
 }

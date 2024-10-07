@@ -5,10 +5,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 public class HomePage extends Application {
@@ -18,29 +18,31 @@ public class HomePage extends Application {
         // Top bar with "Home" label on the left and "Logout" button on the right
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10, 10, 10, 10));
-        topBar.setSpacing(10);
 
         // "Home" text on the left
-        Text homeText = new Text("Home");
+        Label homeText = WindowUtil.createStyledLabel("Home", 24);
         topBar.getChildren().add(homeText);
         HBox.setMargin(homeText, new Insets(0, 0, 0, 10));  // Extra padding for spacing
 
-        // "Logout" button on the right with the same style as Admin logout button
-        Button logoutButton = new Button("Logout");
-        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        logoutButton.setFont(Font.font("Arial", 18));
+        // Add spacer to push the "Logout" button to the right
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);  // Make the spacer grow to push the Logout button to the right
+        topBar.getChildren().add(spacer);
+
+        // "Logout" button on the right
+        Button logoutButton = WindowUtil.createStyledButton("Logout");
+        logoutButton.setFont(WindowUtil.createStyledLabel("Logout", 18).getFont());  // Consistent font
         topBar.getChildren().add(logoutButton);
 
-        // Align the "Logout" button to the right
-        topBar.setAlignment(Pos.TOP_RIGHT);
-        topBar.setSpacing(400);  // Adjust spacing to push "Home" to the left and "Logout" to the right
+        // Align the top bar
+        topBar.setAlignment(Pos.CENTER);
 
         // Create the main layout with the top bar
         BorderPane root = new BorderPane();
         root.setTop(topBar);
 
-        // Set the scene and show the stage
-        Scene scene = new Scene(root, 400, 300);
+        // Set the scene with the required window size
+        Scene scene = new Scene(root, 600, 600);  // Set to 600x600
         primaryStage.setTitle("Home Page");
         primaryStage.setScene(scene);
         primaryStage.show();
