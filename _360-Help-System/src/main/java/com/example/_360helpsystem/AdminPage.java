@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.Admin;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,6 +23,8 @@ public class AdminPage extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Title Text
+
+        Admin admin = new Admin();
         Text title = new Text("Admin Dashboard");
         title.setFont(Font.font("Arial", 36));
 
