@@ -1,11 +1,13 @@
 package com.example._360helpsystem;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -31,17 +33,32 @@ public class NewUserOtp extends Application {
         Button otpOkButton = WindowUtil.createStyledButton("OK");
         otpOkButton.setPrefWidth(120);  // Increase the button width for a better fit
 
+        // Create the circular back button using the utility class
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+
+        // Handle action for back button (currently prints a message)
+        backButton.setOnAction(e -> System.out.println("Back button clicked"));
+
         // VBox layout for OTP screen
         VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
         layout.setSpacing(20);  // Add spacing between elements for better layout
         layout.setAlignment(Pos.CENTER);  // Center the elements in the VBox
         layout.getChildren().addAll(otpText, otpField, otpOkButton);
 
-        // Add layout to the background pane
+        // Add VBox layout to background pane
         backgroundPane.getChildren().add(layout);
 
-        // Create scene and set the stage with the adjusted window size
-        Scene scene = new Scene(backgroundPane, 600, 600);  // Set scene size to 600x600
+        // Create a BorderPane to position the back button at the top left
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(backgroundPane);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
+        // Create the scene and set the stage with the adjusted window size
+        Scene scene = new Scene(root, 600, 600);  // Set scene size to 600x600
         primaryStage.setTitle("New User OTP");
         primaryStage.setScene(scene);
         primaryStage.show();

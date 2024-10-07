@@ -1,11 +1,15 @@
 package com.example._360helpsystem;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -53,8 +57,27 @@ public class CreateAdminAccount extends Application {
         // Add all elements to the layout
         layout.getChildren().addAll(prompt, usernameLabel, usernameField, passwordLabel, passwordField, createAdminButton);
 
+        // Create the circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+
+        // Handle back button action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+
+        // Add the layout to the background pane
+        StackPane backgroundPane = new StackPane();
+        backgroundPane.getChildren().add(layout);
+
+        // Create a BorderPane to position the back button at the top left
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(backgroundPane);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
         // Set standardized window size
-        Scene scene = new Scene(layout);
+        Scene scene = new Scene(root);
         WindowUtil.setWindowSize(primaryStage, scene, 600, 600);  // Standard size applied
 
         primaryStage.show();
@@ -71,5 +94,11 @@ public class CreateAdminAccount extends Application {
 
     private boolean checkIfUsersExist() {
         return false;  // For testing purposes, this is set to false
+    }
+
+    // Method to handle back button logic
+    private void showPreviousScreen(Stage primaryStage) {
+        // Implement your logic to go back to the previous screen
+        System.out.println("Back button clicked - returning to the previous screen.");
     }
 }

@@ -37,9 +37,25 @@ public class HomePage extends Application {
         // Align the top bar
         topBar.setAlignment(Pos.CENTER);
 
-        // Create the main layout with the top bar
+        // Create the circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+
+        // Handle back button action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+
+        // Create the main layout with the top bar and back button
         BorderPane root = new BorderPane();
         root.setTop(topBar);
+
+        // Create a BorderPane to position the back button at the top left
+        BorderPane backButtonPane = new BorderPane();
+        backButtonPane.setTop(backButton);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
+        root.setLeft(backButtonPane);
 
         // Set the scene with the required window size
         Scene scene = new Scene(root, 600, 600);  // Set to 600x600
@@ -59,6 +75,12 @@ public class HomePage extends Application {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    // Method to handle back button logic
+    private void showPreviousScreen(Stage primaryStage) {
+        // Implement your logic to go back to the previous screen
+        System.out.println("Back button clicked - returning to the previous screen.");
     }
 
     public static void main(String[] args) {

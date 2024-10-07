@@ -6,12 +6,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class SignIn extends Application {
@@ -33,6 +35,7 @@ public class SignIn extends Application {
 
         // Create the Sign In heading using the standardized label style
         Label headingText = WindowUtil.createStyledLabel("Sign In", 24);
+        headingText.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         headingText.setTextFill(Color.web("#8b0000"));  // Set custom color for the heading
         grid.add(headingText, 0, 0, 2, 1);  // Span heading across 2 columns
 
@@ -72,9 +75,26 @@ public class SignIn extends Application {
         loginButtonBox.getChildren().add(loginButton);
         grid.add(loginButtonBox, 1, 4);  // Add button to the second column, new row
 
+        // Create the circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+
+        // Handle back button action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+
         // Add everything to the background pane and set up the scene
         backgroundPane.getChildren().add(grid);
-        Scene scene = new Scene(backgroundPane, 600, 600);  // Set scene size to 600x600
+
+        // Create a BorderPane to position the back button at the top left
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(backgroundPane);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
+        // Set the scene size to 600x600 and make all elements visible
+        Scene scene = new Scene(root, 600, 600);  // Set scene size to 600x600
         primaryStage.setTitle("Sign In");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -87,6 +107,12 @@ public class SignIn extends Application {
 
         // Action for the "Forgot Password" link
         forgotPasswordLink.setOnAction(e -> showForgotPasswordOtpScreen(primaryStage));
+    }
+
+    // Method to go back to the previous screen
+    private void showPreviousScreen(Stage primaryStage) {
+        // Implement your logic to go back to the previous screen
+        System.out.println("Back button clicked - returning to the previous screen.");
     }
 
     // Method to show the "Forgot Password" screen

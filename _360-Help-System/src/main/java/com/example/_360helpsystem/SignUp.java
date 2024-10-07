@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -61,11 +62,26 @@ public class SignUp extends Application {
         signUpButton.setPrefWidth(150);  // Increased width to match the larger screen
         grid.add(signUpButton, 1, 4);
 
+        // Create the circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+
+        // Handle back button action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
+
         // Add grid to background pane
         backgroundPane.getChildren().add(grid);
 
+        // Create a BorderPane to position the back button at the top left
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(backgroundPane);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
         // Set the scene size to 600x600 and make all elements visible
-        Scene scene = new Scene(backgroundPane, 600, 600);  // Adjusted scene size to 600x600
+        Scene scene = new Scene(root, 600, 600);  // Adjusted scene size to 600x600
         primaryStage.setTitle("Sign Up");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);  // Disable resizing to keep the layout consistent
@@ -73,6 +89,12 @@ public class SignUp extends Application {
 
         // Sign Up button event handler
         signUpButton.setOnAction(e -> showUserDetailsScreen(primaryStage));
+    }
+
+    // Method to go back to the previous screen
+    private void showPreviousScreen(Stage primaryStage) {
+        // Implement logic to return to the previous screen
+        System.out.println("Back button clicked - returning to the previous screen.");
     }
 
     // Method to show the UserDetails screen

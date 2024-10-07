@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -38,8 +39,23 @@ public class SignInAs extends Application {
         layout.setSpacing(20);  // Adjusted spacing between elements
         layout.getChildren().addAll(title, instructorButton, studentButton, adminButton);
 
+        // Create the circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+
+        // Handle back button action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+
+        // Create a BorderPane to position the back button at the top left
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(layout);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
         // Create scene for the "Login As" screen with a window size of 600x600
-        Scene loginAsScene = new Scene(layout, 600, 600);  // Set the window size to 600x600
+        Scene loginAsScene = new Scene(root, 600, 600);  // Set the window size to 600x600
 
         // Set the scene and show the stage
         primaryStage.setScene(loginAsScene);
@@ -51,6 +67,12 @@ public class SignInAs extends Application {
         adminButton.setOnAction(e -> showAdminPageScreen(primaryStage));
         studentButton.setOnAction(e -> showHomePageScreen(primaryStage));
         instructorButton.setOnAction(e -> showHomePageScreen(primaryStage));
+    }
+
+    // Method to go back to the previous screen
+    private void showPreviousScreen(Stage primaryStage) {
+        // Implement your logic to go back to the previous screen
+        System.out.println("Back button clicked - returning to the previous screen.");
     }
 
     private void showAdminPageScreen(Stage primaryStage) {
