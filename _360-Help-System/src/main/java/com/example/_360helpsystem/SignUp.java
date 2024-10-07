@@ -93,8 +93,13 @@ public class SignUp extends Application {
 
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
-        // Implement logic to return to the previous screen
-        System.out.println("Back button clicked - returning to the previous screen.");
+      NewUserOtp newUserOtp = new NewUserOtp();
+      try{
+          newUserOtp.start(primaryStage);
+      }
+      catch(Exception ex){
+          ex.printStackTrace();
+      }
     }
 
     // Method to show the UserDetails screen

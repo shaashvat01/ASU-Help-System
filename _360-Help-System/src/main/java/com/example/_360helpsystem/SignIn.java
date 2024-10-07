@@ -111,8 +111,13 @@ public class SignIn extends Application {
 
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
-        // Implement your logic to go back to the previous screen
-        System.out.println("Back button clicked - returning to the previous screen.");
+        Main main = new Main();
+        try{
+            main.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     // Method to show the "Forgot Password" screen

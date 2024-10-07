@@ -105,9 +105,13 @@ public class UserDetails extends Application {
 
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
-        // This is where you implement the previous screen logic, for example:
-        System.out.println("Back button clicked - returning to the previous screen.");
-        // Add your logic to navigate back, e.g., show the OTP screen or login screen
+        SignUp signUp = new SignUp();
+        try{
+            signUp.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     // Method to show the Sign In screen

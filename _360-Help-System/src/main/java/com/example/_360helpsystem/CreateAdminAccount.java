@@ -98,7 +98,13 @@ public class CreateAdminAccount extends Application {
 
     // Method to handle back button logic
     private void showPreviousScreen(Stage primaryStage) {
-        // Implement your logic to go back to the previous screen
-        System.out.println("Back button clicked - returning to the previous screen.");
-    }
+        Main main = new Main();
+        try{
+            main.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+
+        }
 }

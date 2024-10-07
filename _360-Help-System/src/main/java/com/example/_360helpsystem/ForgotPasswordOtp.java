@@ -82,8 +82,13 @@ public class ForgotPasswordOtp extends Application {
 
     // Method to handle back button logic
     private void showPreviousScreen(Stage primaryStage) {
-        // Implement your logic to go back to the previous screen
-        System.out.println("Back button clicked - returning to the previous screen.");
+        SignIn signIn = new SignIn();
+        try{
+            signIn.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

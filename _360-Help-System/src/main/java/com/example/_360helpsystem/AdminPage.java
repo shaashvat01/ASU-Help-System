@@ -306,41 +306,58 @@ public class AdminPage extends Application {
         confirmationStage.initModality(Modality.APPLICATION_MODAL);
         confirmationStage.setTitle("Confirmation");
 
-
         VBox confirmationLayout = new VBox(10);
         confirmationLayout.setPadding(new Insets(20));
         confirmationLayout.setAlignment(Pos.CENTER);
 
-
         Text confirmationMessage = new Text("Are you sure you want to delete user: " + username + "?");
-
+        confirmationMessage.setFont(Font.font("Arial", 18));  // Make the font size larger for better readability
 
         Button yesButton = new Button("Yes");
         Button noButton = new Button("No");
         yesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         noButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
 
-
         yesButton.setOnAction(e -> {
             confirmationStage.close();
-            System.out.println("User " + username + " deleted.");
-            primaryStage.setScene(new Scene(new VBox(new Text("User " + username + " deleted.")), 600, 600));
+            showUserDeletedScreen(primaryStage, username);  // Call method to show final delete screen
         });
 
-
         noButton.setOnAction(e -> confirmationStage.close());
-
 
         HBox buttonLayout = new HBox(10, yesButton, noButton);
         buttonLayout.setAlignment(Pos.CENTER);
 
-
         confirmationLayout.getChildren().addAll(confirmationMessage, buttonLayout);
 
-
-        Scene confirmationScene = new Scene(confirmationLayout, 300, 150);
+        Scene confirmationScene = new Scene(confirmationLayout, 400, 250);
         confirmationStage.setScene(confirmationScene);
         confirmationStage.showAndWait();
+    }
+
+    // Method to show the final "User Deleted" screen
+    private void showUserDeletedScreen(Stage primaryStage, String username) {
+        // Create layout for the final confirmation
+        BorderPane userDeletedLayout = new BorderPane();
+
+        // Message in the center
+        Text deletedMessage = new Text("User " + username + " deleted.");
+        deletedMessage.setFont(Font.font("Arial", 24));  // Set larger font size
+        BorderPane.setAlignment(deletedMessage, Pos.CENTER);
+
+        // Back button on the left
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> start(primaryStage));  // Navigate back to the admin dashboard or previous screen
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
+        // Add message and back button to the layout
+        userDeletedLayout.setCenter(deletedMessage);
+        userDeletedLayout.setTop(backButton);
+
+        // Create scene and set on the primary stage
+        Scene userDeletedScene = new Scene(userDeletedLayout, 600, 600);
+        primaryStage.setScene(userDeletedScene);
     }
 
 

@@ -36,9 +36,6 @@ public class NewUserOtp extends Application {
         // Create the circular back button using the utility class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
 
-        // Handle action for back button (currently prints a message)
-        backButton.setOnAction(e -> System.out.println("Back button clicked"));
-
         // VBox layout for OTP screen
         VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
         layout.setSpacing(20);  // Add spacing between elements for better layout
@@ -65,6 +62,7 @@ public class NewUserOtp extends Application {
 
         // Handle OK button action to redirect to the sign-up screen
         otpOkButton.setOnAction(e -> showSignUpScreen(primaryStage));
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
     }
 
     // Method to show the Sign Up screen
@@ -73,6 +71,16 @@ public class NewUserOtp extends Application {
         try {
             mainSignUp.start(primaryStage);
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void showPreviousScreen(Stage primaryStage) {
+        Main main = new Main();
+        try{
+            main.start(primaryStage);
+        }
+        catch(Exception ex){
             ex.printStackTrace();
         }
     }

@@ -79,8 +79,13 @@ public class HomePage extends Application {
 
     // Method to handle back button logic
     private void showPreviousScreen(Stage primaryStage) {
-        // Implement your logic to go back to the previous screen
-        System.out.println("Back button clicked - returning to the previous screen.");
+        SignInAs signInAs = new SignInAs();
+        try{
+            signInAs.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

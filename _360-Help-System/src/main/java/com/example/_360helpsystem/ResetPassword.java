@@ -87,9 +87,14 @@ public class ResetPassword extends Application {
 
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
-        // Implement your logic to go back to the previous screen
-        System.out.println("Back button clicked - returning to the previous screen.");
-    }
+        ForgotPasswordOtp forgotPasswordOtp = new ForgotPasswordOtp();
+        try{
+            forgotPasswordOtp.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+         }
 
     private void showSignInScreen(Stage primaryStage) {
         SignIn signIn = new SignIn();
