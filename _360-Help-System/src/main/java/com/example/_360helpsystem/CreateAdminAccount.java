@@ -1,5 +1,8 @@
 package com.example._360helpsystem;
 
+import Backend.OTPList;
+import Backend.Update_DB;
+import Backend.UserList;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,8 +15,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+//INTEGRATED
+//NEEDS ANOTHER CONFIRM NEW PASSWORD TEXTBOX
 public class CreateAdminAccount extends Application {
+
+    public static UserList USER_LIST = new UserList();
+    public static OTPList OTP_LIST = new OTPList();
+
+    Update_DB UDB = new Update_DB();
 
     public static void main(String[] args) {
         launch(args);
@@ -22,14 +31,21 @@ public class CreateAdminAccount extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Check if users exist (if none exist, show the first-time setup screen)
+        initializeDB();
         boolean usersExist = checkIfUsersExist();
 
         if (!usersExist) {
             showFirstTimeSetupScreen(primaryStage);  // Show the Admin creation screen
         } else {
-            System.out.println("Users already exist, redirect to login.");
+            openMainScreen(primaryStage);
         }
     }
+
+    private void openMainScreen(Stage primaryStage) {
+        Main main = new Main();
+        main.start(primaryStage);
+    }
+
 
     // Method to show the first-time setup screen
     private void showFirstTimeSetupScreen(Stage primaryStage) {
@@ -52,7 +68,14 @@ public class CreateAdminAccount extends Application {
         Button createAdminButton = WindowUtil.createStyledButton("Create Admin Account");
 
         // Action to create the Admin account
-        createAdminButton.setOnAction(e -> showUserDetailsScreen(primaryStage));
+        createAdminButton.setOnAction(e -> {
+            // Store the entered username and password
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            // Show the user details screen
+            showUserDetailsScreen(primaryStage,username,password);
+        });
 
         // Add all elements to the layout
         layout.getChildren().addAll(prompt, usernameLabel, usernameField, passwordLabel, passwordField, createAdminButton);
@@ -83,8 +106,9 @@ public class CreateAdminAccount extends Application {
         primaryStage.show();
     }
 
-    private void showUserDetailsScreen(Stage primaryStage) {
-        UserDetails userDetails = new UserDetails();
+
+    private void showUserDetailsScreen(Stage primaryStage,String username,String password) {
+        UserDetails userDetails = new UserDetails(username, password); // Pass username and password
         try {
             userDetails.start(primaryStage);
         } catch (Exception ex) {
@@ -93,7 +117,10 @@ public class CreateAdminAccount extends Application {
     }
 
     private boolean checkIfUsersExist() {
-        return false;  // For testing purposes, this is set to false
+        if(USER_LIST.getUserList().isEmpty()) {
+            return false;
+        }
+        return true;  // For testing purposes, this is set to false
     }
 
     // Method to handle back button logic
@@ -106,5 +133,18 @@ public class CreateAdminAccount extends Application {
             ex.printStackTrace();
         }
 
-        }
+    }
+
+    private void initializeDB()
+    {
+        UDB.loadUserDB(USER_LIST);
+        UDB.loadOTPDB(OTP_LIST);
+    }
+
+    public void stop() {
+        // Save user and OTP databases when the application is closing
+        UDB.saveUserDB(USER_LIST);
+        UDB.saveOTPDB(OTP_LIST);
+        System.out.println("Databases saved successfully.");
+    }
 }

@@ -9,41 +9,63 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import Backend.*;
+// INTEGRATED
 public class SignInAs extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Get the currently logged-in user
+        User currentUser = SignIn.CURRENT_USER;
+
         // Title Text
         Label title = WindowUtil.createStyledLabel("LOGIN AS", 36);  // Adjusted font size to fit within 600x600 screen
-
-        // Admin Button using WindowUtil's standardized button style
-        Button adminButton = WindowUtil.createStyledButton("Admin");
-        adminButton.setFont(WindowUtil.createStyledLabel("Admin", 20).getFont());  // Adjusted button font size
-        adminButton.setPrefWidth(250);  // Adjusted button width for smaller screen
-
-        // Instructor Button
-        Button instructorButton = WindowUtil.createStyledButton("INSTRUCTOR");
-        instructorButton.setFont(WindowUtil.createStyledLabel("INSTRUCTOR", 20).getFont());  // Consistent font size
-        instructorButton.setPrefWidth(250);  // Adjusted button width
-
-        // Student Button
-        Button studentButton = WindowUtil.createStyledButton("STUDENT");
-        studentButton.setFont(WindowUtil.createStyledLabel("STUDENT", 20).getFont());  // Consistent font size
-        studentButton.setPrefWidth(250);  // Adjusted button width
 
         // VBox layout using WindowUtil
         VBox layout = WindowUtil.createStandardLayout();  // Standardized VBox layout
         layout.setPadding(new Insets(30, 30, 30, 30));  // Adjusted padding for 600x600 screen
         layout.setAlignment(Pos.CENTER);  // Center the layout
         layout.setSpacing(20);  // Adjusted spacing between elements
-        layout.getChildren().addAll(title, instructorButton, studentButton, adminButton);
+
+        // Conditionally add buttons based on the user role
+        if (currentUser.isAdmin()) {
+            // Admin Button
+            Button adminButton = WindowUtil.createStyledButton("Admin");
+            adminButton.setFont(WindowUtil.createStyledLabel("Admin", 20).getFont());  // Adjusted button font size
+            adminButton.setPrefWidth(250);  // Adjusted button width for smaller screen
+            layout.getChildren().add(adminButton);
+
+            // Admin page action
+            adminButton.setOnAction(e -> showAdminPageScreen(primaryStage));
+        }
+
+        if (currentUser.isInstructor()) {
+            // Instructor Button
+            Button instructorButton = WindowUtil.createStyledButton("INSTRUCTOR");
+            instructorButton.setFont(WindowUtil.createStyledLabel("INSTRUCTOR", 20).getFont());  // Consistent font size
+            instructorButton.setPrefWidth(250);  // Adjusted button width
+            layout.getChildren().add(instructorButton);
+
+            // Instructor page action
+            instructorButton.setOnAction(e -> showHomePageScreen(primaryStage));
+        }
+
+        if (currentUser.isStudent()) {
+            // Student Button
+            Button studentButton = WindowUtil.createStyledButton("STUDENT");
+            studentButton.setFont(WindowUtil.createStyledLabel("STUDENT", 20).getFont());  // Consistent font size
+            studentButton.setPrefWidth(250);  // Adjusted button width
+            layout.getChildren().add(studentButton);
+
+            // Student page action
+            studentButton.setOnAction(e -> showHomePageScreen(primaryStage));
+        }
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
 
         // Handle back button action
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
         // Create a BorderPane to position the back button at the top left
         BorderPane root = new BorderPane();
@@ -62,20 +84,14 @@ public class SignInAs extends Application {
         primaryStage.setTitle("Login As");
         primaryStage.setResizable(false);  // Disable resizing to keep consistent layout
         primaryStage.show();
-
-        // Button actions
-        adminButton.setOnAction(e -> showAdminPageScreen(primaryStage));
-        studentButton.setOnAction(e -> showHomePageScreen(primaryStage));
-        instructorButton.setOnAction(e -> showHomePageScreen(primaryStage));
     }
 
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
         SignIn signIn = new SignIn();
-        try{
+        try {
             signIn.start(primaryStage);
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

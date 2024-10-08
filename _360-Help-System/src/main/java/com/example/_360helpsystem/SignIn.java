@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.*;
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -16,7 +17,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+
+// INTEGRATED
 public class SignIn extends Application {
+
+    public static User CURRENT_USER;  // Declare the User as an instance variable
 
     @Override
     public void start(Stage primaryStage) {
@@ -101,8 +107,27 @@ public class SignIn extends Application {
 
         // Set action for the login button
         loginButton.setOnAction(e -> {
-            SignInAs loginAsScreen = new SignInAs();
-            loginAsScreen.start(primaryStage);
+            // Get the entered username and password
+            String enteredUsername = usernameField.getText().trim();
+            String enteredPassword = passwordField.getText().trim();
+
+            // Check if the username exists in the UserList
+            User foundUser = USER_LIST.findUser(enteredUsername);
+
+            if (foundUser != null) {
+                // If the user exists, check the password
+                if (foundUser.getPassword().equals(enteredPassword)) {
+                    // If the password matches, proceed to the next screen
+                    SignInAs loginAsScreen = new SignInAs();
+                    CURRENT_USER = foundUser;
+                    loginAsScreen.start(primaryStage);
+                } else {
+                    // If the password is incorrect, show an alert
+                }
+            } else {
+                // If the username doesn't exist, show an alert
+
+            }
         });
 
         // Action for the "Forgot Password" link

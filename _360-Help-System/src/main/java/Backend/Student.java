@@ -9,8 +9,8 @@ public class Student extends User {
         this.isStudent = true;  // Set Student-specific roles
     }
     
-    public Student(String username, String password, String email, String firstName, String middleName, String lastName) {
-        super(username, password, email, firstName, middleName, lastName);  // Calls the parameterized constructor of User
+    public Student(String username, String password, String email, String firstName, String middleName, String lastName,String preferredName) {
+        super(username, password, email, firstName, middleName, lastName,preferredName);  // Calls the parameterized constructor of User
         this.isStudent = true;  // Set Student-specific roles
     }
     

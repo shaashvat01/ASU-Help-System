@@ -1,5 +1,7 @@
 package com.example._360helpsystem;
 
+import Backend.*;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,7 +16,23 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+
+// INTEGRATED
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+
 public class UserDetails extends Application {
+
+    private String username;
+    private String password;
+
+    public UserDetails(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public UserDetails() {
+
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -100,7 +118,23 @@ public class UserDetails extends Application {
         primaryStage.setResizable(false);  // Disable resizing to keep the layout consistent
         primaryStage.show();
 
-        saveButton.setOnAction(e -> showSignInScreen(primaryStage));  // Save button action
+        saveButton.setOnAction(e -> {
+            // Collect the user details
+            String firstName = firstNameField.getText();
+            String middleName = middleNameField.getText();
+            String lastName = lastNameField.getText();
+            String preferredName = preferredNameField.getText();
+            String email = emailField.getText();
+
+            // Create a new Admin object
+            Admin newAdmin = new Admin(username, password, email, firstName, middleName, lastName, preferredName);
+
+            // Add the Admin object to the UserList
+            USER_LIST.getUserList().add(newAdmin);  // Assuming getUserList() returns the LinkedList of User objects
+
+            // Optionally, show a confirmation or navigate to another screen
+            showSignInScreen(primaryStage);  // Navigate to the Sign In screen
+        });
     }
 
     // Method to go back to the previous screen

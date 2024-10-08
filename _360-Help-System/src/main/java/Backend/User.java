@@ -9,10 +9,12 @@ public class User {
 	protected String firstName;
 	protected String middleName;
 	protected String lastName;
+	protected String preferredName;
 	protected boolean isStudent;
 	protected boolean isAdmin;
 	protected boolean isInstructor;
 	protected boolean isAccountSetupComplete;
+	protected int accResetOTP;
 	
 	// Default constructor that initializes all fields with default values
 	public User() {
@@ -22,24 +24,28 @@ public class User {
 		this.firstName = "";
 		this.middleName = "";
 		this.lastName = "";
+		this.preferredName = "";
 		this.isStudent = false;
 		this.isAdmin = false;
 		this.isInstructor = false;
 		this.isAccountSetupComplete = false;
+		this.accResetOTP = 1000000;
 	}
 	
 	// Parameterized constructor to initialize a user with specific values
-	public User(String username, String password, String email, String firstName, String middleName, String lastName) {
+	public User(String username, String password, String email, String firstName, String middleName, String lastName,String preferredName) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.lastName = lastName;
+		this.preferredName = preferredName;
 		this.isStudent = false;  // User role defaults to none (admin/student/instructor must be set later)
 		this.isAdmin = false;
 		this.isInstructor = false;
 		this.isAccountSetupComplete = false;  // Account setup is incomplete by default
+		this.accResetOTP = 1000000;
 	}
 	
 	// Getter and setter methods for the username
@@ -88,10 +94,19 @@ public class User {
 	}
 	
 	// Getter and setter methods for the last name
+	public void setPreferredName(String preferredName) {
+		this.preferredName = preferredName;
+	}
+	
+	public String getPreferredName() {
+		return this.preferredName;
+	}
+
+	// Getter and setter methods for the last name
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	
+
 	public String getLastName() {
 		return this.lastName;
 	}
@@ -135,4 +150,8 @@ public class User {
 	public void setStudent() {
 		this.isStudent = true;
 	}
+
+	public void setAccResetOTP(int accResetOTP) {this.accResetOTP = accResetOTP;}
+
+	public int getAccResetOTP() {return this.accResetOTP;}
 }

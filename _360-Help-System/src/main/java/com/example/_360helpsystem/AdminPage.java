@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
-import Backend.Admin;
+import Backend.*;
+import Backend.OTP_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,8 +15,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
+// INTEGRATED INVITE USER
+// INTEGRATED DELETE ACCOUNT
 public class AdminPage extends Application {
+
+    OTP_Generator otpGenerator = new OTP_Generator();
 
     @Override
     public void start(Stage primaryStage) {
@@ -193,9 +200,10 @@ public class AdminPage extends Application {
         inviteLayout.add(emailLabel, 0, 1);
         inviteLayout.add(emailField, 1, 1);
 
-
-        inviteLayout.add(new CheckBox("Student"), 0, 2);
-        inviteLayout.add(new CheckBox("Instructor"), 1, 2);
+        CheckBox S_check = new CheckBox("Student");
+        CheckBox I_check = new CheckBox("Instructor");
+        inviteLayout.add(S_check, 0, 2);
+        inviteLayout.add(I_check, 1, 2);
 
 
         Button inviteButton = new Button("Invite");
@@ -204,7 +212,45 @@ public class AdminPage extends Application {
         inviteLayout.add(inviteButton, 0, 3, 2, 1);
 
 
-        inviteButton.setOnAction(e -> showInvitationSentScreen(primaryStage, emailField.getText()));
+        inviteButton.setOnAction(e ->{
+
+            String email = emailField.getText();
+            boolean isStudent = S_check.isSelected();
+            boolean isInstructor = I_check.isSelected();
+
+            // Create a new User based on the selection
+            User newUser = null;
+            if (isStudent) {
+                // Create a Student user with only email
+                newUser = new Student("", "", email, "", "", "", ""); // Use the Student constructor
+            }
+
+            if (isInstructor) {
+                // Create an Instructor user with only email
+                if (newUser == null) {
+                    newUser = new Instructor("", "", email, "", "", "", ""); // Use the Instructor constructor
+                } else {
+                    // If both roles are selected, create a new Instructor from the existing Student
+                    ((Student) newUser).setInstructor(); // Casting to set the instructor role
+                }
+            }
+
+            // Add the new user to the USER_LIST
+            if (newUser != null) {
+                USER_LIST.addUser(newUser);
+
+                // Generate OTP and add to OTP_LIST
+                int generatedOtp = otpGenerator.generateOTP();
+                OTP_LIST.addOTP(generatedOtp);
+                System.out.println(OTP_LIST.toString());
+                newUser.setAccResetOTP(generatedOtp);
+
+                // Optionally, show some confirmation or proceed to the next screen
+                System.out.println("New user added: " + newUser.getEmail() + " | OTP: " + generatedOtp);
+            }
+            showInvitationSentScreen(primaryStage, emailField.getText());
+        });
+
 
 
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -280,7 +326,17 @@ public class AdminPage extends Application {
         deleteLayout.add(deleteUserButton, 0, 2, 2, 1);
 
 
-        deleteUserButton.setOnAction(e -> showConfirmationDialog(primaryStage, usernameField.getText()));
+        deleteUserButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            User toDelete = USER_LIST.findUser(username);
+            boolean userRemoved = USER_LIST.removeUser(toDelete); // Call the remove method
+
+            if (userRemoved) {
+                showConfirmationDialog(primaryStage, "User " + username + " has been deleted successfully.");
+            } else {
+                showConfirmationDialog(primaryStage, "User " + username + " not found.");
+            }
+        });
 
 
         Button backButton = ButtonStyleUtil.createCircularBackButton();

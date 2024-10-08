@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.OTPList;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,7 +15,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
+
 public class NewUserOtp extends Application {
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -61,7 +65,30 @@ public class NewUserOtp extends Application {
         primaryStage.show();
 
         // Handle OK button action to redirect to the sign-up screen
-        otpOkButton.setOnAction(e -> showSignUpScreen(primaryStage));
+        otpOkButton.setOnAction(e -> {
+            String otpInput = otpField.getText();
+
+            try {
+                int otp = Integer.parseInt(otpInput);  // Parse input to an integer
+
+                // Check if OTP exists in OTP_LIST
+                if (OTP_LIST.findOTP(otp)) {
+                    if(OTP_LIST.removeOTP(otp))// Remove the OTP after validation
+                    {
+                        showSignUpScreen(primaryStage);  // Navigate to Sign-Up screen
+                    }
+
+                } else {
+                    // Optionally show an error message if OTP is invalid
+                    System.out.println("Invalid OTP. Please try again.");
+                    // You could also show a dialog or label to inform the user
+                }
+            } catch (NumberFormatException ex) {
+                // Handle case where input is not a valid integer
+                System.out.println("Please enter a valid 6-digit OTP.");
+            }
+        });
+
         backButton.setOnAction(e -> showPreviousScreen(primaryStage));
     }
 
