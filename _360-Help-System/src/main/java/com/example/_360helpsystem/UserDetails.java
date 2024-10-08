@@ -140,7 +140,7 @@ public class UserDetails extends Application {
             {
 
                 USER_LIST.getUserList().add(new Student(username, password, email, firstName, middleName, lastName, preferredName));  // getUserList() returns the LinkedList of User objects
-                USER_LIST.findUser(username).setInstructor();
+                USER_LIST.findUser(username).setInstructor(true);
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
             if(this.Role.equals("S"))

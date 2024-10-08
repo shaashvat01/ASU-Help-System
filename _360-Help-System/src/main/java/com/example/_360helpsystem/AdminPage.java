@@ -5,10 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -116,65 +113,111 @@ public class AdminPage extends Application {
         userModificationsLayout.setHgap(20);
         userModificationsLayout.setAlignment(Pos.CENTER);
 
-
         Text userModificationsTitle = new Text("User Accounts & Modifications");
         userModificationsTitle.setFont(Font.font("Arial", 36));
         userModificationsLayout.add(userModificationsTitle, 0, 0, 4, 1);
-
 
         Label usernameHeader = new Label("Username");
         Label nameHeader = new Label("Name");
         Label roleHeader = new Label("Roles");
         Label actionsHeader = new Label("Actions");
 
-
         usernameHeader.setFont(Font.font("Arial", 18));
         nameHeader.setFont(Font.font("Arial", 18));
         roleHeader.setFont(Font.font("Arial", 18));
         actionsHeader.setFont(Font.font("Arial", 18));
-
 
         userModificationsLayout.add(usernameHeader, 0, 1);
         userModificationsLayout.add(nameHeader, 1, 1);
         userModificationsLayout.add(roleHeader, 2, 1);
         userModificationsLayout.add(actionsHeader, 3, 1);
 
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(userModificationsLayout);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefHeight(400);
 
-        Label usernameLabel1 = new Label("");
-        Label nameLabel1 = new Label("");
-        Label roleLabel1 = new Label("");
+        int count = 0;
 
+        for (User user : USER_LIST.getUserList()) {
 
-        Button addRoleButton1 = new Button("Add Role");
-        Button deleteRoleButton1 = new Button("Delete Role");
+            // Skip the admin account, assuming the admin role is represented by user.isAdmin()
+            if (user.isAdmin()) {
+                continue; // Skip this iteration and don't display the admin account
+            }
 
+            Label usernameLabel = new Label(user.getUserName());
+            String name = user.getPreferredName().isEmpty() ? user.getFirstName() : user.getPreferredName();
+            Label nameLabel = new Label(name);
 
-        addRoleButton1.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        deleteRoleButton1.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            // Checkboxes for roles (non-editable)
+            CheckBox studentCheckbox = new CheckBox("S");
+            CheckBox instructorCheckbox = new CheckBox("I");
 
+            studentCheckbox.setSelected(user.isStudent());
+            studentCheckbox.setDisable(true);  // Disable editing
+            instructorCheckbox.setSelected(user.isInstructor());
+            instructorCheckbox.setDisable(true);  // Disable editing
 
-        HBox buttonBox1 = new HBox(10);
-        buttonBox1.getChildren().addAll(addRoleButton1, deleteRoleButton1);
+            HBox rolesBox = new HBox(10);
+            rolesBox.getChildren().addAll(studentCheckbox, instructorCheckbox);
 
+            // Action buttons depending on the role
+            Button studentActionButton = new Button(user.isStudent() ? "Remove Student" : "Make Student");
+            Button instructorActionButton = new Button(user.isInstructor() ? "Remove Instructor" : "Make Instructor");
 
-        userModificationsLayout.add(usernameLabel1, 0, 2);
-        userModificationsLayout.add(nameLabel1, 1, 2);
-        userModificationsLayout.add(roleLabel1, 2, 2);
-        userModificationsLayout.add(buttonBox1, 3, 2);
+            // Style the buttons
+            studentActionButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            instructorActionButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
 
+            // Add action to studentActionButton
+            studentActionButton.setOnAction(e -> {
+                if (user.isStudent()) {
+                    user.setStudent(false);
+                    studentActionButton.setText("Make Student");
+                    studentCheckbox.setSelected(false);
+                } else {
+                    user.setStudent(true);
+                    studentActionButton.setText("Remove Student");
+                    studentCheckbox.setSelected(true);
+                }
+            });
 
+            // Add action to instructorActionButton
+            instructorActionButton.setOnAction(e -> {
+                if (user.isInstructor()) {
+                    user.setInstructor(false);
+                    instructorActionButton.setText("Make Instructor");
+                    instructorCheckbox.setSelected(false);
+                } else {
+                    user.setInstructor(true);
+                    instructorActionButton.setText("Remove Instructor");
+                    instructorCheckbox.setSelected(true);
+                }
+            });
+
+            HBox actionBox = new HBox(10);
+            actionBox.getChildren().addAll(studentActionButton, instructorActionButton);
+
+            // Add to grid layout
+            userModificationsLayout.add(usernameLabel, 0, count + 2);
+            userModificationsLayout.add(nameLabel, 1, count + 2);
+            userModificationsLayout.add(rolesBox, 2, count + 2);
+            userModificationsLayout.add(actionBox, 3, count + 2);
+
+            count++; // Increment the row count for each displayed user
+        }
+
+        // Back button
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
 
-
         BorderPane root = new BorderPane();
         root.setTop(backButton);
-        root.setCenter(userModificationsLayout);
-
+        root.setCenter(scrollPane);
 
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
-
 
         Scene userModificationsScene = new Scene(root, 600, 600);
         primaryStage.setScene(userModificationsScene);
@@ -231,7 +274,7 @@ public class AdminPage extends Application {
                     newUser = new Instructor("", "", email, "", "", "", ""); // Use the Instructor constructor
                 } else {
                     // If both roles are selected, create a new Instructor from the existing Student
-                    ((Student) newUser).setInstructor(); // Casting to set the instructor role
+                    ((Student) newUser).setInstructor(true); // Casting to set the instructor role
                 }
             }
 

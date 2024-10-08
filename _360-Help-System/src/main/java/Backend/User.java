@@ -142,14 +142,12 @@ public class User {
 	}
 	
 	// Setter method to make the user an instructor
-	public void setInstructor() {
-		this.isInstructor = true;
+	public void setInstructor(Boolean bool) {
+		this.isInstructor = bool;
 	}
 	
 	// Setter method to make the user a student
-	public void setStudent() {
-		this.isStudent = true;
-	}
+	public void setStudent(Boolean bool) {this.isStudent = bool;}
 
 	public void setAccOTP(int accOTP) {this.accOTP = accOTP;}
 
