@@ -1,77 +1,103 @@
 package com.example._360helpsystem;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class SignInAs extends Application {
 
+    @Override
     public void start(Stage primaryStage) {
         // Title Text
-        Text title = new Text("LOGIN AS");
-        title.setFont(Font.font("Arial", 36));
+        Label title = WindowUtil.createStyledLabel("LOGIN AS", 36);  // Adjusted font size to fit within 600x600 screen
 
-        //Admin Button
-        Button adminButton = new Button("Admin");
-        adminButton.setFont(Font.font("Arial", 20));
-        adminButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        adminButton.setPrefWidth(200);
+        // Admin Button using WindowUtil's standardized button style
+        Button adminButton = WindowUtil.createStyledButton("Admin");
+        adminButton.setFont(WindowUtil.createStyledLabel("Admin", 20).getFont());  // Adjusted button font size
+        adminButton.setPrefWidth(250);  // Adjusted button width for smaller screen
 
         // Instructor Button
-        Button instructorButton = new Button("INSTRUCTOR");
-        instructorButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        instructorButton.setFont(Font.font("Arial", 18));
-        instructorButton.setPrefWidth(200);
+        Button instructorButton = WindowUtil.createStyledButton("INSTRUCTOR");
+        instructorButton.setFont(WindowUtil.createStyledLabel("INSTRUCTOR", 20).getFont());  // Consistent font size
+        instructorButton.setPrefWidth(250);  // Adjusted button width
 
         // Student Button
-        Button studentButton = new Button("STUDENT");
-        studentButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        studentButton.setFont(Font.font("Arial", 18));
-        studentButton.setPrefWidth(200);
+        Button studentButton = WindowUtil.createStyledButton("STUDENT");
+        studentButton.setFont(WindowUtil.createStyledLabel("STUDENT", 20).getFont());  // Consistent font size
+        studentButton.setPrefWidth(250);  // Adjusted button width
 
-        // VBox layout
-        VBox layout = new VBox(20);  // 20 is the spacing between elements
-        layout.setStyle("-fx-background-color: #f8f5f3;");  // Light yellow background
-        layout.setAlignment(Pos.CENTER);
+        // VBox layout using WindowUtil
+        VBox layout = WindowUtil.createStandardLayout();  // Standardized VBox layout
+        layout.setPadding(new Insets(30, 30, 30, 30));  // Adjusted padding for 600x600 screen
+        layout.setAlignment(Pos.CENTER);  // Center the layout
+        layout.setSpacing(20);  // Adjusted spacing between elements
         layout.getChildren().addAll(title, instructorButton, studentButton, adminButton);
-        layout.setMinWidth(400);  // Set minimum width for layout
 
-        // Create scene for the "Login As" screen
-        Scene loginAsScene = new Scene(layout, 400, 300);
+        // Create the circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
 
-        // Switch to the new scene
+        // Handle back button action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+
+        // Create a BorderPane to position the back button at the top left
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(layout);
+
+        // Align the back button to the top-left and set padding (gap of 5)
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
+
+        // Create scene for the "Login As" screen with a window size of 600x600
+        Scene loginAsScene = new Scene(root, 600, 600);  // Set the window size to 600x600
+
+        // Set the scene and show the stage
         primaryStage.setScene(loginAsScene);
+        primaryStage.setTitle("Login As");
+        primaryStage.setResizable(false);  // Disable resizing to keep consistent layout
+        primaryStage.show();
 
+        // Button actions
         adminButton.setOnAction(e -> showAdminPageScreen(primaryStage));
         studentButton.setOnAction(e -> showHomePageScreen(primaryStage));
         instructorButton.setOnAction(e -> showHomePageScreen(primaryStage));
     }
 
-    private void showAdminPageScreen(Stage primaryStage) {
-        AdminPage adminPage = new AdminPage();
+    // Method to go back to the previous screen
+    private void showPreviousScreen(Stage primaryStage) {
+        SignIn signIn = new SignIn();
         try{
-            adminPage.start(primaryStage);
+            signIn.start(primaryStage);
         }
-        catch (Exception ex) {
+        catch(Exception ex){
             ex.printStackTrace();
         }
     }
 
+    private void showAdminPageScreen(Stage primaryStage) {
+        AdminPage adminPage = new AdminPage();
+        try {
+            adminPage.start(primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     private void showHomePageScreen(Stage primaryStage) {
         HomePage homePage = new HomePage();
-        try{
+        try {
             homePage.start(primaryStage);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
     public static void main(String[] args) {
         launch(args);
     }
