@@ -443,7 +443,15 @@ public class AdminPage extends Application {
         resetLayout.add(resetUserAccountButton, 2, 1);
 
 
-        resetUserAccountButton.setOnAction(e -> showAccountResetConfirmation(primaryStage));
+        resetUserAccountButton.setOnAction(e -> {
+            String username = usernameField.getText();  // Get the username from the text field
+
+            USER_LIST.findUser(username).setAccOTP(new OTP_Generator().generateOTP());
+            //USER_LIST.findUser(username).setPassword(""); //still not sure if need to change his initial password
+
+            // Now you can pass the username to the next method or handle it as needed
+            showAccountResetConfirmation(primaryStage);
+        });
 
 
         Button backButton = ButtonStyleUtil.createCircularBackButton();

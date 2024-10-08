@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.User;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +15,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 public class ForgotPasswordOtp extends Application {
 
@@ -66,12 +69,20 @@ public class ForgotPasswordOtp extends Application {
         primaryStage.show();
 
         // Handle OK button action to redirect to the reset password screen
-        otpOkButton.setOnAction(e -> showResetPasswordScreen(primaryStage));
+        otpOkButton.setOnAction(e -> {
+            String enteredOtp = otpField.getText();  // Get the OTP from the text field
+            int otpInt = Integer.parseInt(enteredOtp);
+
+
+
+            // Now, you can use the entered OTP for further validation
+            showResetPasswordScreen(primaryStage,USER_LIST.findUserByOTP(otpInt));
+        });
     }
 
     // Method to show the Reset Password screen
-    private void showResetPasswordScreen(Stage primaryStage){
-        ResetPassword resetPassword = new ResetPassword();
+    private void showResetPasswordScreen(Stage primaryStage, User user) {
+        ResetPassword resetPassword = new ResetPassword(user);
         try{
             resetPassword.start(primaryStage);  // Call the ResetPassword screen
         }

@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +18,9 @@ import javafx.stage.Stage;
 
 public class ResetPassword extends Application {
 
+    private User User_to_resetPassword;
+
+    public ResetPassword(User user) {this.User_to_resetPassword = user;}
     @Override
     public void start(Stage primaryStage) {
         // Create background
@@ -82,7 +86,21 @@ public class ResetPassword extends Application {
         primaryStage.show();
 
         // Set button action to go to the Sign In screen
-        updateButton.setOnAction(e -> showSignInScreen(primaryStage));
+        updateButton.setOnAction(e -> {
+            String newPassword = newPasswordField.getText();
+            String confirmPassword = confirmPasswordField.getText();
+
+            // Check if both password fields match
+            if (newPassword.equals(confirmPassword)) {
+                // If passwords match, you can proceed to update the password and move to the SignIn screen
+                User_to_resetPassword.setPassword(newPassword);
+                User_to_resetPassword.setAccOTP(1000000);// Assuming there is a setPassword method in User class
+                showSignInScreen(primaryStage);
+            } else {
+                // If passwords don't match, show an error message (e.g., using a Label or Alert)
+                System.out.println("Passwords do not match. Please try again.");  // Debug message or replace with user alert
+            }
+        });
     }
 
     // Method to go back to the previous screen
