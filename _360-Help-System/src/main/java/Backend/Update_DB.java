@@ -42,7 +42,7 @@ public class Update_DB {
                         }
 
                         // Assign the OTP
-                        user.setAccResetOTP(accResetOTP);
+                        user.setAccOTP(accResetOTP);
 
                         // Add the user to UserList
                         userL.addUser(user);
@@ -95,7 +95,7 @@ public class Update_DB {
                         user.getPreferredName() + "-" +
                         user.getEmail() + "-" +
                         role + "-" +
-                        user.getAccResetOTP());
+                        user.getAccOTP());
                 writer.newLine(); // Add a new line after each user
             }
         } catch (IOException e) {

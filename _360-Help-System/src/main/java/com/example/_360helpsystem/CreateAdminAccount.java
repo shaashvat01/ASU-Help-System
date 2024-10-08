@@ -108,7 +108,7 @@ public class CreateAdminAccount extends Application {
 
 
     private void showUserDetailsScreen(Stage primaryStage,String username,String password) {
-        UserDetails userDetails = new UserDetails(username, password); // Pass username and password
+        UserDetails userDetails = new UserDetails(username, password,"A",0); // Pass username and password
         try {
             userDetails.start(primaryStage);
         } catch (Exception ex) {

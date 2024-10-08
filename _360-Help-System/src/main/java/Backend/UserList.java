@@ -61,6 +61,17 @@ public class UserList {
         return null;
     }
 
+    public User findUserByOTP(int otp)
+    {
+        for (User user : this.userL) {
+            if(user.getAccOTP() == otp)
+            {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public LinkedList<User> getUserList() {
         return userL; // Return the entire list
     }
@@ -83,7 +94,7 @@ public class UserList {
                 sb.append("Is Admin: ").append(user.isAdmin()).append("\n");
                 sb.append("Is Instructor: ").append(user.isInstructor()).append("\n");
                 sb.append("Account Setup Complete: ").append(user.isAccountSetupDone()).append("\n");
-                sb.append("Account Reset OTP: ").append(user.getAccResetOTP()).append("\n");
+                sb.append("Account Reset OTP: ").append(user.getAccOTP()).append("\n");
                 sb.append("------------------------\n"); // Separator for each user
             }
         }

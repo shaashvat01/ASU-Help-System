@@ -24,10 +24,14 @@ public class UserDetails extends Application {
 
     private String username;
     private String password;
+    private String Role;
+    private int otp;
 
-    public UserDetails(String username, String password) {
+    public UserDetails(String username, String password,String Role, int otp) {
         this.username = username;
         this.password = password;
+        this.Role = Role;
+        this.otp = otp;
     }
 
     public UserDetails() {
@@ -97,7 +101,7 @@ public class UserDetails extends Application {
         Button backButton = ButtonStyleUtil.createCircularBackButton();
 
         // Handle back button action
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement the previous screen action
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage,0));  // Implement the previous screen action
 
         // Add grid to background pane
         backgroundPane.getChildren().add(grid);
@@ -126,11 +130,29 @@ public class UserDetails extends Application {
             String preferredName = preferredNameField.getText();
             String email = emailField.getText();
 
-            // Create a new Admin object
-            Admin newAdmin = new Admin(username, password, email, firstName, middleName, lastName, preferredName);
 
             // Add the Admin object to the UserList
-            USER_LIST.getUserList().add(newAdmin);  // Assuming getUserList() returns the LinkedList of User objects
+            if(this.Role.equals("A"))
+            {
+                USER_LIST.getUserList().add(new Admin(username, password, email, firstName, middleName, lastName, preferredName));  // getUserList() returns the LinkedList of User objects
+            }
+            if(this.Role.equals("SI") || this.Role.equals("IS"))
+            {
+
+                USER_LIST.getUserList().add(new Student(username, password, email, firstName, middleName, lastName, preferredName));  // getUserList() returns the LinkedList of User objects
+                USER_LIST.findUser(username).setInstructor();
+                USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
+            }
+            if(this.Role.equals("S"))
+            {
+                USER_LIST.getUserList().add(new Student(username, password, email, firstName, middleName, lastName, preferredName));
+                USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
+            }
+            if(this.Role.equals("I"))
+            {
+                USER_LIST.getUserList().add(new Instructor(username, password, email, firstName, middleName, lastName, preferredName));
+                USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
+            }
 
             // Optionally, show a confirmation or navigate to another screen
             showSignInScreen(primaryStage);  // Navigate to the Sign In screen
@@ -138,8 +160,8 @@ public class UserDetails extends Application {
     }
 
     // Method to go back to the previous screen
-    private void showPreviousScreen(Stage primaryStage) {
-        SignUp signUp = new SignUp();
+    private void showPreviousScreen(Stage primaryStage,int otp) {
+        SignUp signUp = new SignUp(this.Role,0);
         try{
             signUp.start(primaryStage);
         }

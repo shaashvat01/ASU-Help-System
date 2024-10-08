@@ -16,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 public class NewUserOtp extends Application {
 
@@ -75,7 +76,19 @@ public class NewUserOtp extends Application {
                 if (OTP_LIST.findOTP(otp)) {
                     if(OTP_LIST.removeOTP(otp))// Remove the OTP after validation
                     {
-                        showSignUpScreen(primaryStage);  // Navigate to Sign-Up screen
+                        if(USER_LIST.findUserByOTP(otp).isInstructor() && USER_LIST.findUserByOTP(otp).isStudent())
+                        {
+                            showSignUpScreen(primaryStage,"SI",otp);  // Navigate to Sign-Up screen
+                        }
+                        if(USER_LIST.findUserByOTP(otp).isInstructor())
+                        {
+                            showSignUpScreen(primaryStage,"I",otp);  // Navigate to Sign-Up screen
+                        }
+                        if(USER_LIST.findUserByOTP(otp).isStudent())
+                        {
+                            showSignUpScreen(primaryStage,"S",otp);  // Navigate to Sign-Up screen
+                        }
+
                     }
 
                 } else {
@@ -93,8 +106,8 @@ public class NewUserOtp extends Application {
     }
 
     // Method to show the Sign Up screen
-    private void showSignUpScreen(Stage primaryStage) {
-        SignUp mainSignUp = new SignUp();
+    private void showSignUpScreen(Stage primaryStage,String role,int otp) {
+        SignUp mainSignUp = new SignUp(role,otp);
         try {
             mainSignUp.start(primaryStage);
         } catch (Exception ex) {

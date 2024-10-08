@@ -14,7 +14,7 @@ public class User {
 	protected boolean isAdmin;
 	protected boolean isInstructor;
 	protected boolean isAccountSetupComplete;
-	protected int accResetOTP;
+	protected int accOTP;
 	
 	// Default constructor that initializes all fields with default values
 	public User() {
@@ -29,7 +29,7 @@ public class User {
 		this.isAdmin = false;
 		this.isInstructor = false;
 		this.isAccountSetupComplete = false;
-		this.accResetOTP = 1000000;
+		this.accOTP = 1000000;
 	}
 	
 	// Parameterized constructor to initialize a user with specific values
@@ -45,7 +45,7 @@ public class User {
 		this.isAdmin = false;
 		this.isInstructor = false;
 		this.isAccountSetupComplete = false;  // Account setup is incomplete by default
-		this.accResetOTP = 1000000;
+		this.accOTP = 1000000;
 	}
 	
 	// Getter and setter methods for the username
@@ -151,7 +151,7 @@ public class User {
 		this.isStudent = true;
 	}
 
-	public void setAccResetOTP(int accResetOTP) {this.accResetOTP = accResetOTP;}
+	public void setAccOTP(int accOTP) {this.accOTP = accOTP;}
 
-	public int getAccResetOTP() {return this.accResetOTP;}
+	public int getAccOTP() {return this.accOTP;}
 }

@@ -15,8 +15,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+
 public class SignUp extends Application {
 
+    private String Role;
+    private int otp;
+
+    public SignUp(String role,int otp) {
+        this.Role = role;
+        this.otp = otp;
+    }
     @Override
     public void start(Stage primaryStage) {
         // Background setup
@@ -88,7 +97,21 @@ public class SignUp extends Application {
         primaryStage.show();
 
         // Sign Up button event handler
-        signUpButton.setOnAction(e -> showUserDetailsScreen(primaryStage));
+        signUpButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            String confirmPassword = confirmPasswordField.getText();
+
+            // Check if password and confirm password match
+            if (password.equals(confirmPassword)) {
+                // Call showUserDetailsScreen with username and password
+                showUserDetailsScreen(primaryStage, username, password,this.Role);
+            } else {
+                // Optionally show an error message if passwords do not match
+                System.out.println("Passwords do not match!");
+                // You could also display an alert or label to inform the user
+            }
+        });
     }
 
     // Method to go back to the previous screen
@@ -103,8 +126,9 @@ public class SignUp extends Application {
     }
 
     // Method to show the UserDetails screen
-    private void showUserDetailsScreen(Stage primaryStage) {
-        UserDetails userDetails = new UserDetails();
+    private void showUserDetailsScreen(Stage primaryStage,String username,String password,String role) {
+
+        UserDetails userDetails = new UserDetails(username, password,role,otp);
         try {
             userDetails.start(primaryStage);
         } catch (Exception ex) {

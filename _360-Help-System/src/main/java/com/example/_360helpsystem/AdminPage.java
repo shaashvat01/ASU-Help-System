@@ -243,7 +243,7 @@ public class AdminPage extends Application {
                 int generatedOtp = otpGenerator.generateOTP();
                 OTP_LIST.addOTP(generatedOtp);
                 System.out.println(OTP_LIST.toString());
-                newUser.setAccResetOTP(generatedOtp);
+                newUser.setAccOTP(generatedOtp);
 
                 // Optionally, show some confirmation or proceed to the next screen
                 System.out.println("New user added: " + newUser.getEmail() + " | OTP: " + generatedOtp);
