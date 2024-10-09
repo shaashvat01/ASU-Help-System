@@ -2,8 +2,18 @@ package com.example._360helpsystem;
 
 import javafx.scene.control.Button;
 
-public class ButtonStyleUtil {
+/*******
+ * <p> ButtonStyleUtil Class </p>
+ *
+ * <p> Description: This utility class provides styling methods for JavaFX buttons.
+ * It includes methods to create buttons with specific styles such as circular buttons. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
 
+public class ButtonStyleUtil {
     // Method to create a styled circular back button
     public static Button createCircularBackButton() {
         Button backButton = new Button("←");
@@ -18,6 +28,4 @@ public class ButtonStyleUtil {
         );
         return backButton;
     }
-
-    // You can add more styling methods for different button styles if needed
 }

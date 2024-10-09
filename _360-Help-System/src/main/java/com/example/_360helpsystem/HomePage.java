@@ -11,6 +11,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
+/*******
+ * <p> HomePage Class </p>
+ *
+ * <p> Description: This class represents the home page of the application.
+ * It includes a top bar with a "Home" label and a logout button, and a back button to return to the previous screen. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class HomePage extends Application {
 
     @Override
@@ -87,7 +98,7 @@ public class HomePage extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }

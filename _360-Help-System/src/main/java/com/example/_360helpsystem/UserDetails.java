@@ -15,10 +15,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
-
-// INTEGRATED
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+
+/*******
+ * <p> UserDetails Class </p>
+ *
+ * <p> Description: This class handles the final setup of a user's account by collecting
+ * their personal details (name, email, etc.) and creating the user in the system. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
 
 public class UserDetails extends Application {
 
@@ -33,11 +41,10 @@ public class UserDetails extends Application {
         this.Role = Role;
         this.otp = otp;
     }
-
     public UserDetails() {
-
     }
 
+    // This method sets up the form to collect additional user details for account setup.
     @Override
     public void start(Stage primaryStage) {
         // Background setup
@@ -152,7 +159,6 @@ public class UserDetails extends Application {
                 USER_LIST.getUserList().add(new Instructor(username, password, email, firstName, middleName, lastName, preferredName));
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
-
             // Optionally, show a confirmation or navigate to another screen
             showSignInScreen(primaryStage);  // Navigate to the Sign In screen
         });
@@ -178,7 +184,7 @@ public class UserDetails extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }

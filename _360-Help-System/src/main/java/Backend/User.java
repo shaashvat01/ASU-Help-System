@@ -1,5 +1,17 @@
 package Backend;
 
+/*******
+ * <p> User Class </p>
+ *
+ * <p> Description: This class defines a generic user in the system.
+ * It provides fields and methods to manage user details such as
+ * username, password, email, roles, and account status. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class User {
 	
 	// Private variables to store user information
@@ -149,7 +161,9 @@ public class User {
 	// Setter method to make the user a student
 	public void setStudent(Boolean bool) {this.isStudent = bool;}
 
+	// Setter method for account OTP
 	public void setAccOTP(int accOTP) {this.accOTP = accOTP;}
 
+	// Getter method for account OTP
 	public int getAccOTP() {return this.accOTP;}
 }

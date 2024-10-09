@@ -6,11 +6,24 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.paint.Color;
 
+/*******
+ * <p> PasswordEvaluator Class </p>
+ *
+ * <p> Description: This class evaluates passwords based on various criteria such as
+ * the presence of uppercase letters, lowercase letters, digits, special characters,
+ * and the password length. Feedback is provided in real time as the user types. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class PasswordEvaluator {
 
     private PasswordField passwordField;
     private Label feedbackLabel;
 
+    // Initializes the PasswordEvaluator with the given password field and feedback label. Adds a listener to trigger real-time password evaluation.
     public PasswordEvaluator(PasswordField passwordField, Label feedbackLabel) {
         this.passwordField = passwordField;
         this.feedbackLabel = feedbackLabel;
@@ -24,6 +37,7 @@ public class PasswordEvaluator {
         });
     }
 
+    // Evaluates the password based on the criteria and updates the feedback label with the results. Returns true if all criteria are met, otherwise false.
     private boolean evaluatePassword(String password) {
         StringBuilder feedback = new StringBuilder();
         boolean isValid = true;
@@ -32,7 +46,8 @@ public class PasswordEvaluator {
         if (!password.matches(".*[A-Z].*")) {
             feedback.append("At least one uppercase letter - Not satisfied\n");
             isValid = false;
-        } else {
+        }
+        else {
             feedback.append("At least one uppercase letter - Satisfied\n");
         }
 
@@ -40,7 +55,8 @@ public class PasswordEvaluator {
         if (!password.matches(".*[a-z].*")) {
             feedback.append("At least one lowercase letter - Not satisfied\n");
             isValid = false;
-        } else {
+        }
+        else {
             feedback.append("At least one lowercase letter - Satisfied\n");
         }
 
@@ -48,7 +64,8 @@ public class PasswordEvaluator {
         if (!password.matches(".*[0-9].*")) {
             feedback.append("At least one numeric digit - Not satisfied\n");
             isValid = false;
-        } else {
+        }
+        else {
             feedback.append("At least one numeric digit - Satisfied\n");
         }
 
@@ -56,7 +73,8 @@ public class PasswordEvaluator {
         if (!password.matches(".*[!@#$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>/?].*")) {
             feedback.append("At least one special character - Not satisfied\n");
             isValid = false;
-        } else {
+        }
+        else {
             feedback.append("At least one special character - Satisfied\n");
         }
 
@@ -64,7 +82,8 @@ public class PasswordEvaluator {
         if (password.length() < 8) {
             feedback.append("At least eight characters - Not satisfied\n");
             isValid = false;
-        } else {
+        }
+        else {
             feedback.append("At least eight characters - Satisfied\n");
         }
 
@@ -80,6 +99,7 @@ public class PasswordEvaluator {
         }
     }
 
+    // Checks if the password meets all criteria (uppercase, lowercase, digit, special character, and length). Returns true if all conditions are satisfied.
     public boolean checkPassword(String password) {
         boolean hasUppercase = password.matches(".*[A-Z].*");
         boolean hasLowercase = password.matches(".*[a-z].*");

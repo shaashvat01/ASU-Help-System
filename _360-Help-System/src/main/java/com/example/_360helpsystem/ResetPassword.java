@@ -16,15 +16,24 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+/*******
+ * <p> ResetPassword Class </p>
+ *
+ * <p> Description: This class handles the password reset functionality.
+ * It provides a screen for users to enter a new password and confirm it before resetting. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class ResetPassword extends Application {
-
     private User User_to_resetPassword;
-
     public ResetPassword(User user) {this.User_to_resetPassword = user;}
+    // This method sets up the screen where users can enter and confirm their new password.
     @Override
     public void start(Stage primaryStage) {
         // Create background
-
         StackPane backgroundPane = new StackPane();
         Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey background, adjusted to 600x600
         backgroundPane.getChildren().add(background);
@@ -60,12 +69,9 @@ public class ResetPassword extends Application {
         Label passwordFeedbackLabel = new Label();
         passwordFeedbackLabel.setTextFill(Color.RED);  // Initially set the text color to red
 
-
         // Error label for password mismatch
         Label errorLabel = new Label();
         errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
-
-
 
         // VBox layout
         VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
@@ -73,9 +79,7 @@ public class ResetPassword extends Application {
         layout.setAlignment(Pos.CENTER);  // Center the VBox elements
         layout.getChildren().addAll(newPasswordBox, confirmPasswordBox, passwordFeedbackLabel,errorLabel,updateButton);
 
-
         PasswordEvaluator PE = new PasswordEvaluator(newPasswordField,passwordFeedbackLabel);
-
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
 
@@ -132,7 +136,7 @@ public class ResetPassword extends Application {
             ex.printStackTrace();
         }
          }
-
+    // This method navigates to the Sign In screen after password reset.
     private void showSignInScreen(Stage primaryStage) {
         SignIn signIn = new SignIn();
         try {
@@ -141,7 +145,7 @@ public class ResetPassword extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }

@@ -15,8 +15,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+
+/*******
+ * <p> SignUp Class </p>
+ *
+ * <p> Description: This class handles the user sign-up process, allowing users
+ * to create a new account by entering their username, password, and other details. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
 
 public class SignUp extends Application {
 
@@ -27,6 +37,7 @@ public class SignUp extends Application {
         this.Role = role;
         this.otp = otp;
     }
+    // This method sets up the screen where users can input their username, password, and confirm it.
     @Override
     public void start(Stage primaryStage) {
 
@@ -68,13 +79,10 @@ public class SignUp extends Application {
         grid.add(confirmPasswordLabel, 0, 3);
         grid.add(confirmPasswordField, 1, 3);
 
-
-
         // Feedback label for password evaluation
         Label passwordFeedbackLabel = new Label();  // This will display real-time feedback
         passwordFeedbackLabel.setTextFill(Color.RED);  // Initial color is red for unmet conditions
         grid.add(passwordFeedbackLabel, 1, 4);
-
         PasswordEvaluator PE = new PasswordEvaluator(passwordField, passwordFeedbackLabel);
 
         // Sign Up button using WindowUtil's standardized button style
@@ -86,7 +94,6 @@ public class SignUp extends Application {
         Label errorLabel = new Label();
         errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
         grid.add(errorLabel, 1, 5);  // Add it to row 5, below the Confirm Password field
-
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -128,8 +135,8 @@ public class SignUp extends Application {
                             showUserDetailsScreen(primaryStage, username, password,this.Role);
                         }
                     }
-
-                } else {
+                }
+                else {
                     // Optionally show an error message if passwords do not match
                     errorLabel.setText("Passwords do not match!");
                     // You could also display an alert or label to inform the user
@@ -138,11 +145,8 @@ public class SignUp extends Application {
             else{
                 errorLabel.setText("Username already exists!");
             }
-
-
         });
     }
-
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
         NewUserOtp newUserOtp = new NewUserOtp();
@@ -153,10 +157,8 @@ public class SignUp extends Application {
             ex.printStackTrace();
         }
     }
-
     // Method to show the UserDetails screen
     private void showUserDetailsScreen(Stage primaryStage,String username,String password,String role) {
-
         UserDetails userDetails = new UserDetails(username, password,role,otp);
         try {
             userDetails.start(primaryStage);
@@ -164,7 +166,7 @@ public class SignUp extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }

@@ -1,5 +1,4 @@
 package com.example._360helpsystem;
-
 import Backend.OTPList;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -14,13 +13,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
+/*******
+ * <p> NewUserOtp Class </p>
+ *
+ * <p> Description: This class handles the OTP validation process for new users.
+ * It provides a screen where users can enter their OTP, and based on the OTP, it directs them to the sign-up process. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class NewUserOtp extends Application {
 
-
+    // This method sets up the screen for users to input their OTP and validates the OTP.
     @Override
     public void start(Stage primaryStage) {
         // Create background
@@ -71,7 +80,6 @@ public class NewUserOtp extends Application {
         // Handle OK button action to redirect to the sign-up screen
         otpOkButton.setOnAction(e -> {
             String otpInput = otpField.getText();
-
             try {
                 int otp = Integer.parseInt(otpInput);  // Parse input to an integer
 
@@ -91,20 +99,19 @@ public class NewUserOtp extends Application {
                         {
                             showSignUpScreen(primaryStage,"S",otp);  // Navigate to Sign-Up screen
                         }
-
                     }
-
-                } else {
+                }
+                else {
                     // Optionally show an error message if OTP is invalid
                     errorLabel.setText("Invalid OTP. Please try again.");
                     // You could also show a dialog or label to inform the user
                 }
-            } catch (NumberFormatException ex) {
+            }
+            catch (NumberFormatException ex) {
                 // Handle case where input is not a valid integer
                 errorLabel.setText("Invalid OTP. Please try again.");
             }
         });
-
         backButton.setOnAction(e -> showPreviousScreen(primaryStage));
     }
 
@@ -117,7 +124,7 @@ public class NewUserOtp extends Application {
             ex.printStackTrace();
         }
     }
-
+    // This method navigates back to the previous screen when the back button is clicked.
     private void showPreviousScreen(Stage primaryStage) {
         Main main = new Main();
         try{
@@ -127,7 +134,7 @@ public class NewUserOtp extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }
