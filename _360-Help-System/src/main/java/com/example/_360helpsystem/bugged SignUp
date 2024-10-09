@@ -1,0 +1,133 @@
+package com.example._360helpsystem;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
+import Backend.*;
+
+public class SignUp extends Application {
+
+    private String Role;
+    private int otp;
+
+    public SignUp(String role, int otp) {
+        this.Role = role;
+        this.otp = otp;
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        StackPane backgroundPane = new StackPane();
+        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));
+        backgroundPane.getChildren().add(background);
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(30, 30, 30, 30));
+
+        Label headingText = WindowUtil.createStyledLabel("Sign Up", 24);
+        headingText.setTextFill(Color.web("#8b0000"));
+        grid.add(headingText, 0, 0, 2, 1);
+
+        Label usernameLabel = WindowUtil.createStyledLabel("Username", 16);
+        TextField usernameField = new TextField();
+        usernameField.setPrefWidth(250);
+        grid.add(usernameLabel, 0, 1);
+        grid.add(usernameField, 1, 1);
+
+        Label passwordLabel = WindowUtil.createStyledLabel("Password", 16);
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPrefWidth(250);
+        grid.add(passwordLabel, 0, 2);
+        grid.add(passwordField, 1, 2);
+
+        // Label to show password evaluation feedback
+        Label passwordFeedbackLabel = new Label();
+        grid.add(passwordFeedbackLabel, 1, 3);
+
+        // Create PasswordEvaluator instance for real-time password feedback
+        PasswordEvaluator PE = new PasswordEvaluator(passwordField, passwordFeedbackLabel);
+
+        Label confirmPasswordLabel = WindowUtil.createStyledLabel("Confirm Password", 16);
+        PasswordField confirmPasswordField = new PasswordField();
+        confirmPasswordField.setPrefWidth(250);
+        grid.add(confirmPasswordLabel, 0, 4);
+        grid.add(confirmPasswordField, 1, 4);
+
+        Button signUpButton = WindowUtil.createStyledButton("Sign Up");
+        signUpButton.setPrefWidth(150);
+        grid.add(signUpButton, 1, 5);
+
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
+
+        backgroundPane.getChildren().add(grid);
+
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(backgroundPane);
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
+        Scene scene = new Scene(root, 600, 600);
+        primaryStage.setTitle("Sign Up");
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
+
+        signUpButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            String confirmPassword = confirmPasswordField.getText();
+
+            if (password.equals(confirmPassword)) {
+                /**
+                if(PE.checkPassword(password))
+                {
+                    showUserDetailsScreen(primaryStage, username, password, this.Role);
+                }
+                 **/
+                showUserDetailsScreen(primaryStage, username, password, this.Role);
+
+            } else {
+                System.out.println("Passwords do not match!");
+            }
+        });
+    }
+
+    private void showPreviousScreen(Stage primaryStage) {
+        NewUserOtp newUserOtp = new NewUserOtp();
+        try {
+            newUserOtp.start(primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void showUserDetailsScreen(Stage primaryStage, String username, String password, String role) {
+        UserDetails userDetails = new UserDetails(username, password, role, otp);
+        try {
+            userDetails.start(primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}

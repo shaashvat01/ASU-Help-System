@@ -24,6 +24,7 @@ public class ResetPassword extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Create background
+
         StackPane backgroundPane = new StackPane();
         Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey background, adjusted to 600x600
         backgroundPane.getChildren().add(background);
@@ -55,11 +56,25 @@ public class ResetPassword extends Application {
         Button updateButton = WindowUtil.createStyledButton("Update Password");
         updateButton.setPrefWidth(150);
 
+        // Feedback label for real-time password strength evaluation
+        Label passwordFeedbackLabel = new Label();
+        passwordFeedbackLabel.setTextFill(Color.RED);  // Initially set the text color to red
+
+
+        // Error label for password mismatch
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+
+
+
         // VBox layout
         VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
         layout.setSpacing(20);  // Add spacing between elements for better visibility
         layout.setAlignment(Pos.CENTER);  // Center the VBox elements
-        layout.getChildren().addAll(newPasswordBox, confirmPasswordBox, updateButton);
+        layout.getChildren().addAll(newPasswordBox, confirmPasswordBox, passwordFeedbackLabel,errorLabel,updateButton);
+
+
+        PasswordEvaluator PE = new PasswordEvaluator(newPasswordField,passwordFeedbackLabel);
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -85,21 +100,25 @@ public class ResetPassword extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        // Set button action to go to the Sign In screen
         updateButton.setOnAction(e -> {
             String newPassword = newPasswordField.getText();
             String confirmPassword = confirmPasswordField.getText();
 
             // Check if both password fields match
-            if (newPassword.equals(confirmPassword)) {
-                // If passwords match, you can proceed to update the password and move to the SignIn screen
-                User_to_resetPassword.setPassword(newPassword);
-                User_to_resetPassword.setAccOTP(1000000);// Assuming there is a setPassword method in User class
-                showSignInScreen(primaryStage);
-            } else {
-                // If passwords don't match, show an error message (e.g., using a Label or Alert)
-                System.out.println("Passwords do not match. Please try again.");  // Debug message or replace with user alert
+            if (PE.checkPassword(newPassword)) {
+
+                // Check password strength
+                if (newPassword.equals(confirmPassword)) {
+                    // If password is strong enough, update it
+                    User_to_resetPassword.setPassword(newPassword);
+                    User_to_resetPassword.setAccOTP(1000000);  // Assuming there's a method to reset OTP
+                    showSignInScreen(primaryStage);
+                } else {
+                    // If passwords don't match, show an error message 
+                    errorLabel.setText("Passwords do not match!");     
+                }
             }
+            
         });
     }
 

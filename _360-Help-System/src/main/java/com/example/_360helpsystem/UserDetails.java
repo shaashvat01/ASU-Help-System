@@ -130,7 +130,6 @@ public class UserDetails extends Application {
             String preferredName = preferredNameField.getText();
             String email = emailField.getText();
 
-
             // Add the Admin object to the UserList
             if(this.Role.equals("A"))
             {
