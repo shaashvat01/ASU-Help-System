@@ -17,19 +17,28 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-//INTEGRATED
-//NEEDS ANOTHER CONFIRM NEW PASSWORD TEXTBOX
+
+/*******
+ * <p> CreateAdminAccount Class </p>
+ *
+ * <p> Description: This class handles the first-time setup for creating an admin account.
+ * If no users exist in the system, it presents a form to create the admin account. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
 public class CreateAdminAccount extends Application {
 
     public static UserList USER_LIST = new UserList();
     public static OTPList OTP_LIST = new OTPList();
-
     Update_DB UDB = new Update_DB();
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    // This method checks if users exist and either shows the admin creation screen or opens the main screen based on that condition.
     @Override
     public void start(Stage primaryStage) {
         // Check if users exist (if none exist, show the first-time setup screen)
@@ -43,11 +52,11 @@ public class CreateAdminAccount extends Application {
         }
     }
 
+    // If users already exist, this method opens the main screen.
     private void openMainScreen(Stage primaryStage) {
         Main main = new Main();
         main.start(primaryStage);
     }
-
 
     // Method to show the first-time setup screen
     private void showFirstTimeSetupScreen(Stage primaryStage) {
@@ -55,8 +64,6 @@ public class CreateAdminAccount extends Application {
 
         Label passwordFeedbackLabel = new Label();  // This will display real-time feedback
         passwordFeedbackLabel.setTextFill(Color.RED);  // Initial color is red for unmet conditions
-
-
 
         Label prompt = WindowUtil.createStyledLabel("Create Admin Account", 24);  // Standardized title label
 
@@ -89,7 +96,6 @@ public class CreateAdminAccount extends Application {
             }
 
         });
-
         // Add all elements to the layout
         layout.getChildren().addAll(prompt, usernameLabel, usernameField, passwordLabel, passwordField,passwordFeedbackLabel, createAdminButton);
 
@@ -118,8 +124,7 @@ public class CreateAdminAccount extends Application {
 
         primaryStage.show();
     }
-
-
+    // This method passes the username and password to the UserDetails screen.
     private void showUserDetailsScreen(Stage primaryStage,String username,String password) {
         UserDetails userDetails = new UserDetails(username, password,"A",0); // Pass username and password
         try {
@@ -129,6 +134,7 @@ public class CreateAdminAccount extends Application {
         }
     }
 
+    // Returns true if there are users in the system, otherwise false.
     private boolean checkIfUsersExist() {
         if(USER_LIST.getUserList().isEmpty()) {
             return false;
@@ -145,20 +151,18 @@ public class CreateAdminAccount extends Application {
         catch(Exception ex){
             ex.printStackTrace();
         }
-
     }
-
+    // Loads the user and OTP databases from files.
     private void initializeDB()
     {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
     }
-
+    // This method saves the databases when the application is closing.
     public void stop() {
         // Save user and OTP databases when the application is closing
         UDB.saveUserDB(USER_LIST);
         UDB.saveOTPDB(OTP_LIST);
         System.out.println("Databases saved successfully.");
     }
-
 }

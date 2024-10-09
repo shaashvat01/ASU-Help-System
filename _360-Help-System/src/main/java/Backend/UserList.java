@@ -2,6 +2,17 @@ package Backend;
 
 import java.util.LinkedList;
 
+/*******
+ * <p> UserList Class </p>
+ *
+ * <p> Description: This class manages a list of users in the system.
+ * It provides methods to add, remove, search, and display user details. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class UserList {
 
     // Linked list to store User objects
@@ -29,7 +40,6 @@ public class UserList {
         }
     }
 
-
     // Get the number of users in the list
     public int getUserCount() {
         return userL.size(); // Return the size of userL
@@ -46,10 +56,11 @@ public class UserList {
         {
             for(User user : userL) { // Use userL to iterate over
                 //Need to implement front end list
-        }
+            }
         }
     }
 
+    // Searches for and returns a User object by username. Returns null if not found.
     public User findUser(String username)
     {
         for (User user : this.userL) {
@@ -61,6 +72,7 @@ public class UserList {
         return null;
     }
 
+    // Searches for and returns User object by OTP
     public User findUserByOTP(int otp)
     {
         for (User user : this.userL) {
@@ -72,11 +84,12 @@ public class UserList {
         return null;
     }
 
+    // Returns the list of all users.
     public LinkedList<User> getUserList() {
         return userL; // Return the entire list
     }
 
-    //debug function
+    // Returns a string representation of all users in the list.
     public String toString() {
         StringBuilder sb = new StringBuilder(); // Create a StringBuilder to accumulate the string representation
         if (userL.isEmpty()) {

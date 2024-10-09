@@ -16,8 +16,18 @@ import javafx.stage.Stage;
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
-// INTEGRATED INVITE USER
-// INTEGRATED DELETE ACCOUNT
+/*******
+ * <p> AdminPage Class </p>
+ *
+ * <p> Description: This class is the main dashboard for admin users.
+ * It includes various options such as inviting users, modifying user accounts,
+ * resetting accounts, and logging out. The layout is built using JavaFX elements. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class AdminPage extends Application {
 
     OTP_Generator otpGenerator = new OTP_Generator();
@@ -98,13 +108,13 @@ public class AdminPage extends Application {
 
     // Implement logic for back button on Admin Dashboard
     private void showPreviousScreen(Stage primaryStage) {
-       SignInAs signInAs = new SignInAs();
-       try{
-           signInAs.start(primaryStage);
-       }
-       catch(Exception ex){
-           ex.printStackTrace();
-       }
+        SignInAs signInAs = new SignInAs();
+        try{
+            signInAs.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private void showUserModificationsScreen(Stage primaryStage) {

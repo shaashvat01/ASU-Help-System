@@ -10,9 +10,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import Backend.*;
-// INTEGRATED
-public class SignInAs extends Application {
 
+/*******
+ * <p> SignInAs Class </p>
+ *
+ * <p> Description: This class handles the screen where users can choose to log in as either
+ * Admin, Instructor, or Student, based on their assigned roles. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
+public class SignInAs extends Application {
+    // This method sets up the screen where users can select their role (Admin, Instructor, Student).
     @Override
     public void start(Stage primaryStage) {
         // Get the currently logged-in user
@@ -34,11 +45,10 @@ public class SignInAs extends Application {
             adminButton.setFont(WindowUtil.createStyledLabel("Admin", 20).getFont());  // Adjusted button font size
             adminButton.setPrefWidth(250);  // Adjusted button width for smaller screen
             layout.getChildren().add(adminButton);
-
             // Admin page action
             adminButton.setOnAction(e -> showAdminPageScreen(primaryStage));
         }
-
+        // Conditionally add buttons based on the user role
         if (currentUser.isInstructor()) {
             // Instructor Button
             Button instructorButton = WindowUtil.createStyledButton("INSTRUCTOR");
@@ -95,7 +105,7 @@ public class SignInAs extends Application {
             ex.printStackTrace();
         }
     }
-
+    // method to show admin screen
     private void showAdminPageScreen(Stage primaryStage) {
         AdminPage adminPage = new AdminPage();
         try {
@@ -104,7 +114,7 @@ public class SignInAs extends Application {
             ex.printStackTrace();
         }
     }
-
+    // method to show home page
     private void showHomePageScreen(Stage primaryStage) {
         HomePage homePage = new HomePage();
         try {
@@ -113,7 +123,7 @@ public class SignInAs extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }

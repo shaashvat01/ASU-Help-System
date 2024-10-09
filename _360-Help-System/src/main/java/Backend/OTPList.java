@@ -1,10 +1,22 @@
 package Backend;
-
 import java.util.LinkedList;
 
+/*******
+ * <p> OTPList Class </p>
+ *
+ * <p> Description: This class maintains a list of One-Time Passwords (OTPs).
+ * It provides functionalities to add, remove, and search for OTPs within the list. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class OTPList {
+    // A linked list to store the generated OTPs
     private LinkedList<Integer> OTP_LIST;
 
+    // Initializes the OTP list.
     public OTPList() {
         OTP_LIST = new LinkedList<>();
     }

@@ -16,12 +16,23 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
+/*******
+ * <p> ForgotPasswordOtp Class </p>
+ *
+ * <p> Description: This class handles the OTP validation process when a user forgets their password.
+ * It allows the user to enter an OTP and, if valid, redirects them to the reset password screen. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class ForgotPasswordOtp extends Application {
 
+    // This method sets up the OTP validation screen with an input field, feedback, and navigation buttons.
     @Override
     public void start(Stage primaryStage) {
         // Create background
@@ -86,10 +97,6 @@ public class ForgotPasswordOtp extends Application {
             else {
                 errorLabel.setText("Invalid OTP");
             }
-
-
-
-
         });
     }
 
@@ -115,6 +122,7 @@ public class ForgotPasswordOtp extends Application {
         }
     }
 
+    // main
     public static void main(String[] args) {
         launch(args);
     }

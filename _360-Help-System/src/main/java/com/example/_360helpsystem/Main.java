@@ -14,6 +14,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+/*******
+ * <p> Main Class </p>
+ *
+ * <p> Description: This class handles the initial login/signup options and navigation.
+ * It presents buttons for "Sign In" and "Sign Up" and navigates accordingly. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 // Main class to handle initial Login/Signup buttons and navigation
 public class Main extends Application {
 
@@ -71,7 +82,7 @@ public class Main extends Application {
             ex.printStackTrace();
         }
     }
-
+    // This method opens the OTP screen for new users when the "Sign Up" button is clicked.
     private void showNewUserOtpScreen(Stage primaryStage) {
         NewUserOtp mainOtp = new NewUserOtp();
         try {

@@ -5,6 +5,18 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*******
+ * <p> Update_DB Class </p>
+ *
+ * <p> Description: This class handles loading and saving user and OTP databases.
+ * It reads from and writes to text files, managing user and OTP information for
+ * the system. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class Update_DB {
     private String path_to_UserDB = "Users.txt";
     private String path_to_OTPDB = "OTPs.txt";
@@ -50,7 +62,7 @@ public class Update_DB {
                                 user = new Instructor(username, password, email, firstName, middleName, lastName, preferredName);
                             }
                         }
-                        
+
                         // Assign the OTP
                         if (user != null) {
                             user.setAccOTP(accResetOTP);

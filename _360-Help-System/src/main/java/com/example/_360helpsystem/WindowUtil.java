@@ -12,8 +12,18 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class WindowUtil {
+/*******
+ * <p> WindowUtil Class </p>
+ *
+ * <p> Description: This utility class provides methods for standardized window sizing,
+ * button styling, and label styling used across the application. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
 
+public class WindowUtil {
     // Method to set a standardized scene size
     public static void setWindowSize(Stage stage, Scene scene, double width, double height) {
         stage.setWidth(width);

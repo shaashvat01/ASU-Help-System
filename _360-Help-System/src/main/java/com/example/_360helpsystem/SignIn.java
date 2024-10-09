@@ -16,14 +16,23 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
-// INTEGRATED
+/*******
+ * <p> SignIn Class </p>
+ *
+ * <p> Description: This class handles the sign-in process for users.
+ * It provides a screen for entering username and password, and validates credentials. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class SignIn extends Application {
 
     public static User CURRENT_USER;  // Declare the User as an instance variable
-
+    // This method sets up the screen where users can enter their username and password.
     @Override
     public void start(Stage primaryStage) {
 
@@ -125,21 +134,21 @@ public class SignIn extends Application {
                     SignInAs loginAsScreen = new SignInAs();
                     CURRENT_USER = foundUser;
                     loginAsScreen.start(primaryStage);
-                } else {
+                }
+                else {
                     // If the password is incorrect, show an alert
                     errorLabel.setText("Wrong Password");
                 }
-            } else {
+            }
+            else {
                 // If the username doesn't exist, show an alert
                 errorLabel.setText("Username not found");
-
             }
         });
 
         // Action for the "Forgot Password" link
         forgotPasswordLink.setOnAction(e -> showForgotPasswordOtpScreen(primaryStage));
     }
-
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
         Main main = new Main();
@@ -160,7 +169,7 @@ public class SignIn extends Application {
             ex.printStackTrace();
         }
     }
-
+    // main
     public static void main(String[] args) {
         launch(args);
     }

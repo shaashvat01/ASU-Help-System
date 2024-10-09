@@ -16,8 +16,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+/*******
+ * <p> UserDetails Class </p>
+ *
+ * <p> Description: This class handles the final setup of a user's account by collecting
+ * their personal details (name, email, etc.) and creating the user in the system. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
 
-// INTEGRATED
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 public class UserDetails extends Application {
