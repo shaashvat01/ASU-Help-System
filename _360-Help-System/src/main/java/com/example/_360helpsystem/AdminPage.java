@@ -15,26 +15,14 @@ import javafx.stage.Stage;
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
-/*******
- * <p> AdminPage Class </p>
- *
- * <p> Description: This class is the main dashboard for admin users.
- * It includes various options such as inviting users, modifying user accounts,
- * resetting accounts, and logging out. The layout is built using JavaFX elements. </p>
- *
- * @version 1.00, 2024-10-09
- * @author Team - Th15
- *
- */
-
+// INTEGRATED INVITE USER
+// INTEGRATED DELETE ACCOUNT
 public class AdminPage extends Application {
 
     OTP_Generator otpGenerator = new OTP_Generator();
 
-    // This method initializes the Admin dashboard with buttons for different admin functionalities.
     @Override
     public void start(Stage primaryStage) {
-
         Admin admin = new Admin();
         Text title = new Text("Admin Dashboard");
         title.setFont(Font.font("Arial", 36));
@@ -118,7 +106,6 @@ public class AdminPage extends Application {
        }
     }
 
-    // Displays the Modify User Roles Screen
     private void showUserModificationsScreen(Stage primaryStage) {
         GridPane userModificationsLayout = new GridPane();
         userModificationsLayout.setPadding(new Insets(20));
@@ -151,11 +138,14 @@ public class AdminPage extends Application {
         scrollPane.setPrefHeight(400);
 
         int count = 0;
+
         for (User user : USER_LIST.getUserList()) {
+
             // Skip the admin account, assuming the admin role is represented by user.isAdmin()
             if (user.isAdmin()) {
                 continue; // Skip this iteration and don't display the admin account
             }
+
             Label usernameLabel = new Label(user.getUserName());
             String name = user.getPreferredName().isEmpty() ? user.getFirstName() : user.getPreferredName();
             Label nameLabel = new Label(name);
@@ -214,6 +204,7 @@ public class AdminPage extends Application {
             userModificationsLayout.add(nameLabel, 1, count + 2);
             userModificationsLayout.add(rolesBox, 2, count + 2);
             userModificationsLayout.add(actionBox, 3, count + 2);
+
             count++; // Increment the row count for each displayed user
         }
 
@@ -232,6 +223,7 @@ public class AdminPage extends Application {
         primaryStage.setScene(userModificationsScene);
     }
 
+
     private void showInviteUserScreen(Stage primaryStage) {
         GridPane inviteLayout = new GridPane();
         inviteLayout.setPadding(new Insets(20));
@@ -239,9 +231,11 @@ public class AdminPage extends Application {
         inviteLayout.setHgap(10);
         inviteLayout.setAlignment(Pos.CENTER);
 
+
         Text inviteTitle = new Text("Invite User");
         inviteTitle.setFont(Font.font("Arial", 24));
         inviteLayout.add(inviteTitle, 0, 0, 2, 1);
+
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
@@ -254,17 +248,22 @@ public class AdminPage extends Application {
         inviteLayout.add(S_check, 0, 2);
         inviteLayout.add(I_check, 1, 2);
 
+
         Button inviteButton = new Button("Invite");
         inviteButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         inviteButton.setFont(Font.font("Arial", 18));
         inviteLayout.add(inviteButton, 0, 3, 2, 1);
 
+
         inviteButton.setOnAction(e ->{
+
             String email = emailField.getText();
             boolean isStudent = S_check.isSelected();
             boolean isInstructor = I_check.isSelected();
+
             // Create a new User based on the selection
             User newUser = null;
+
             if (isInstructor && isStudent) {
                 // If both roles are selected, create a Student and set the Instructor role
                 newUser = new Student("", "", email, "", "", "", ""); // Create a Student
@@ -280,56 +279,72 @@ public class AdminPage extends Application {
                 newUser = new Student("", "", email, "", "", "", ""); // Use the Student constructor
                 System.out.println("Created Only Role Student = "+newUser.isStudent());
             }
+
             // Add the new user to the USER_LIST
             if (newUser != null) {
                 USER_LIST.addUser(newUser);
+
                 // Generate OTP and add to OTP_LIST
                 int generatedOtp = otpGenerator.generateOTP();
                 OTP_LIST.addOTP(generatedOtp);
                 System.out.println(OTP_LIST.toString());
                 newUser.setAccOTP(generatedOtp);
+
                 // Optionally, show some confirmation or proceed to the next screen
                 System.out.println("New user added: " + newUser.getEmail() + " | OTP: " + generatedOtp);
             }
             showInvitationSentScreen(primaryStage, emailField.getText());
         });
+
+
+
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
+
 
         BorderPane root = new BorderPane();
         root.setTop(backButton);
         root.setCenter(inviteLayout);
 
+
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
 
         Scene inviteScene = new Scene(root, 600, 600);
         primaryStage.setScene(inviteScene);
     }
-    // this method displays the invitation screen after sending
+
+
     private void showInvitationSentScreen(Stage primaryStage, String email) {
         VBox confirmationLayout = new VBox(20);
         confirmationLayout.setPadding(new Insets(20));
         confirmationLayout.setAlignment(Pos.CENTER);
 
+
         Text confirmationMessage = new Text("Invitation code sent to " + email);
         confirmationMessage.setFont(Font.font("Arial", 20));
         confirmationLayout.getChildren().add(confirmationMessage);
 
+
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> showInviteUserScreen(primaryStage));
+
 
         BorderPane root = new BorderPane();
         root.setTop(backButton);
         root.setCenter(confirmationLayout);
 
+
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
 
         Scene confirmationScene = new Scene(root, 600, 600);
         primaryStage.setScene(confirmationScene);
     }
-    // show the delete user screen
+
+
     private void showDeleteUserScreen(Stage primaryStage) {
         GridPane deleteLayout = new GridPane();
         deleteLayout.setPadding(new Insets(20));
@@ -337,9 +352,11 @@ public class AdminPage extends Application {
         deleteLayout.setHgap(10);
         deleteLayout.setAlignment(Pos.CENTER);
 
+
         Text deleteTitle = new Text("Delete User");
         deleteTitle.setFont(Font.font("Arial", 24));
         deleteLayout.add(deleteTitle, 0, 0, 2, 1);
+
 
         Label usernameLabel = new Label("Username:");
         TextField usernameField = new TextField();
@@ -347,10 +364,12 @@ public class AdminPage extends Application {
         deleteLayout.add(usernameLabel, 0, 1);
         deleteLayout.add(usernameField, 1, 1);
 
+
         Button deleteUserButton = new Button("Delete User");
         deleteUserButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteUserButton.setFont(Font.font("Arial", 18));
         deleteLayout.add(deleteUserButton, 0, 2, 2, 1);
+
 
         deleteUserButton.setOnAction(e -> {
             String username = usernameField.getText();
@@ -364,20 +383,25 @@ public class AdminPage extends Application {
             }
         });
 
+
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
+
 
         BorderPane root = new BorderPane();
         root.setTop(backButton);
         root.setCenter(deleteLayout);
 
+
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
 
         Scene deleteScene = new Scene(root, 600, 600);
         primaryStage.setScene(deleteScene);
     }
-    // shows the confirmation dialogue box after user deletion
+
+
     private void showConfirmationDialog(Stage primaryStage, String username) {
         Stage confirmationStage = new Stage();
         confirmationStage.initModality(Modality.APPLICATION_MODAL);
@@ -436,7 +460,8 @@ public class AdminPage extends Application {
         Scene userDeletedScene = new Scene(userDeletedLayout, 600, 600);
         primaryStage.setScene(userDeletedScene);
     }
-    // shows the reset account screen
+
+
     private void showResetAccountScreen(Stage primaryStage) {
         GridPane resetLayout = new GridPane();
         resetLayout.setPadding(new Insets(20));
@@ -444,9 +469,11 @@ public class AdminPage extends Application {
         resetLayout.setHgap(10);
         resetLayout.setAlignment(Pos.CENTER);
 
+
         Text resetTitle = new Text("Reset Account");
         resetTitle.setFont(Font.font("Arial", 24));
         resetLayout.add(resetTitle, 0, 0, 2, 1);
+
 
         Label usernameLabel = new Label("Username:");
         TextField usernameField = new TextField();
@@ -454,10 +481,12 @@ public class AdminPage extends Application {
         resetLayout.add(usernameLabel, 0, 1);
         resetLayout.add(usernameField, 1, 1);
 
+
         Button resetUserAccountButton = new Button("Reset User Account");
         resetUserAccountButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         resetUserAccountButton.setFont(Font.font("Arial", 16));
         resetLayout.add(resetUserAccountButton, 2, 1);
+
 
         resetUserAccountButton.setOnAction(e -> {
             String username = usernameField.getText();  // Get the username from the text field
@@ -469,48 +498,60 @@ public class AdminPage extends Application {
             showAccountResetConfirmation(primaryStage);
         });
 
+
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
+
 
         BorderPane root = new BorderPane();
         root.setTop(backButton);
         root.setCenter(resetLayout);
 
+
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
 
         Scene resetScene = new Scene(root, 600, 600);
         primaryStage.setScene(resetScene);
     }
-    // shows the account reset confirmation screen
+
+
     private void showAccountResetConfirmation(Stage primaryStage) {
         VBox confirmationLayout = new VBox(20);
         confirmationLayout.setPadding(new Insets(20));
         confirmationLayout.setAlignment(Pos.CENTER);
 
+
         Text confirmationMessage = new Text("Account reset request has been generated.");
         confirmationMessage.setFont(Font.font("Arial", 20));
         confirmationLayout.getChildren().add(confirmationMessage);
 
+
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> showResetAccountScreen(primaryStage));
+
 
         BorderPane root = new BorderPane();
         root.setTop(backButton);
         root.setCenter(confirmationLayout);
 
+
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
 
         Scene confirmationScene = new Scene(root, 600, 600);
         primaryStage.setScene(confirmationScene);
     }
-    // shows the sign in page
+
+
     private void showSignInPage(Stage primaryStage) {
         SignIn signInPage = new SignIn();
         signInPage.start(primaryStage);
     }
-    // main
+
+
     public static void main(String[] args) {
         launch(args);
     }
