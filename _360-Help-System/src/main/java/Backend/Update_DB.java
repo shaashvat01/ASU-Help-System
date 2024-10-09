@@ -28,6 +28,9 @@ public class Update_DB {
             try (BufferedReader reader = new BufferedReader(new FileReader(userDBFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    if (line.trim().isEmpty()) {
+                        break; // Stop reading if a blank line is encountered
+                    }
                     String[] data = line.split("-"); // Split by "-"
                     if (data.length == 9) { // Now expecting 9 fields with middle name included
                         String username = data[0];
@@ -99,9 +102,18 @@ public class Update_DB {
             for (User user : userL.getUserList()) { // Accessing userL directly from UserList class
                 // Determine the role(s)
                 String role = "";
-                if (user.isStudent()) role += "S";
-                if (user.isInstructor()) role += "I";
-                if (user.isAdmin()) role += "A";
+                if (user.isStudent()){
+                    role += "S";
+                    System.out.println("USer is student");
+                }
+                if (user.isInstructor()) {
+                    role += "I";
+                    System.out.println("USer is instructor");
+                }
+                if (user.isAdmin()) {
+                    role += "A";
+                    System.out.println("USer is admin");
+                }
 
                 // Format: username-password-firstname-middlename-lastname-preferredname-email-role-accResetOTP
                 writer.write(user.getUserName() + "-" +
