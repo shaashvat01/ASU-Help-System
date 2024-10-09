@@ -79,7 +79,11 @@ public class SignIn extends Application {
         HBox loginButtonBox = new HBox(10);
         loginButtonBox.setAlignment(Pos.CENTER);  // Align the button to the center
         loginButtonBox.getChildren().add(loginButton);
-        grid.add(loginButtonBox, 1, 4);  // Add button to the second column, new row
+        grid.add(loginButtonBox, 1, 5);  // Add button to the second column, new row
+
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+        grid.add(errorLabel, 1, 4);  // Add it to row 5, below the Confirm Password field
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -123,9 +127,11 @@ public class SignIn extends Application {
                     loginAsScreen.start(primaryStage);
                 } else {
                     // If the password is incorrect, show an alert
+                    errorLabel.setText("Wrong Password");
                 }
             } else {
                 // If the username doesn't exist, show an alert
+                errorLabel.setText("Username not found");
 
             }
         });
