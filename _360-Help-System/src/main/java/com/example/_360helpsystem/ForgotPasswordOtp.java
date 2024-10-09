@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -16,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 public class ForgotPasswordOtp extends Application {
@@ -39,10 +41,13 @@ public class ForgotPasswordOtp extends Application {
         otpOkButton.setPrefWidth(120);  // Increased button width for larger screen
         otpOkButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
 
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+
         // VBox layout for OTP screen
         VBox layout = new VBox(30);  // Increased spacing between elements
         layout.setAlignment(Pos.CENTER);
-        layout.getChildren().addAll(otpText, otpField, otpOkButton);
+        layout.getChildren().addAll(otpText, otpField,errorLabel, otpOkButton);
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -73,10 +78,18 @@ public class ForgotPasswordOtp extends Application {
             String enteredOtp = otpField.getText();  // Get the OTP from the text field
             int otpInt = Integer.parseInt(enteredOtp);
 
+            if(USER_LIST.findUserByOTP(otpInt) != null)
+            {
+                // Now, you can use the entered OTP for further validation
+                showResetPasswordScreen(primaryStage,USER_LIST.findUserByOTP(otpInt));
+            }
+            else {
+                errorLabel.setText("Invalid OTP");
+            }
 
 
-            // Now, you can use the entered OTP for further validation
-            showResetPasswordScreen(primaryStage,USER_LIST.findUserByOTP(otpInt));
+
+
         });
     }
 

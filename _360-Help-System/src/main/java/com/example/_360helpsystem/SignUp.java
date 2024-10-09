@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.PasswordEvaluator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ public class SignUp extends Application {
     }
     @Override
     public void start(Stage primaryStage) {
+
         // Background setup
         StackPane backgroundPane = new StackPane();
         Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Set background size to 600x600
@@ -66,10 +68,25 @@ public class SignUp extends Application {
         grid.add(confirmPasswordLabel, 0, 3);
         grid.add(confirmPasswordField, 1, 3);
 
+
+
+        // Feedback label for password evaluation
+        Label passwordFeedbackLabel = new Label();  // This will display real-time feedback
+        passwordFeedbackLabel.setTextFill(Color.RED);  // Initial color is red for unmet conditions
+        grid.add(passwordFeedbackLabel, 1, 4);
+
+        PasswordEvaluator PE = new PasswordEvaluator(passwordField, passwordFeedbackLabel);
+
         // Sign Up button using WindowUtil's standardized button style
         Button signUpButton = WindowUtil.createStyledButton("Sign Up");
         signUpButton.setPrefWidth(150);  // Increased width to match the larger screen
-        grid.add(signUpButton, 1, 4);
+        grid.add(signUpButton, 1, 6);
+
+        // Label for the password mismatch error (initially empty)
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+        grid.add(errorLabel, 1, 5);  // Add it to row 5, below the Confirm Password field
+
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -102,27 +119,39 @@ public class SignUp extends Application {
             String password = passwordField.getText();
             String confirmPassword = confirmPasswordField.getText();
 
-            // Check if password and confirm password match
-            if (password.equals(confirmPassword)) {
-                // Call showUserDetailsScreen with username and password
-                showUserDetailsScreen(primaryStage, username, password,this.Role);
-            } else {
-                // Optionally show an error message if passwords do not match
-                System.out.println("Passwords do not match!");
-                // You could also display an alert or label to inform the user
+            if(USER_LIST.findUser(username) == null) {
+                // Check if password and confirm password match
+                if (password.equals(confirmPassword)) {
+                    // Call showUserDetailsScreen with username and password
+                    if(PE.checkPassword(password)) {
+                        {
+                            showUserDetailsScreen(primaryStage, username, password,this.Role);
+                        }
+                    }
+
+                } else {
+                    // Optionally show an error message if passwords do not match
+                    errorLabel.setText("Passwords do not match!");
+                    // You could also display an alert or label to inform the user
+                }
             }
+            else{
+                errorLabel.setText("Username already exists!");
+            }
+
+
         });
     }
 
     // Method to go back to the previous screen
     private void showPreviousScreen(Stage primaryStage) {
-      NewUserOtp newUserOtp = new NewUserOtp();
-      try{
-          newUserOtp.start(primaryStage);
-      }
-      catch(Exception ex){
-          ex.printStackTrace();
-      }
+        NewUserOtp newUserOtp = new NewUserOtp();
+        try{
+            newUserOtp.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     // Method to show the UserDetails screen

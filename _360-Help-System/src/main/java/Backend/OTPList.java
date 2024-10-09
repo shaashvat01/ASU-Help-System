@@ -17,7 +17,9 @@ public class OTPList {
     // Remove an OTP from the list
     public boolean removeOTP(int otp) {
         if (OTP_LIST.contains(otp)) { // Check if OTP exists in the list
+            OTP_LIST.toString();
             OTP_LIST.remove(Integer.valueOf(otp)); // Remove the OTP
+
             return true;
         }
         else
