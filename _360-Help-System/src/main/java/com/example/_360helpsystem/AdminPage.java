@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -15,8 +16,18 @@ import javafx.stage.Stage;
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
-// INTEGRATED INVITE USER
-// INTEGRATED DELETE ACCOUNT
+/*******
+ * <p> AdminPage Class </p>
+ *
+ * <p> Description: This class is the main dashboard for admin users.
+ * It includes various options such as inviting users, modifying user accounts,
+ * resetting accounts, and logging out. The layout is built using JavaFX elements. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class AdminPage extends Application {
 
     OTP_Generator otpGenerator = new OTP_Generator();
@@ -35,7 +46,7 @@ public class AdminPage extends Application {
         inviteUserButton.setOnAction(e -> showInviteUserScreen(primaryStage));
 
         // Other buttons
-        Button userModificationsButton = new Button("User Accounts & Modifications");
+        Button userModificationsButton = new Button("List Accounts");
         userModificationsButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         userModificationsButton.setFont(Font.font("Arial", 18));
         userModificationsButton.setPrefWidth(250);
@@ -97,13 +108,13 @@ public class AdminPage extends Application {
 
     // Implement logic for back button on Admin Dashboard
     private void showPreviousScreen(Stage primaryStage) {
-       SignInAs signInAs = new SignInAs();
-       try{
-           signInAs.start(primaryStage);
-       }
-       catch(Exception ex){
-           ex.printStackTrace();
-       }
+        SignInAs signInAs = new SignInAs();
+        try{
+            signInAs.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private void showUserModificationsScreen(Stage primaryStage) {
@@ -113,7 +124,7 @@ public class AdminPage extends Application {
         userModificationsLayout.setHgap(20);
         userModificationsLayout.setAlignment(Pos.CENTER);
 
-        Text userModificationsTitle = new Text("User Accounts & Modifications");
+        Text userModificationsTitle = new Text("Accounts");
         userModificationsTitle.setFont(Font.font("Arial", 36));
         userModificationsLayout.add(userModificationsTitle, 0, 0, 4, 1);
 
@@ -144,6 +155,10 @@ public class AdminPage extends Application {
             // Skip the admin account, assuming the admin role is represented by user.isAdmin()
             if (user.isAdmin()) {
                 continue; // Skip this iteration and don't display the admin account
+            }
+            if(!user.isAccountSetupDone())
+            {
+                continue;
             }
 
             Label usernameLabel = new Label(user.getUserName());
@@ -368,18 +383,28 @@ public class AdminPage extends Application {
         Button deleteUserButton = new Button("Delete User");
         deleteUserButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteUserButton.setFont(Font.font("Arial", 18));
-        deleteLayout.add(deleteUserButton, 0, 2, 2, 1);
+        deleteLayout.add(deleteUserButton, 0, 3, 2, 1);
+
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+        deleteLayout.add(errorLabel, 1, 2);  // Add it to row 5, below the Confirm Password field
 
 
         deleteUserButton.setOnAction(e -> {
             String username = usernameField.getText();
-            User toDelete = USER_LIST.findUser(username);
-            boolean userRemoved = USER_LIST.removeUser(toDelete); // Call the remove method
 
-            if (userRemoved) {
-                showConfirmationDialog(primaryStage, "User " + username + " has been deleted successfully.");
+
+            if (USER_LIST.findUser(username) != null) {
+                if(!USER_LIST.findUser(username).isAdmin())
+                {
+                    showConfirmationDialog(primaryStage, username );
+                }
+                else{
+                    errorLabel.setText("Permission Denied");
+                }
+
             } else {
-                showConfirmationDialog(primaryStage, "User " + username + " not found.");
+                errorLabel.setText("User not found");
             }
         });
 
@@ -420,8 +445,14 @@ public class AdminPage extends Application {
         noButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
 
         yesButton.setOnAction(e -> {
-            confirmationStage.close();
-            showUserDeletedScreen(primaryStage, username);  // Call method to show final delete screen
+            User toDelete = USER_LIST.findUser(username);
+            boolean userRemoved = USER_LIST.removeUser(toDelete); // Call the remove method
+            if (userRemoved) {
+                // Call method to show final delete screen
+                confirmationStage.close();
+                showUserDeletedScreen(primaryStage, username);
+            }
+
         });
 
         noButton.setOnAction(e -> confirmationStage.close());
@@ -490,9 +521,9 @@ public class AdminPage extends Application {
 
         resetUserAccountButton.setOnAction(e -> {
             String username = usernameField.getText();  // Get the username from the text field
-
-            USER_LIST.findUser(username).setAccOTP(new OTP_Generator().generateOTP());
-            //USER_LIST.findUser(username).setPassword(""); //still not sure if need to change his initial password
+            int newotp = new OTP_Generator().generateOTP();
+            USER_LIST.findUser(username).setAccOTP(newotp);
+            System.out.println("Reset "+username+"'s password : OTP Generated = "+newotp);
 
             // Now you can pass the username to the next method or handle it as needed
             showAccountResetConfirmation(primaryStage);

@@ -5,6 +5,18 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*******
+ * <p> Update_DB Class </p>
+ *
+ * <p> Description: This class handles loading and saving user and OTP databases.
+ * It reads from and writes to text files, managing user and OTP information for
+ * the system. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class Update_DB {
     private String path_to_UserDB = "Users.txt";
     private String path_to_OTPDB = "OTPs.txt";
@@ -20,7 +32,7 @@ public class Update_DB {
                         break; // Stop reading if a blank line is encountered
                     }
                     String[] data = line.split("-"); // Split by "-"
-                    if (data.length == 9) { // Now expecting 9 fields with middle name included
+                    if (data.length == 10) { // Now expecting 9 fields with middle name included
                         String username = data[0];
                         String password = data[1];
                         String firstName = data[2];
@@ -30,24 +42,37 @@ public class Update_DB {
                         String email = data[6];
                         String role = data[7]; // S, I, A (or combinations like SI)
                         int accResetOTP = Integer.parseInt(data[8]);
+                        boolean setupDone = Boolean.parseBoolean(data[9]);
 
-                        User user;
+                        User user = null;
 
                         // Create the user object based on the role
-                        if (role.equalsIgnoreCase("S")) {
-                            user = new Student(username, password, email, firstName, middleName, lastName, preferredName);
-                        } else if (role.equalsIgnoreCase("I")) {
-                            user = new Instructor(username, password, email, firstName, middleName, lastName, preferredName);
-                        } else if (role.equalsIgnoreCase("A")) {
+                        if (role.equalsIgnoreCase("A")) {
                             user = new Admin(username, password, email, firstName, middleName, lastName, preferredName);
-                        } else {
-                            user = new User(username, password, email, firstName, middleName, lastName, preferredName);
+                        }
+                        if (role.equalsIgnoreCase("S") && role.equalsIgnoreCase("I")) {
+                            user = new Student(username, password, email, firstName, middleName, lastName, preferredName);
+                            user.setInstructor(true);
+                        }
+                        else{
+                            if (role.equalsIgnoreCase("S")) {
+                                user = new Student(username, password, email, firstName, middleName, lastName, preferredName);
+                            }
+                            if (role.equalsIgnoreCase("I")) {
+                                user = new Instructor(username, password, email, firstName, middleName, lastName, preferredName);
+                            }
                         }
 
                         // Assign the OTP
-                        user.setAccOTP(accResetOTP);
-
+                        if (user != null) {
+                            user.setAccOTP(accResetOTP);
+                            if(setupDone)
+                            {
+                                user.finishAccountSetup();
+                            }
+                        }
                         // Add the user to UserList
+
                         userL.addUser(user);
                     }
                 }
@@ -107,7 +132,8 @@ public class Update_DB {
                         user.getPreferredName() + "-" +
                         user.getEmail() + "-" +
                         role + "-" +
-                        user.getAccOTP());
+                        user.getAccOTP() + "-" +
+                        user.isAccountSetupDone());
                 writer.newLine(); // Add a new line after each user
             }
         } catch (IOException e) {

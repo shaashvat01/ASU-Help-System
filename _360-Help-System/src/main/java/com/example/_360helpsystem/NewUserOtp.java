@@ -18,6 +18,17 @@ import javafx.stage.Stage;
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
+/*******
+ * <p> NewUserOtp Class </p>
+ *
+ * <p> Description: This class handles the OTP validation process for new users.
+ * It provides a screen where users can enter their OTP, and based on the OTP, it directs them to the sign-up process. </p>
+ *
+ * @version 1.00, 2024-10-09
+ * @author Team - Th15
+ *
+ */
+
 public class NewUserOtp extends Application {
 
 
@@ -83,14 +94,17 @@ public class NewUserOtp extends Application {
                         {
                             showSignUpScreen(primaryStage,"SI",otp);  // Navigate to Sign-Up screen
                         }
-                        if(USER_LIST.findUserByOTP(otp).isInstructor())
-                        {
-                            showSignUpScreen(primaryStage,"I",otp);  // Navigate to Sign-Up screen
+                        else {
+                            if(USER_LIST.findUserByOTP(otp).isInstructor())
+                            {
+                                showSignUpScreen(primaryStage,"I",otp);  // Navigate to Sign-Up screen
+                            }
+                            if(USER_LIST.findUserByOTP(otp).isStudent())
+                            {
+                                showSignUpScreen(primaryStage,"S",otp);  // Navigate to Sign-Up screen
+                            }
                         }
-                        if(USER_LIST.findUserByOTP(otp).isStudent())
-                        {
-                            showSignUpScreen(primaryStage,"S",otp);  // Navigate to Sign-Up screen
-                        }
+
 
                     }
 

@@ -15,7 +15,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 /*******
  * <p> UserDetails Class </p>
@@ -27,6 +26,8 @@ import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
  * @author Team - Th15
  *
  */
+
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 public class UserDetails extends Application {
 
@@ -41,10 +42,11 @@ public class UserDetails extends Application {
         this.Role = Role;
         this.otp = otp;
     }
+
     public UserDetails() {
+
     }
 
-    // This method sets up the form to collect additional user details for account setup.
     @Override
     public void start(Stage primaryStage) {
         // Background setup
@@ -166,6 +168,7 @@ public class UserDetails extends Application {
                 USER_LIST.getUserList().add(newInstructor);
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
+
             // Optionally, show a confirmation or navigate to another screen
             showSignInScreen(primaryStage);  // Navigate to the Sign In screen
         });
@@ -191,7 +194,7 @@ public class UserDetails extends Application {
             ex.printStackTrace();
         }
     }
-    // main
+
     public static void main(String[] args) {
         launch(args);
     }
