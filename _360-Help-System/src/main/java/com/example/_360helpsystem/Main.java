@@ -72,16 +72,12 @@ public class Main extends Application {
         }
     }
 
-    private void showNewUserOtpScreen(Stage primaryStage){
+    private void showNewUserOtpScreen(Stage primaryStage) {
         NewUserOtp mainOtp = new NewUserOtp();
         try {
             mainOtp.start(primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        launch(args);  // Ensure you're running Main.java as the entry point
     }
 }

@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.OTPList;
+import Backend.PasswordEvaluator;
 import Backend.Update_DB;
 import Backend.UserList;
 import javafx.application.Application;
@@ -14,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 //INTEGRATED
 //NEEDS ANOTHER CONFIRM NEW PASSWORD TEXTBOX
@@ -51,6 +53,11 @@ public class CreateAdminAccount extends Application {
     private void showFirstTimeSetupScreen(Stage primaryStage) {
         VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
 
+        Label passwordFeedbackLabel = new Label();  // This will display real-time feedback
+        passwordFeedbackLabel.setTextFill(Color.RED);  // Initial color is red for unmet conditions
+
+
+
         Label prompt = WindowUtil.createStyledLabel("Create Admin Account", 24);  // Standardized title label
 
         // Username and Password fields
@@ -64,6 +71,8 @@ public class CreateAdminAccount extends Application {
         passwordField.setPrefWidth(250);
         passwordField.setMaxWidth(250);
 
+        PasswordEvaluator PE = new PasswordEvaluator(passwordField, passwordFeedbackLabel);
+
         // Create the standardized button
         Button createAdminButton = WindowUtil.createStyledButton("Create Admin Account");
 
@@ -73,12 +82,16 @@ public class CreateAdminAccount extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
 
-            // Show the user details screen
-            showUserDetailsScreen(primaryStage,username,password);
+            if(PE.checkPassword(password)) {
+                {
+                    showUserDetailsScreen(primaryStage,username,password);
+                }
+            }
+
         });
 
         // Add all elements to the layout
-        layout.getChildren().addAll(prompt, usernameLabel, usernameField, passwordLabel, passwordField, createAdminButton);
+        layout.getChildren().addAll(prompt, usernameLabel, usernameField, passwordLabel, passwordField,passwordFeedbackLabel, createAdminButton);
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -147,4 +160,5 @@ public class CreateAdminAccount extends Application {
         UDB.saveOTPDB(OTP_LIST);
         System.out.println("Databases saved successfully.");
     }
+
 }
