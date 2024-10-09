@@ -38,6 +38,9 @@ public class NewUserOtp extends Application {
         Button otpOkButton = WindowUtil.createStyledButton("OK");
         otpOkButton.setPrefWidth(120);  // Increase the button width for a better fit
 
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+
         // Create the circular back button using the utility class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
 
@@ -45,7 +48,7 @@ public class NewUserOtp extends Application {
         VBox layout = WindowUtil.createStandardLayout();  // Use standardized VBox layout
         layout.setSpacing(20);  // Add spacing between elements for better layout
         layout.setAlignment(Pos.CENTER);  // Center the elements in the VBox
-        layout.getChildren().addAll(otpText, otpField, otpOkButton);
+        layout.getChildren().addAll(otpText, otpField, errorLabel,otpOkButton);
 
         // Add VBox layout to background pane
         backgroundPane.getChildren().add(layout);
@@ -93,12 +96,12 @@ public class NewUserOtp extends Application {
 
                 } else {
                     // Optionally show an error message if OTP is invalid
-                    System.out.println("Invalid OTP. Please try again.");
+                    errorLabel.setText("Invalid OTP. Please try again.");
                     // You could also show a dialog or label to inform the user
                 }
             } catch (NumberFormatException ex) {
                 // Handle case where input is not a valid integer
-                System.out.println("Please enter a valid 6-digit OTP.");
+                errorLabel.setText("Invalid OTP. Please try again.");
             }
         });
 

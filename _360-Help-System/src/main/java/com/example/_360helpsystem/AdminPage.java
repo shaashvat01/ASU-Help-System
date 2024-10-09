@@ -263,19 +263,17 @@ public class AdminPage extends Application {
 
             // Create a new User based on the selection
             User newUser = null;
-            if (isStudent) {
+
+            if (isInstructor && isStudent) {
+                // If both roles are selected, create a Student and set the Instructor role
+                newUser = new Student("", "", email, "", "", "", ""); // Create a Student
+                ((Student) newUser).setInstructor(true); // Set as Instructor as well
+            } else if (isInstructor) {
+                // Create an Instructor user with only email
+                newUser = new Instructor("", "", email, "", "", "", ""); // Use the Instructor constructor
+            } else if (isStudent) {
                 // Create a Student user with only email
                 newUser = new Student("", "", email, "", "", "", ""); // Use the Student constructor
-            }
-
-            if (isInstructor) {
-                // Create an Instructor user with only email
-                if (newUser == null) {
-                    newUser = new Instructor("", "", email, "", "", "", ""); // Use the Instructor constructor
-                } else {
-                    // If both roles are selected, create a new Instructor from the existing Student
-                    ((Student) newUser).setInstructor(true); // Casting to set the instructor role
-                }
             }
 
             // Add the new user to the USER_LIST
