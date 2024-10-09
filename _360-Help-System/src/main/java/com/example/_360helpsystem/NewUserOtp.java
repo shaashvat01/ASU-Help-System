@@ -83,14 +83,17 @@ public class NewUserOtp extends Application {
                         {
                             showSignUpScreen(primaryStage,"SI",otp);  // Navigate to Sign-Up screen
                         }
-                        if(USER_LIST.findUserByOTP(otp).isInstructor())
-                        {
-                            showSignUpScreen(primaryStage,"I",otp);  // Navigate to Sign-Up screen
+                        else {
+                            if(USER_LIST.findUserByOTP(otp).isInstructor())
+                            {
+                                showSignUpScreen(primaryStage,"I",otp);  // Navigate to Sign-Up screen
+                            }
+                            if(USER_LIST.findUserByOTP(otp).isStudent())
+                            {
+                                showSignUpScreen(primaryStage,"S",otp);  // Navigate to Sign-Up screen
+                            }
                         }
-                        if(USER_LIST.findUserByOTP(otp).isStudent())
-                        {
-                            showSignUpScreen(primaryStage,"S",otp);  // Navigate to Sign-Up screen
-                        }
+
 
                     }
 

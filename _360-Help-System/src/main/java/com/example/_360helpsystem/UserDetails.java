@@ -133,23 +133,30 @@ public class UserDetails extends Application {
             // Add the Admin object to the UserList
             if(this.Role.equals("A"))
             {
-                USER_LIST.getUserList().add(new Admin(username, password, email, firstName, middleName, lastName, preferredName));  // getUserList() returns the LinkedList of User objects
+                Admin newAdmin = new Admin(username, password, email, firstName, middleName, lastName, preferredName);
+                newAdmin.finishAccountSetup();
+                USER_LIST.getUserList().add(newAdmin);  // getUserList() returns the LinkedList of User objects
             }
             if(this.Role.equals("SI") || this.Role.equals("IS"))
             {
-
-                USER_LIST.getUserList().add(new Student(username, password, email, firstName, middleName, lastName, preferredName));  // getUserList() returns the LinkedList of User objects
-                USER_LIST.findUser(username).setInstructor(true);
+                Student newStudent = new Student(username, password, email, firstName, middleName, lastName, preferredName);
+                newStudent.finishAccountSetup();
+                newStudent.setInstructor(true);
+                USER_LIST.getUserList().add(newStudent);  // getUserList() returns the LinkedList of User objects
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
             if(this.Role.equals("S"))
             {
-                USER_LIST.getUserList().add(new Student(username, password, email, firstName, middleName, lastName, preferredName));
+                Student newStudent = new Student(username, password, email, firstName, middleName, lastName, preferredName);
+                newStudent.finishAccountSetup();
+                USER_LIST.getUserList().add(newStudent);
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
             if(this.Role.equals("I"))
             {
-                USER_LIST.getUserList().add(new Instructor(username, password, email, firstName, middleName, lastName, preferredName));
+                Instructor newInstructor = new Instructor(username, password, email, firstName, middleName, lastName, preferredName);
+                newInstructor.finishAccountSetup();
+                USER_LIST.getUserList().add(newInstructor);
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
 
