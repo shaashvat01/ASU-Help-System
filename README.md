@@ -7,4 +7,5 @@ Naga Sathvik Kommareddy
 Mukesh Tulluru  
 Gayathri Kota     
   
-To **launch** the application run **CreatAdminAccount** File.
+To **launch** the application run **CreatAdminAccount.java** File  
+Path to the file - _360-Help-System/src/main/java/com/example/_360helpsystem/CreateAdminAccount.java  
