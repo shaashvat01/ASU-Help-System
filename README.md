@@ -1,3 +1,5 @@
+Adaptive Learning Support Platform (ALSP) - CSE 360 Help System  
+
 Team Th15:  
 Shaashvat Mittal  
 Saisrivathsan Manikandan  
