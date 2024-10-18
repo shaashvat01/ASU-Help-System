@@ -35,7 +35,7 @@ public class AdminPage extends Application {
     @Override
     public void start(Stage primaryStage) {
         Admin admin = new Admin();
-        Text title = new Text("Admins Dashboard");
+        Text title = new Text("Admin Dashboard");
         title.setFont(Font.font("Arial", 36));
 
         // Invite User Button
