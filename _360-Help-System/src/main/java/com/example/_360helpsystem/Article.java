@@ -91,7 +91,7 @@ public class Article extends Application {
         articleButtons.setPadding(new Insets(0, 0, 0, 0)); // Reduced padding for better alignment
 
         // Create a large box to display articles in the future
-        Rectangle articleContainer = new Rectangle(590, 450);  // Adjust width and height as needed
+        Rectangle articleContainer = new Rectangle(700, 565);  // Adjust width and height as needed
         articleContainer.setFill(Color.WHITE);
         //articleContainer.setStroke(Color.BLACK);  // Border for the container
 
