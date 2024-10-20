@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /*******
@@ -22,7 +23,7 @@ import javafx.stage.Stage;
  *
  */
 
-public class HomePage extends Application {
+public class InstructorPage extends Application {
 
     @Override
     public void start(Stage primaryStage) {
@@ -68,14 +69,35 @@ public class HomePage extends Application {
 
         root.setLeft(backButtonPane);
 
+        // Create and style the "Articles" button
+        Button article = new Button("Articles");
+        article.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        article.setFont(Font.font("Arial", 18));
+        article.setPrefWidth(250);
+        article.setOnAction(e -> showArticleScreen(primaryStage));
+
+        // Add the article button to the center of the layout
+        root.setCenter(article);  // Set the button in the center of the layout
+
         // Set the scene with the required window size
-        Scene scene = new Scene(root, 600, 600);  // Set to 600x600
+        Scene scene = new Scene(root, 900, 700);  // Set to 600x600
         primaryStage.setTitle("Home Page");
         primaryStage.setScene(scene);
         primaryStage.show();
 
         // Set action for the logout button to show the SignIn screen
         logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
+    }
+
+    private void showArticleScreen(Stage primaryStage) {
+        Article article = new Article();
+        try{
+            article.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+
     }
 
     // Method to show the SignIn screen when Logout is clicked
@@ -98,6 +120,7 @@ public class HomePage extends Application {
             ex.printStackTrace();
         }
     }
+
     // main
     public static void main(String[] args) {
         launch(args);

@@ -4,6 +4,13 @@ import Backend.OTP_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -28,15 +35,89 @@ import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
  *
  */
 
+
 public class AdminPage extends Application {
 
+    private VBox mainContentArea; // VBox to hold main content dynamically
     OTP_Generator otpGenerator = new OTP_Generator();
 
     @Override
     public void start(Stage primaryStage) {
         Admin admin = new Admin();
-        Text title = new Text("Admin Dashboard");
-        title.setFont(Font.font("Arial", 36));
+
+        // Sidebar buttons for "User Accounts" and "Articles" with icons
+        Button userModificationsButton = createSidebarButtonWithIcon("User Accounts", "👤");
+        userModificationsButton.setOnAction(e -> showUserSettingsScreen(primaryStage));
+
+        Button articleButton = createSidebarButtonWithIcon("Articles", "📘");
+        articleButton.setOnAction(e -> showArticleScreen(primaryStage));
+
+        // Sidebar VBox with buttons
+        VBox sidebar = new VBox(10);
+        sidebar.setPadding(new Insets(20, 5, 10, 5));  // Reduced left-side padding
+        sidebar.setStyle("-fx-background-color: #333;");
+        sidebar.setPrefWidth(160);  // Reduced sidebar width to match the smaller size
+        sidebar.getChildren().addAll(userModificationsButton, articleButton);
+
+        // Logout Button
+        Button logoutButton = new Button("Logout");
+        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        logoutButton.setFont(Font.font("Arial", 18));
+        logoutButton.setOnAction(e -> showSignInPage(primaryStage));
+
+        // Back Button using the ButtonStyleUtil class
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage)); // Call the showPreviousScreen method
+
+        // Top bar layout with Back and Logout button
+        HBox topBar = new HBox();
+        topBar.setPadding(new Insets(10, 10, 0, 10));
+        topBar.setSpacing(10);
+
+        HBox leftBox = new HBox(backButton);
+        leftBox.setAlignment(Pos.TOP_LEFT);  // Align back button to the left
+
+        HBox rightBox = new HBox(logoutButton);
+        rightBox.setAlignment(Pos.TOP_RIGHT);  // Align logout button to the right
+
+        topBar.getChildren().addAll(leftBox, rightBox);
+        HBox.setHgrow(rightBox, Priority.ALWAYS); // Make the rightBox grow to push the logout button to the right
+
+        // Main content area to show buttons dynamically
+        mainContentArea = new VBox(20);
+        mainContentArea.setAlignment(Pos.CENTER);
+        mainContentArea.setPadding(new Insets(20));
+
+        // Main layout with sidebar and main content area
+        HBox mainLayout = new HBox(sidebar, mainContentArea);
+
+        BorderPane root = new BorderPane();
+        root.setTop(topBar);
+        root.setCenter(mainLayout);
+        root.setStyle("-fx-background-color: #f8f5f3;");
+
+        Scene adminScene = new Scene(root, 900, 700);  // Set the window size to 800x600
+
+        primaryStage.setTitle("Admin Dashboard");
+        primaryStage.setScene(adminScene);
+        primaryStage.setResizable(false);  // Disable resizing if you want a fixed size
+        primaryStage.show();
+    }
+
+    // Helper method to create a sidebar button with an icon
+    private Button createSidebarButtonWithIcon(String text, String icon) {
+        Button button = new Button(icon + " " + text);
+        button.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT;");
+        button.setMaxWidth(Double.MAX_VALUE);  // Make the button fill the width of the side bar
+        button.setPadding(new Insets(10, 10, 10, 10));  // Reduced left-side padding for button
+        button.setAlignment(Pos.CENTER_LEFT);
+        return button;
+    }
+
+    // Function to update the content when "User Account" is clicked
+    private void showUserSettingsScreen(Stage primaryStage) {
+        mainContentArea.getChildren().clear(); // Clear current content
+        mainContentArea.setAlignment(Pos.CENTER); // Center the main content area vertically and horizontally
 
         // Invite User Button
         Button inviteUserButton = new Button("Invite User");
@@ -45,77 +126,58 @@ public class AdminPage extends Application {
         inviteUserButton.setPrefWidth(250);
         inviteUserButton.setOnAction(e -> showInviteUserScreen(primaryStage));
 
-        // Other buttons
-        Button userModificationsButton = new Button("List Accounts");
-        userModificationsButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        userModificationsButton.setFont(Font.font("Arial", 18));
-        userModificationsButton.setPrefWidth(250);
-        userModificationsButton.setOnAction(e -> showUserModificationsScreen(primaryStage));
+        // List Accounts Button
+        Button listAccountsButton = new Button("List Accounts");
+        listAccountsButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        listAccountsButton.setFont(Font.font("Arial", 18));
+        listAccountsButton.setPrefWidth(250);
+        listAccountsButton.setOnAction(e -> showUserModificationsScreen(primaryStage));
 
+        // Reset Account Button
         Button resetAccountButton = new Button("Reset Account");
         resetAccountButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         resetAccountButton.setFont(Font.font("Arial", 18));
         resetAccountButton.setPrefWidth(250);
         resetAccountButton.setOnAction(e -> showResetAccountScreen(primaryStage));
 
+        // Delete Account Button
         Button deleteAccountButton = new Button("Delete Account");
         deleteAccountButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteAccountButton.setFont(Font.font("Arial", 18));
         deleteAccountButton.setPrefWidth(250);
         deleteAccountButton.setOnAction(e -> showDeleteUserScreen(primaryStage));
 
-        // Logout Button
-        Button logoutButton = new Button("Logout");
-        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        logoutButton.setFont(Font.font("Arial", 18));
-        logoutButton.setOnAction(e -> showSignInPage(primaryStage));
+        // VBox to hold buttons with spacing, and center everything
+        VBox buttonContainer = new VBox(20);
+        buttonContainer.setAlignment(Pos.CENTER); // Center the buttons horizontally
+        buttonContainer.getChildren().addAll(inviteUserButton, listAccountsButton, resetAccountButton, deleteAccountButton);
 
-        // Back Button
-        Button backButton = ButtonStyleUtil.createCircularBackButton();
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back logic here
-
-        // Top bar layout: Back button on the left and Logout button on the right
-        HBox topBar = new HBox();
-        topBar.setPadding(new Insets(10, 10, 0, 10));
-        topBar.setSpacing(10);
-
-        // Align buttons in their respective positions
-        HBox leftBox = new HBox(backButton); // Left side with back button
-        leftBox.setAlignment(Pos.TOP_LEFT);
-
-        HBox rightBox = new HBox(logoutButton); // Right side with logout button
-        rightBox.setAlignment(Pos.TOP_RIGHT);
-
-        // Add both to topBar with spacing in between
-        topBar.getChildren().addAll(leftBox, rightBox);
-        HBox.setHgrow(rightBox, Priority.ALWAYS); // Make the rightBox grow to push the logout button to the right
-
-        // Main layout with admin dashboard buttons
-        VBox layout = new VBox(20);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-        layout.getChildren().addAll(title, inviteUserButton, userModificationsButton, resetAccountButton, deleteAccountButton);
-
-        BorderPane root = new BorderPane();
-        root.setTop(topBar);
-        root.setCenter(layout);
-
-        Scene adminScene = new Scene(root, 600, 600);
-        primaryStage.setTitle("Admin Dashboard");
-        primaryStage.setScene(adminScene);
-        primaryStage.show();
+        // Center the button container vertically and horizontally in the main content area
+        mainContentArea.getChildren().add(buttonContainer);
+        VBox.setVgrow(buttonContainer, Priority.ALWAYS);  // Allow the button container to grow and center vertically
     }
 
-    // Implement logic for back button on Admin Dashboard
-    private void showPreviousScreen(Stage primaryStage) {
-        SignInAs signInAs = new SignInAs();
+
+    private void showArticleScreen(Stage primaryStage) {
+        Article article = new Article();
         try{
-            signInAs.start(primaryStage);
+            article.start(primaryStage);
         }
         catch(Exception ex){
             ex.printStackTrace();
         }
     }
+
+    // Implement logic for back button on Admin Dashboard
+    private void showPreviousScreen(Stage primaryStage) {
+        SignInAs signInAs = new SignInAs();
+        try {
+            signInAs.start(primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();  // Print the stack trace to debug any potential issues
+        }
+    }
+
 
     private void showUserModificationsScreen(Stage primaryStage) {
         GridPane userModificationsLayout = new GridPane();
@@ -234,7 +296,7 @@ public class AdminPage extends Application {
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
 
-        Scene userModificationsScene = new Scene(root, 600, 600);
+        Scene userModificationsScene = new Scene(root, 800, 600);
         primaryStage.setScene(userModificationsScene);
     }
 
@@ -246,11 +308,9 @@ public class AdminPage extends Application {
         inviteLayout.setHgap(10);
         inviteLayout.setAlignment(Pos.CENTER);
 
-
         Text inviteTitle = new Text("Invite User");
         inviteTitle.setFont(Font.font("Arial", 24));
         inviteLayout.add(inviteTitle, 0, 0, 2, 1);
-
 
         Label emailLabel = new Label("Email:");
         TextField emailField = new TextField();
@@ -263,15 +323,12 @@ public class AdminPage extends Application {
         inviteLayout.add(S_check, 0, 2);
         inviteLayout.add(I_check, 1, 2);
 
-
         Button inviteButton = new Button("Invite");
         inviteButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         inviteButton.setFont(Font.font("Arial", 18));
         inviteLayout.add(inviteButton, 0, 3, 2, 1);
 
-
-        inviteButton.setOnAction(e ->{
-
+        inviteButton.setOnAction(e -> {
             String email = emailField.getText();
             boolean isStudent = S_check.isSelected();
             boolean isInstructor = I_check.isSelected();
@@ -280,39 +337,37 @@ public class AdminPage extends Application {
             User newUser = null;
 
             if (isInstructor && isStudent) {
-                // If both roles are selected, create a Student and set the Instructor role
                 newUser = new Student("", "", email, "", "", "", ""); // Create a Student
                 ((Student) newUser).setInstructor(true); // Set as Instructor as well
-                System.out.println("Created Role Student = "+newUser.isStudent());
-                System.out.println("Created Role Instructor = "+newUser.isInstructor());
+                System.out.println("Created Role Student = " + newUser.isStudent());
+                System.out.println("Created Role Instructor = " + newUser.isInstructor());
             } else if (isInstructor) {
-                // Create an Instructor user with only email
                 newUser = new Instructor("", "", email, "", "", "", ""); // Use the Instructor constructor
-                System.out.println("Created Only Role Instructor = "+newUser.isInstructor());
+                System.out.println("Created Only Role Instructor = " + newUser.isInstructor());
             } else if (isStudent) {
-                // Create a Student user with only email
                 newUser = new Student("", "", email, "", "", "", ""); // Use the Student constructor
-                System.out.println("Created Only Role Student = "+newUser.isStudent());
+                System.out.println("Created Only Role Student = " + newUser.isStudent());
             }
 
             // Add the new user to the USER_LIST
             if (newUser != null) {
-                USER_LIST.addUser(newUser);
+                USER_LIST.addUser(newUser); // Ensure USER_LIST is initialized
 
                 // Generate OTP and add to OTP_LIST
+                OTP_Generator otpGenerator = new OTP_Generator(); // Initialize properly
                 int generatedOtp = otpGenerator.generateOTP();
-                OTP_LIST.addOTP(generatedOtp);
+                OTP_LIST.addOTP(generatedOtp); // Ensure OTP_LIST is initialized
                 System.out.println(OTP_LIST.toString());
                 newUser.setAccOTP(generatedOtp);
 
                 // Optionally, show some confirmation or proceed to the next screen
                 System.out.println("New user added: " + newUser.getEmail() + " | OTP: " + generatedOtp);
             }
+
             showInvitationSentScreen(primaryStage, emailField.getText());
         });
 
-
-
+        // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
 
@@ -326,9 +381,10 @@ public class AdminPage extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
 
 
-        Scene inviteScene = new Scene(root, 600, 600);
-        primaryStage.setScene(inviteScene);
+        Scene resetScene = new Scene(root, 800, 600);
+        primaryStage.setScene(resetScene);
     }
+
 
 
     private void showInvitationSentScreen(Stage primaryStage, String email) {
@@ -355,7 +411,7 @@ public class AdminPage extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
 
 
-        Scene confirmationScene = new Scene(root, 600, 600);
+        Scene confirmationScene = new Scene(root, 800, 600);
         primaryStage.setScene(confirmationScene);
     }
 
@@ -422,7 +478,7 @@ public class AdminPage extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
 
 
-        Scene deleteScene = new Scene(root, 600, 600);
+        Scene deleteScene = new Scene(root, 800, 600);
         primaryStage.setScene(deleteScene);
     }
 
@@ -462,7 +518,7 @@ public class AdminPage extends Application {
 
         confirmationLayout.getChildren().addAll(confirmationMessage, buttonLayout);
 
-        Scene confirmationScene = new Scene(confirmationLayout, 400, 250);
+        Scene confirmationScene = new Scene(confirmationLayout, 800, 600);
         confirmationStage.setScene(confirmationScene);
         confirmationStage.showAndWait();
     }
@@ -488,7 +544,7 @@ public class AdminPage extends Application {
         userDeletedLayout.setTop(backButton);
 
         // Create scene and set on the primary stage
-        Scene userDeletedScene = new Scene(userDeletedLayout, 600, 600);
+        Scene userDeletedScene = new Scene(userDeletedLayout, 800, 600);
         primaryStage.setScene(userDeletedScene);
     }
 
@@ -543,7 +599,7 @@ public class AdminPage extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
 
 
-        Scene resetScene = new Scene(root, 600, 600);
+        Scene resetScene = new Scene(root, 800, 600);
         primaryStage.setScene(resetScene);
     }
 
@@ -572,7 +628,7 @@ public class AdminPage extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
 
 
-        Scene confirmationScene = new Scene(root, 600, 600);
+        Scene confirmationScene = new Scene(root, 800, 600);
         primaryStage.setScene(confirmationScene);
     }
 
@@ -581,6 +637,7 @@ public class AdminPage extends Application {
         SignIn signInPage = new SignIn();
         signInPage.start(primaryStage);
     }
+
 
 
     public static void main(String[] args) {

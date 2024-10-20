@@ -35,7 +35,7 @@ public class ResetPassword extends Application {
     public void start(Stage primaryStage) {
         // Create background
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey background, adjusted to 600x600
+        Rectangle background = new Rectangle(900, 700, Color.web("#f8f5f3"));  // Very light grey background, adjusted to 600x600
         backgroundPane.getChildren().add(background);
 
         // Create labels and password fields
@@ -63,7 +63,7 @@ public class ResetPassword extends Application {
 
         // Create Update button using WindowUtil for consistent styling
         Button updateButton = WindowUtil.createStyledButton("Update Password");
-        updateButton.setPrefWidth(150);
+        updateButton.setPrefWidth(250);
 
         // Feedback label for real-time password strength evaluation
         Label passwordFeedbackLabel = new Label();
@@ -99,7 +99,7 @@ public class ResetPassword extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
 
         // Create scene and set stage using the adjusted window size
-        Scene scene = new Scene(root, 600, 600);  // Set scene size to 600x600
+        Scene scene = new Scene(root, 900, 700);  // Set scene size to 600x600
         primaryStage.setTitle("Reset Password");
         primaryStage.setScene(scene);
         primaryStage.show();

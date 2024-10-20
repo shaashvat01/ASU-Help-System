@@ -51,7 +51,7 @@ public class UserDetails extends Application {
     public void start(Stage primaryStage) {
         // Background setup
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Set background size to 600x600
+        Rectangle background = new Rectangle(900, 700, Color.web("#f8f5f3"));  // Set background size to 600x600
         backgroundPane.getChildren().add(background);
 
         // GridPane for form layout
@@ -125,7 +125,7 @@ public class UserDetails extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
 
         // Set the scene size to 600x600 and make all elements visible
-        Scene scene = new Scene(root, 600, 600);  // Adjusted scene size to 600x600
+        Scene scene = new Scene(root, 900, 700);  // Adjusted scene size to 600x600
         primaryStage.setTitle("User Details");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);  // Disable resizing to keep the layout consistent

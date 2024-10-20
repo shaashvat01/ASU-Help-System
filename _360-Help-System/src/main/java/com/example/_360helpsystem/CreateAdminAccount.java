@@ -120,7 +120,7 @@ public class CreateAdminAccount extends Application {
 
         // Set standardized window size
         Scene scene = new Scene(root);
-        WindowUtil.setWindowSize(primaryStage, scene, 600, 600);  // Standard size applied
+        WindowUtil.setWindowSize(primaryStage, scene, 900, 700);  // Standard size applied
 
         primaryStage.show();
     }

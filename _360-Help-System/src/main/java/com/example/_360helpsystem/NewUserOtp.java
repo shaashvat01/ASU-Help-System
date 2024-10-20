@@ -36,7 +36,7 @@ public class NewUserOtp extends Application {
     public void start(Stage primaryStage) {
         // Create background
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey, adjusted to 600x600
+        Rectangle background = new Rectangle(900, 700, Color.web("#f8f5f3"));  // Very light grey, adjusted to 600x600
         backgroundPane.getChildren().add(background);
 
         // Create OTP label and text field
@@ -74,7 +74,7 @@ public class NewUserOtp extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
 
         // Create the scene and set the stage with the adjusted window size
-        Scene scene = new Scene(root, 600, 600);  // Set scene size to 600x600
+        Scene scene = new Scene(root, 900, 700);  // Set scene size to 600x600
         primaryStage.setTitle("New User OTP");
         primaryStage.setScene(scene);
         primaryStage.show();
