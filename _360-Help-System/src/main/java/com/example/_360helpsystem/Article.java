@@ -33,14 +33,16 @@ public class Article extends Application {
         sidebar.setPrefWidth(160);  // Adjust the sidebar width
         sidebar.getChildren().addAll(eclipseBtn, gitHubBtn, javaFxBtn, h2Btn, sqlBtn);
 
-        // Create the Logout button
-        Button logoutButton = new Button("Logout");
-        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        logoutButton.setFont(javafx.scene.text.Font.font("Arial", 18));
-        logoutButton.setPrefWidth(100);  // Set preferred width to control the button size
-        logoutButton.setPrefHeight(35);  // Set preferred height
 
-        logoutButton.setOnAction(e -> showSignInPage(primaryStage));
+        // Create article-related buttons (Create Article, Backup, Restore) with reduced padding
+        Button createArticleBtn = new Button("Create Article");
+        createArticleBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        createArticleBtn.setPrefWidth(150);  // Set the preferred width similar to Logout
+        createArticleBtn.setPrefHeight(35);  // Set the preferred height
+        createArticleBtn.setFont(javafx.scene.text.Font.font("Arial", 15));
+        createArticleBtn.setOnAction(e -> showCreateArticleScreen(primaryStage));
+
+
 
         // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -63,13 +65,7 @@ public class Article extends Application {
         searchBar.setAlignment(Pos.CENTER);
         searchBar.setPadding(new Insets(10, 0, 0, 100));
 
-        // Create article-related buttons (Create Article, Backup, Restore) with reduced padding
-        Button createArticleBtn = new Button("Create Article");
-        createArticleBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        createArticleBtn.setPrefWidth(150);  // Set the preferred width similar to Logout
-        createArticleBtn.setPrefHeight(35);  // Set the preferred height
-        createArticleBtn.setFont(javafx.scene.text.Font.font("Arial", 15));
-        createArticleBtn.setOnAction(e -> showCreateArticleScreen(primaryStage));
+
 
         Button backupBtn = new Button("Backup");
         backupBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
@@ -108,7 +104,7 @@ public class Article extends Application {
         HBox leftBox = new HBox(backButton);
         leftBox.setAlignment(Pos.TOP_LEFT);  // Align back button to the left
 
-        HBox rightBox = new HBox(logoutButton);
+        HBox rightBox = new HBox(createArticleBtn);
         rightBox.setAlignment(Pos.TOP_RIGHT);  // Align logout button to the right
 
         topBar.getChildren().addAll(leftBox, searchBar, rightBox);
@@ -170,15 +166,6 @@ public class Article extends Application {
             ex.printStackTrace();
         }
    }
-
-    private void showSignInPage(Stage primaryStage) {
-        SignIn signin = new SignIn();
-        try {
-            signin.start(primaryStage);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 
     private void showPreviousScreen(Stage primaryStage) {
         AdminPage adminpage = new AdminPage();
