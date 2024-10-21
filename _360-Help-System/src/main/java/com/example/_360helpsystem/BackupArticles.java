@@ -96,9 +96,9 @@ public class BackupArticles extends Application {
     }
 
     private void showPreviousScreen(Stage primaryStage) {
-        Article article = new Article();
+        Articles articles = new Articles();
         try {
-            article.start(primaryStage);
+            articles.start(primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
