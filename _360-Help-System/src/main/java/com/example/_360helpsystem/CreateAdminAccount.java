@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 /*******
  * <p> CreateAdminAccount Class </p>
  *
@@ -155,16 +157,18 @@ public class CreateAdminAccount extends Application {
     {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
+        System.out.println("Size before load - "+ARTICLE_LIST.getSize());
         UDB.loadArticleDB(ARTICLE_LIST);
-        ARTICLE_LIST.addArticle(new Article(12321313123L,"Test","","","","",null,"","",""));
-        System.out.println(ARTICLE_LIST.getArticles().getFirst().getTitle());
+        System.out.println("Size after load - "+ARTICLE_LIST.getSize());
     }
     // This method saves the databases when the application is closing.
     public void stop() {
         // Save user and OTP databases when the application is closing
         UDB.saveUserDB(USER_LIST);
         UDB.saveOTPDB(OTP_LIST);
+        System.out.println("Size before save - "+ARTICLE_LIST.getSize());
         UDB.saveArticleDB(ARTICLE_LIST);
+        System.out.println("Size after save - "+ARTICLE_LIST.getSize());
         System.out.println("Databases saved successfully.");
     }
 }

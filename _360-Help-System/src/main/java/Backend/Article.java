@@ -1,5 +1,4 @@
 package Backend;
-import java.util.ArrayList;
 
 public class Article {
     private long UID;
@@ -8,12 +7,12 @@ public class Article {
     private String level;
     private String security;
     private String abs;
-    private ArrayList <String> keywords;
+    private String keywords;
     private String body;
     private String links;
     private String group;
 
-    public Article(long UID, String title, String author, String level, String security, String abs, ArrayList<String> keywords, String body, String links, String group) {
+    public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String group) {
         this.UID = UID;
         this.title = title;
         this.author = author;
@@ -61,10 +60,10 @@ public class Article {
     public void setAbs(String abs) {
         this.abs = abs;
     }
-    public ArrayList <String> getKeywords() {
+    public String getKeywords() {
         return keywords;
     }
-    public void setKeywords(ArrayList <String> keywords) {
+    public void setKeywords(String keywords) {
         this.keywords = keywords;
     }
     public String getBody() {

@@ -1,8 +1,10 @@
 package com.example._360helpsystem;
 
+import Backend.Article;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -15,15 +17,15 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+
 public class ArticlesPage extends Application {
 
     private VBox articleContainerVBox; // The container to display the articles
-    private List<ArticleData> eclipseArticles; // List of articles for Eclipse group
 
     @Override
     public void start(Stage primaryStage) {
         // Initialize the articles for the Eclipse group
-        initializeArticles();
 
         // Create group buttons
         Button eclipseBtn = createGroupButton("Eclipse");
@@ -44,21 +46,21 @@ public class ArticlesPage extends Application {
         createArticleBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         createArticleBtn.setPrefWidth(150);
         createArticleBtn.setPrefHeight(35);
-        createArticleBtn.setFont(javafx.scene.text.Font.font("Arial", 15));
+        createArticleBtn.setFont(Font.font("Arial", 15));
         createArticleBtn.setOnAction(e -> showCreateArticleScreen(primaryStage));
 
         Button backupBtn = new Button("Backup");
         backupBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         backupBtn.setPrefWidth(100);
         backupBtn.setPrefHeight(35);
-        backupBtn.setFont(javafx.scene.text.Font.font("Arial", 15));
+        backupBtn.setFont(Font.font("Arial", 15));
         backupBtn.setOnAction(e -> showBackupScreen(primaryStage));
 
         Button restoreBtn = new Button("Restore");
         restoreBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         restoreBtn.setPrefWidth(100);
         restoreBtn.setPrefHeight(35);
-        restoreBtn.setFont(javafx.scene.text.Font.font("Arial", 15));
+        restoreBtn.setFont(Font.font("Arial", 15));
         restoreBtn.setOnAction(e -> showRestoreArticles(primaryStage));
 
         // HBox to hold article-related buttons
@@ -89,7 +91,7 @@ public class ArticlesPage extends Application {
         // Search Button with "Search" text
         Button searchButton = new Button("Search");
         searchButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        searchButton.setFont(javafx.scene.text.Font.font("Arial", 15));
+        searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
 
         // Search bar layout
@@ -158,11 +160,25 @@ public class ArticlesPage extends Application {
 
     // Method to dynamically display articles for a specific group
     private void displayArticlesForGroup(String groupName) {
-        articleContainerVBox.getChildren().clear(); // Clear previous articles
+        // Clear previous articles
+        articleContainerVBox.getChildren().clear();
 
-        List<ArticleData> articles = eclipseArticles; // Use your actual logic here for groups
+        // Create a ScrollPane to hold the VBox containing articles
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true); // Makes sure the ScrollPane fits the width
+        scrollPane.setContent(articleContainerVBox); // Add VBox to ScrollPane
 
-        for (ArticleData article : articles) {
+        // ScrollPane styling (optional)
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
+
+        // Iterate over the articles in the ArticleList
+        int numArticles = 0;
+        for (Article article : ARTICLE_LIST) {
+            numArticles++;
+            System.out.println(numArticles);
+
+            // Create VBox for each article with padding and border
             VBox articleBox = new VBox(5);
             articleBox.setPadding(new Insets(10));
             articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
@@ -181,7 +197,7 @@ public class ArticlesPage extends Application {
             titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
             titleLevelBox.setAlignment(Pos.TOP_LEFT);
 
-            // Create the 3-dots button
+            // Create the 3-dots button for options
             Button optionsButton = new Button("...");
             optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
             optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton)); // Pass button reference
@@ -189,13 +205,13 @@ public class ArticlesPage extends Application {
             // Create HBox for title, level, and options button
             HBox titleOptionsBox = new HBox();
             titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-            HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow
+            HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
             titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
 
-            // Add elements to the VBox (article container)
-            articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getShortDescription()));
+            // Add titleOptionsBox and abstract to articleBox (VBox)
+            articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
 
-            // Add articleBox to the main VBox
+            // Add the articleBox (for each article) to the main VBox
             articleContainerVBox.getChildren().add(articleBox);
         }
     }
@@ -203,7 +219,7 @@ public class ArticlesPage extends Application {
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(ArticleData article, Button optionsButton) {
+    private void showArticleOptions(Article article, Button optionsButton) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
@@ -211,7 +227,8 @@ public class ArticlesPage extends Application {
         MenuItem deleteItem = new MenuItem("Delete Article");
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
-            deleteArticle(article);
+            ARTICLE_LIST.removeArticle(article);
+            displayArticlesForGroup("Eclipse");
             contextMenu.hide(); // Hide the context menu after action
         });
 
@@ -227,27 +244,11 @@ public class ArticlesPage extends Application {
         contextMenu.getItems().addAll(deleteItem, updateItem);
 
         // Show the context menu relative to the clicked 3-dots button
-        contextMenu.show(optionsButton, javafx.geometry.Side.BOTTOM, 0, 0);
+        contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
 
 
 
-    // Method to delete the article and refresh the list
-    private void deleteArticle(ArticleData article) {
-        // Remove the article from the list
-        eclipseArticles.remove(article); // Assuming you are working with eclipseArticles list
-
-        // Refresh the article list on the screen
-        displayArticlesForGroup("Eclipse"); // Or pass the current group dynamically
-    }
-
-    // Initialize articles (replace this with actual data fetching logic)
-    private void initializeArticles() {
-        eclipseArticles = new ArrayList<>();
-        eclipseArticles.add(new ArticleData("Eclipse Intro", "Beginner", "Search or browse high-impact publications on various aspects of cancer research, including molecular and cellular biology, clinical studies, epidemiology, prevention, and translational research, as well as meeting abstracts and clinical trial information, to support advancements in cancer prevention, diagnosis, and treatment."));
-        eclipseArticles.add(new ArticleData("Eclipse Debugging", "Intermediate", "Comprehensive access to full-text business and economics journals, dissertations, working papers, and key periodicals like The Economist and The Wall Street Journal, along with detailed company and industry reports."));
-        // Add more articles as needed
-    }
 
     private void showRestoreArticles(Stage primaryStage) {
         RestoreArticles restoreArticles = new RestoreArticles();
@@ -270,42 +271,12 @@ public class ArticlesPage extends Application {
     }
 
     private void showBackupScreen(Stage primaryStage) {
-       BackupArticles backupArticles = new BackupArticles();
-       try{
-           backupArticles.start(primaryStage);
-       }
-       catch (Exception ex) {
-           ex.printStackTrace();
-       }
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    // ArticleData class to hold article details
-    class ArticleData {
-        private String title;
-        private String level;
-        private String shortDescription;
-
-        public ArticleData(String title, String level, String shortDescription) {
-            this.title = title;
-            this.level = level;
-            this.shortDescription = shortDescription;
+        BackupArticles backupArticles = new BackupArticles();
+        try{
+            backupArticles.start(primaryStage);
         }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getLevel() {
-            return level;
-        }
-
-        public String getShortDescription() {
-            return shortDescription;
+        catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }
-

@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+
 /*******
  * <p> Update_DB Class </p>
  *
@@ -86,6 +88,7 @@ public class Update_DB {
     }
 
     public void loadArticleDB(ArticleList articleL) {
+        int iterations = 0;
         File userDBFile = new File(path_to_ArticleDB);
         if (userDBFile.exists()) { // Check if the file exists
             try (BufferedReader reader = new BufferedReader(new FileReader(userDBFile))) {
@@ -94,7 +97,7 @@ public class Update_DB {
                     if (line.trim().isEmpty()) {
                         break; // Stop reading if a blank line is encountered
                     }
-                    String[] data = line.split("-"); // Split by "-"
+                    String[] data = line.split("-");
                     if (data.length == 10) {
                         long UID = Long.parseLong(data[0]);
                         String level = data[1];
@@ -102,29 +105,29 @@ public class Update_DB {
                         String author = data[3];
                         String title = data[4];
                         String abstractText = data[5];
-                        String keywordString = data[6];
-                        ArrayList<String> keywords = new ArrayList<>();
-                        // Split the keywordString by commas and add each keyword to the ArrayList
-                        String[] keywordArray = keywordString.split(","); // Assuming commas are used to separate keywords
-                        for (String keyword : keywordArray) {
-                            keywords.add(keyword.trim()); // trim() removes any leading/trailing spaces
-                        }
+                        String keywords = data[6];
                         String body = data[7];
                         String links = data[8];
                         String group = data[9];
 
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
                         articleL.addArticle(article);
+                        System.out.println("Article added to user database: " + article.getTitle() + " - " + article.getKeywords());
+                        iterations++;
+                        System.out.println("Iteration - " + iterations);
+                    } else {
+                        System.out.println("Data length mismatch. Expected 10, found: " + data.length);
                     }
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println("Error loading article database: " + e.getMessage());
             }
         } else {
-            // File doesn't exist; leave userL empty
+            // File doesn't exist; leave articleL empty
             System.out.println("Article database file does not exist. Starting with an empty ArticleList.");
         }
     }
+
 
     // Load the OTP database from the file into OTPList
     public void loadOTPDB(OTPList otpList) {
@@ -184,7 +187,9 @@ public class Update_DB {
 
     public void saveArticleDB(ArticleList articleL) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_ArticleDB, false))) {
-            for (Article article : articleL.getArticles()) {
+            // Write every article in the list
+            for (Article article : articleL) {
+                System.out.println("Saving  " + article.getTitle() +" + "+ article.getKeywords());
                 writer.write(article.getUID() + "-" +
                         article.getLevel() + "-" +
                         article.getSecurity() + "-" +
@@ -198,7 +203,7 @@ public class Update_DB {
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error saving user database: " + e.getMessage());
+            System.out.println("Error saving article database: " + e.getMessage());
         }
     }
 
