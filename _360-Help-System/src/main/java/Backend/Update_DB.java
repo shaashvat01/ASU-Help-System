@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 
 /*******
  * <p> Update_DB Class </p>
@@ -115,6 +116,12 @@ public class Update_DB {
                         System.out.println("Article added to user database: " + article.getTitle() + " - " + article.getKeywords());
                         iterations++;
                         System.out.println("Iteration - " + iterations);
+
+                        if(!GROUP_LIST.contains(group))
+                        {
+                            GROUP_LIST.addGroup(group);
+                            System.out.println("Group added to group list: " + group);
+                        }
                     } else {
                         System.out.println("Data length mismatch. Expected 10, found: " + data.length);
                     }

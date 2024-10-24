@@ -25,7 +25,15 @@ public class ArticlesPage extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize the articles for the Eclipse group
+
+        // Create a ScrollPane to hold the VBox containing articles
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true); // Ensure the ScrollPane fits the width of the content
+        scrollPane.setFitToHeight(true); // Ensure the ScrollPane also fits the height of the window
+
+        // ScrollPane styling (optional)
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
 
         // Create group buttons
         Button eclipseBtn = createGroupButton("Eclipse");
@@ -73,8 +81,11 @@ public class ArticlesPage extends Application {
         articleContainerVBox.setPrefSize(700, 565); // Set preferred size
         articleContainerVBox.setStyle("-fx-background-color: white;");
 
+        scrollPane.setContent(articleContainerVBox); // Add VBox to ScrollPane
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);  // Disable horizontal scrollbar
         // VBox to hold the article buttons and container
-        VBox articleSection = new VBox(20, articleButtons, articleContainerVBox);
+        VBox articleSection = new VBox(20, articleButtons, scrollPane);
         articleSection.setAlignment(Pos.TOP_CENTER);
         articleSection.setPadding(new Insets(20));
 
@@ -162,15 +173,6 @@ public class ArticlesPage extends Application {
     private void displayArticlesForGroup(String groupName) {
         // Clear previous articles
         articleContainerVBox.getChildren().clear();
-
-        // Create a ScrollPane to hold the VBox containing articles
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true); // Makes sure the ScrollPane fits the width
-        scrollPane.setContent(articleContainerVBox); // Add VBox to ScrollPane
-
-        // ScrollPane styling (optional)
-        scrollPane.setStyle("-fx-background-color: transparent;");
-
 
         // Iterate over the articles in the ArticleList
         int numArticles = 0;

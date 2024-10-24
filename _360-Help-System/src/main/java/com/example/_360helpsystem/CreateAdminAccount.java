@@ -32,6 +32,7 @@ public class CreateAdminAccount extends Application {
     public static UserList USER_LIST = new UserList();
     public static OTPList OTP_LIST = new OTPList();
     public static ArticleList ARTICLE_LIST = new ArticleList();
+    public static GroupList GROUP_LIST = new GroupList();
     Update_DB UDB = new Update_DB();
 
     public static void main(String[] args) {
