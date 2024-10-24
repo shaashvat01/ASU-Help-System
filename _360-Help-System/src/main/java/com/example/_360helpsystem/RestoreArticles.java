@@ -101,7 +101,7 @@ public class RestoreArticles extends Application {
     }
 
     private void showPreviousScreen(Stage primaryStage) {
-        Articles articles = new Articles();
+        ArticlesPage articles = new ArticlesPage();
         try {
             articles.start(primaryStage);
         } catch (Exception ex) {

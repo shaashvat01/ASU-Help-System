@@ -1,9 +1,6 @@
 package com.example._360helpsystem;
 
-import Backend.OTPList;
-import Backend.PasswordEvaluator;
-import Backend.Update_DB;
-import Backend.UserList;
+import Backend.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -32,6 +29,7 @@ public class CreateAdminAccount extends Application {
 
     public static UserList USER_LIST = new UserList();
     public static OTPList OTP_LIST = new OTPList();
+    public static ArticleList ARTICLE_LIST = new ArticleList();
     Update_DB UDB = new Update_DB();
 
     public static void main(String[] args) {
@@ -157,12 +155,16 @@ public class CreateAdminAccount extends Application {
     {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
+        UDB.loadArticleDB(ARTICLE_LIST);
+        ARTICLE_LIST.addArticle(new Article(12321313123L,"Test","","","","",null,"","",""));
+        System.out.println(ARTICLE_LIST.getArticles().getFirst().getTitle());
     }
     // This method saves the databases when the application is closing.
     public void stop() {
         // Save user and OTP databases when the application is closing
         UDB.saveUserDB(USER_LIST);
         UDB.saveOTPDB(OTP_LIST);
+        UDB.saveArticleDB(ARTICLE_LIST);
         System.out.println("Databases saved successfully.");
     }
 }

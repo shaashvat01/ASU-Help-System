@@ -4,7 +4,6 @@ import Backend.OTP_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -159,7 +158,7 @@ public class AdminPage extends Application {
 
 
     private void showArticleScreen(Stage primaryStage) {
-        Articles articles = new Articles();
+        ArticlesPage articles = new ArticlesPage();
         try{
             articles.start(primaryStage);
         }

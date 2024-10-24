@@ -90,7 +90,7 @@ public class InstructorPage extends Application {
     }
 
     private void showArticleScreen(Stage primaryStage) {
-       Articles articles = new Articles();
+       ArticlesPage articles = new ArticlesPage();
         try{
             articles.start(primaryStage);
         }

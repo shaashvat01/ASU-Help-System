@@ -4,6 +4,7 @@ import java.io.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /*******
  * <p> Update_DB Class </p>
@@ -18,8 +19,9 @@ import java.io.IOException;
  */
 
 public class Update_DB {
-    private String path_to_UserDB = "Users.txt";
-    private String path_to_OTPDB = "OTPs.txt";
+    private final String path_to_UserDB = "Users.txt";
+    private final String path_to_OTPDB = "OTPs.txt";
+    private final String path_to_ArticleDB = "Articles.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -53,8 +55,7 @@ public class Update_DB {
                         if (role.equalsIgnoreCase("S") && role.equalsIgnoreCase("I")) {
                             user = new Student(username, password, email, firstName, middleName, lastName, preferredName);
                             user.setInstructor(true);
-                        }
-                        else{
+                        } else {
                             if (role.equalsIgnoreCase("S")) {
                                 user = new Student(username, password, email, firstName, middleName, lastName, preferredName);
                             }
@@ -66,8 +67,7 @@ public class Update_DB {
                         // Assign the OTP
                         if (user != null) {
                             user.setAccOTP(accResetOTP);
-                            if(setupDone)
-                            {
+                            if (setupDone) {
                                 user.finishAccountSetup();
                             }
                         }
@@ -82,6 +82,47 @@ public class Update_DB {
         } else {
             // File doesn't exist; leave userL empty
             System.out.println("User database file does not exist. Starting with an empty UserList.");
+        }
+    }
+
+    public void loadArticleDB(ArticleList articleL) {
+        File userDBFile = new File(path_to_ArticleDB);
+        if (userDBFile.exists()) { // Check if the file exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(userDBFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().isEmpty()) {
+                        break; // Stop reading if a blank line is encountered
+                    }
+                    String[] data = line.split("-"); // Split by "-"
+                    if (data.length == 10) {
+                        long UID = Long.parseLong(data[0]);
+                        String level = data[1];
+                        String security = data[2];
+                        String author = data[3];
+                        String title = data[4];
+                        String abstractText = data[5];
+                        String keywordString = data[6];
+                        ArrayList<String> keywords = new ArrayList<>();
+                        // Split the keywordString by commas and add each keyword to the ArrayList
+                        String[] keywordArray = keywordString.split(","); // Assuming commas are used to separate keywords
+                        for (String keyword : keywordArray) {
+                            keywords.add(keyword.trim()); // trim() removes any leading/trailing spaces
+                        }
+                        String body = data[7];
+                        String links = data[8];
+                        String group = data[9];
+
+                        Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
+                        articleL.addArticle(article);
+                    }
+                }
+            }catch (IOException e) {
+                System.out.println("Error loading article database: " + e.getMessage());
+            }
+        } else {
+            // File doesn't exist; leave userL empty
+            System.out.println("Article database file does not exist. Starting with an empty ArticleList.");
         }
     }
 
@@ -110,7 +151,7 @@ public class Update_DB {
             for (User user : userL.getUserList()) { // Accessing userL directly from UserList class
                 // Determine the role(s)
                 String role = "";
-                if (user.isStudent()){
+                if (user.isStudent()) {
                     role += "S";
                     System.out.println("USer is student");
                 }
@@ -141,6 +182,26 @@ public class Update_DB {
         }
     }
 
+    public void saveArticleDB(ArticleList articleL) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_ArticleDB, false))) {
+            for (Article article : articleL.getArticles()) {
+                writer.write(article.getUID() + "-" +
+                        article.getLevel() + "-" +
+                        article.getSecurity() + "-" +
+                        article.getAuthor() + "-" +
+                        article.getTitle() + "-" +
+                        article.getAbs() + "-" +
+                        article.getKeywords() + "-" +
+                        article.getBody() + "-" +
+                        article.getLinks() + "-" +
+                        article.getGroup());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving user database: " + e.getMessage());
+        }
+    }
+
     // Save the OTP database to the file (overwrite if exists)
     public void saveOTPDB(OTPList otpList) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_OTPDB, false))) { // Set append to false
@@ -152,4 +213,7 @@ public class Update_DB {
             System.out.println("Error saving OTP database: " + e.getMessage());
         }
     }
+
+
 }
+

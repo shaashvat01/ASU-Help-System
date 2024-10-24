@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Articles extends Application {
+public class ArticlesPage extends Application {
 
     private VBox articleContainerVBox; // The container to display the articles
     private List<ArticleData> eclipseArticles; // List of articles for Eclipse group
