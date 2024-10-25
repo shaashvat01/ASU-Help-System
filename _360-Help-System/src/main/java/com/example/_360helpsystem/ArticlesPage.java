@@ -96,7 +96,14 @@ public class ArticlesPage extends Application {
         createGrpBtn.setPrefWidth(125);
         createGrpBtn.setPrefHeight(35);
         createGrpBtn.setFont(Font.font("Arial", 15));
-        createGrpBtn.setOnAction(e -> showCreateGroup());
+        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar));
+
+        Button deleteGrpBtn = new Button("Delete Group");
+        deleteGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        deleteGrpBtn.setPrefWidth(125);
+        deleteGrpBtn.setPrefHeight(35);
+        deleteGrpBtn.setFont(Font.font("Arial", 15));
+        deleteGrpBtn.setOnAction(e -> showDeleteGroup(sidebar));
 
         HBox articleButtons = new HBox(20);
         articleButtons.setAlignment(Pos.CENTER);
@@ -107,13 +114,10 @@ public class ArticlesPage extends Application {
             if(CURRENT_USER.isAdmin() || CURRENT_USER.isInstructor())
             {
                 // HBox to hold article-related buttons
-                articleButtons.getChildren().addAll(createGrpBtn);
+                articleButtons.getChildren().addAll(createGrpBtn,deleteGrpBtn);
             }
 
         }
-
-        // Debug
-        //articleButtons.getChildren().addAll(createGrpBtn);
 
         // HBox to hold article-related buttons
         articleButtons.getChildren().addAll(createArticleBtn, backupBtn, restoreBtn);
@@ -315,7 +319,7 @@ public class ArticlesPage extends Application {
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
             ARTICLE_LIST.removeArticle(article);
-            displayArticlesForGroup("Eclipse");
+            displayArticlesForGroup("General");
             contextMenu.hide(); // Hide the context menu after action
         });
 
@@ -334,7 +338,7 @@ public class ArticlesPage extends Application {
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
 
-    private void showCreateGroup() {
+    private void showCreateGroup(VBox sidebar) {
         // Create a new Stage (window) for the pop-up
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
@@ -366,6 +370,7 @@ public class ArticlesPage extends Application {
                 if(!GROUP_LIST.contains(groupName)) {
                     GROUP_LIST.addGroup(groupName);
                     System.out.println("Group Created: " + groupName);
+                    sidebar.getChildren().add(createGroupButton(groupName));
                     // Close the pop-up after creation
                     popupStage.close();
                 }
@@ -387,6 +392,73 @@ public class ArticlesPage extends Application {
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
+
+    private void showDeleteGroup(VBox sidebar) {
+        // Create a new Stage (window) for the pop-up
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
+        popupStage.setTitle("Delete Group");
+
+        // Create a VBox layout for the pop-up content
+        VBox popupLayout = new VBox(10);
+        popupLayout.setPadding(new Insets(15));
+        popupLayout.setAlignment(Pos.CENTER);
+
+        // Create the TextField for entering the group name to delete
+        TextField groupNameField = new TextField();
+        groupNameField.setPromptText("Enter Group Name to Delete");  // Set placeholder text
+        groupNameField.setPrefWidth(200);
+
+        // Create the "Delete" button
+        Button deleteButton = new Button("Delete");
+        deleteButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
+        deleteButton.setPrefWidth(100);
+
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+
+        // Handle "Delete" button action
+        deleteButton.setOnAction(event -> {
+            String groupName = groupNameField.getText();
+            if (!groupName.isEmpty()) {
+                // Handle group deletion logic here
+                if(GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
+                    GROUP_LIST.removeGroup(groupName); // Assuming removeGroup is a method in GROUP_LIST
+                    System.out.println("Group Deleted: " + groupName);
+                    // Remove the corresponding button from the sidebar
+                    sidebar.getChildren().removeIf(node -> {
+                        if (node instanceof Button) {
+                            Button button = (Button) node;
+                            return button.getText().equals(groupName); // Check if the button text matches
+                        }
+                        return false;
+                    });
+                    // Close the pop-up after deletion
+                    popupStage.close();
+                } else {
+                    if(groupName.equalsIgnoreCase("General")) {
+                        errorLabel.setText("Cannot delete " + groupName);
+                    }
+                    else{
+                        errorLabel.setText("Group " + groupName + " does not exist.");
+                    }
+
+                }
+            } else {
+                // Show an alert or error message if the field is empty
+                errorLabel.setText("Group name cannot be empty.");
+            }
+        });
+
+        // Add the TextField and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, errorLabel, deleteButton);
+
+        // Create a Scene for the pop-up window and set it to the stage
+        Scene popupScene = new Scene(popupLayout, 300, 150);
+        popupStage.setScene(popupScene);
+        popupStage.showAndWait();  // Show the pop-up and wait until it is closed
+    }
+
 
 
 

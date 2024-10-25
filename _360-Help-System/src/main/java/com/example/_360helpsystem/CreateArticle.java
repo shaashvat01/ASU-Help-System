@@ -1,5 +1,7 @@
 package com.example._360helpsystem;
 
+import Backend.Article;
+import Backend.UID_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,16 +11,29 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 
 public class CreateArticle extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);
+
+        // Create an HBox to center the errorLabel
+        HBox errorLabelContainer = new HBox(errorLabel);
+        errorLabelContainer.setAlignment(Pos.CENTER);  // Center the error label horizontally
+
         // Title Label and TextField
         Label titleLabel = new Label("Title:");
         titleLabel.setFont(Font.font("Arial", 14));
@@ -32,8 +47,8 @@ public class CreateArticle extends Application {
         levelLabel.setFont(Font.font("Arial", 14));
         levelLabel.setStyle("-fx-font-weight: bold;");  // Make the label bold
         ComboBox<String> levelComboBox = new ComboBox<>();
-        levelComboBox.getItems().addAll("Choose a level", "Beginner", "Intermediate", "Advanced", "Expert");
-        levelComboBox.setValue("Choose a level");  // Set default option
+        levelComboBox.getItems().addAll("Beginner","Intermediate", "Advanced", "Expert");
+        levelComboBox.setValue("");  // Set default option
         levelComboBox.setStyle("-fx-font-size: 14px;");  // Smaller font for consistency
 
         // Create a layout to place Title and Level vertically
@@ -70,17 +85,22 @@ public class CreateArticle extends Application {
         groupLabel.setFont(Font.font("Arial", 14));
         groupLabel.setStyle("-fx-font-weight: bold;");
 
-        // CheckBoxes for Grouping Identifiers
-        CheckBox groupEclipse = new CheckBox("Eclipse");
-        CheckBox groupJavaFX = new CheckBox("JavaFX");
-        CheckBox groupH2 = new CheckBox("H2");
-        CheckBox groupGitHub = new CheckBox("GitHub");
-        CheckBox groupSQL = new CheckBox("SQL");
-
         // HBox to hold the CheckBoxes in a row
         HBox groupCheckBoxLayout = new HBox(10);  // Horizontal layout with 10px spacing
-        groupCheckBoxLayout.getChildren().addAll(groupEclipse, groupJavaFX, groupH2, groupGitHub, groupSQL);
         groupCheckBoxLayout.setAlignment(Pos.CENTER_LEFT);
+
+        List<CheckBox> groupCheckBoxes = new ArrayList<>();
+
+        for(String grpName : GROUP_LIST)
+        {
+            if(!grpName.equals("General"))
+            {
+                CheckBox checkBox = new CheckBox(grpName);
+                checkBox.setFont(Font.font("Arial", 14));
+                groupCheckBoxes.add(checkBox);
+                groupCheckBoxLayout.getChildren().addAll(checkBox);
+            }
+        }
 
         // Body Label and adjustable TextArea (positioned at the bottom)
         Label bodyLabel = new Label("Body:");
@@ -98,21 +118,14 @@ public class CreateArticle extends Application {
         saveButton.setFont(Font.font("Arial", 16));
         saveButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         saveButton.setPrefWidth(150);  // Button width
-        saveButton.setOnAction(e -> {
-            List<String> selectedGroups = new ArrayList<>();
-            if (groupEclipse.isSelected()) selectedGroups.add("Eclipse");
-            if (groupJavaFX.isSelected()) selectedGroups.add("JavaFX");
-            if (groupH2.isSelected()) selectedGroups.add("H2");
-            if (groupGitHub.isSelected()) selectedGroups.add("GitHub");
-            if (groupSQL.isSelected()) selectedGroups.add("SQL");
-            System.out.println("Selected Groups: " + selectedGroups);
-        });
+        saveButton.setOnAction(e -> createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel));
+
 
         Button clearButton = new Button("Clear Fields");
         clearButton.setFont(Font.font("Arial", 16));
         clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         clearButton.setPrefWidth(150);  // Button width
-        clearButton.setOnAction(e -> clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupEclipse, groupJavaFX, groupH2, groupGitHub, groupSQL));
+        clearButton.setOnAction(e -> clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox));
 
         // Layout for buttons (centered horizontally)
         HBox buttonLayout = new HBox(20);  // Horizontal box layout with spacing between buttons
@@ -123,17 +136,16 @@ public class CreateArticle extends Application {
         VBox formLayout = new VBox(15);
         formLayout.setPadding(new Insets(20));
         formLayout.setAlignment(Pos.CENTER_LEFT);  // Align fields to the left
-        formLayout.getChildren().addAll(titleAndLevelLayout, descriptionLabel, descriptionField, keywordsLabel, keywordsField, referenceLinksLabel, referenceLinksField, groupLabel, groupCheckBoxLayout, bodyLabel, bodyField, buttonLayout);
+        formLayout.getChildren().addAll(titleAndLevelLayout, descriptionLabel, descriptionField, keywordsLabel, keywordsField, referenceLinksLabel, referenceLinksField, groupLabel, groupCheckBoxLayout, bodyLabel, bodyField, buttonLayout,errorLabelContainer);
 
         // Create Back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
         // Logout button
-        Button logoutButton = new Button("Logout");
-        logoutButton.setFont(Font.font("Arial", 16));
-        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
+        Button logoutButton = new Button("");
+        logoutButton.setVisible(false);
+
 
         // Layout for the top bar
         HBox topBar = new HBox();
@@ -165,15 +177,49 @@ public class CreateArticle extends Application {
     }
 
     // Method to clear all fields
-    private void clearFields(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, CheckBox... groupCheckBoxes) {
+    private void clearFields(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes,ComboBox<String> levelBox) {
         titleField.clear();
         descriptionField.clear();
         keywordsField.clear();
         bodyField.clear();
         referenceLinksField.clear();
+        levelBox.setValue("");
         for (CheckBox checkBox : groupCheckBoxes) {
             checkBox.setSelected(false);  // Deselect all checkboxes
         }
+    }
+
+    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes,ComboBox<String> levelBox,Label errorLabel) {
+        // Validate input fields
+        String title = titleField.getText().trim();
+        String description = descriptionField.getText().trim();
+        String keywords = keywordsField.getText().trim();
+        String body = bodyField.getText().trim();
+        String referenceLinks = referenceLinksField.getText().trim();
+        String level = levelBox.getValue().trim();
+
+        // Check for empty fields
+        if (title.isEmpty() || description.isEmpty() || keywords.isEmpty() || body.isEmpty() || referenceLinks.isEmpty() || level.isEmpty()){
+            errorLabel.setText("All fields must be filled.");
+            return; // Exit if any field is empty
+        }
+
+        // Collect selected group identifiers
+        String selectedGrp = "General";
+        for (CheckBox checkBox : groupCheckBoxes) {
+            if (checkBox.isSelected()) {
+                selectedGrp = checkBox.getText();
+            }
+        }
+
+        String security = "Public";
+        // Create a new Article object (Assuming Article class has an appropriate constructor)
+        long articleUID = new UID_Generator().getUID();
+        Article newArticle = new Article(articleUID, title,CURRENT_USER.getUserName(),level,security, description, keywords, body, referenceLinks, selectedGrp);
+
+        ARTICLE_LIST.addArticle(newArticle);
+        System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
+        clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField,groupCheckBoxes,levelBox);
     }
 
 
@@ -187,18 +233,5 @@ public class CreateArticle extends Application {
         }
     }
 
-    // Show sign-in screen (placeholder)
-    private void showSignInScreen(Stage stage) {
-        SignIn signIn = new SignIn();
-        try {
-            signIn.start(stage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
 
