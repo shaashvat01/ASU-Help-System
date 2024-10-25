@@ -1,5 +1,7 @@
 package Backend;
 
+import java.util.ArrayList;
+
 public class Article {
     private long UID;
     private String title;
@@ -7,22 +9,37 @@ public class Article {
     private String level;
     private String security;
     private String abs;
-    private String keywords;
+    private ArrayList<String> keywords;
     private String body;
     private String links;
-    private String group;
+    private ArrayList<String> groups;
 
-    public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String group) {
+    public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
+        this.keywords = new ArrayList<>();
+        this.groups = new ArrayList<>();
+
         this.UID = UID;
         this.title = title;
         this.author = author;
         this.level = level;
         this.security = security;
         this.abs = abs;
-        this.keywords = keywords;
+        String[] splitKeywords = keywords.split(",");
+
+        // Add each keyword to the ArrayList
+        for (String keyword : splitKeywords) {
+            assert false;
+            this.keywords.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
+        }
         this.body = body;
         this.links = links;
-        this.group = group;
+        String[] splitGroups = groups.split(",");
+
+        // Add each keyword to the ArrayList
+        for (String keyword : splitGroups) {
+            assert false;
+            this.groups.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
+        }
     }
     public long getUID() {
         return UID;
@@ -61,10 +78,7 @@ public class Article {
         this.abs = abs;
     }
     public String getKeywords() {
-        return keywords;
-    }
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
+        return String.join(",", keywords);
     }
     public String getBody() {
         return body;
@@ -79,9 +93,17 @@ public class Article {
         this.links = links;
     }
     public String getGroup() {
-        return group;
+        return String.join(",", groups);
     }
-    public void setGroup(String group) {
-        this.group = group;
+    public boolean hasGroup(String group) {
+        for(String grpName : groups)
+        {
+            if(grpName.equals(group))
+            {
+                return true;
+            }
+        }
+        return false;
     }
+
 }

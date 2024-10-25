@@ -65,7 +65,7 @@ public class CreateArticle extends Application {
         descriptionField.setPrefWidth(400);
 
         // Keywords Label and TextField
-        Label keywordsLabel = new Label("Keywords:");
+        Label keywordsLabel = new Label("Keywords: ( separate the words with a comma )");
         keywordsLabel.setFont(Font.font("Arial", 14));
         keywordsLabel.setStyle("-fx-font-weight: bold;");  // Make the label bold
         TextField keywordsField = new TextField();
@@ -189,38 +189,49 @@ public class CreateArticle extends Application {
         }
     }
 
-    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes,ComboBox<String> levelBox,Label errorLabel) {
-        // Validate input fields
+    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes, ComboBox<String> levelBox, Label errorLabel) {
+        // Print diagnostic info
+        System.out.println("Creating article with fields:");
+        System.out.println("Title: " + titleField.getText());
+        System.out.println("Description: " + descriptionField.getText());
+        System.out.println("Keywords: " + keywordsField.getText());
+        System.out.println("Body: " + bodyField.getText());
+        System.out.println("Reference Links: " + referenceLinksField.getText());
+        System.out.println("Level: " + levelBox.getValue());
+
         String title = titleField.getText().trim();
         String description = descriptionField.getText().trim();
         String keywords = keywordsField.getText().trim();
         String body = bodyField.getText().trim();
         String referenceLinks = referenceLinksField.getText().trim();
-        String level = levelBox.getValue().trim();
+        String level = (levelBox.getValue() != null) ? levelBox.getValue().trim() : "";
 
-        // Check for empty fields
-        if (title.isEmpty() || description.isEmpty() || keywords.isEmpty() || body.isEmpty() || referenceLinks.isEmpty() || level.isEmpty()){
+        if (title.isEmpty() || description.isEmpty() || keywords.isEmpty() || body.isEmpty() || referenceLinks.isEmpty() || level.isEmpty()) {
             errorLabel.setText("All fields must be filled.");
-            return; // Exit if any field is empty
+            return;
         }
 
         // Collect selected group identifiers
-        String selectedGrp = "General";
+        StringBuilder selectedGrpBuilder = new StringBuilder("General");
         for (CheckBox checkBox : groupCheckBoxes) {
             if (checkBox.isSelected()) {
-                selectedGrp = checkBox.getText();
+                selectedGrpBuilder.append(",").append(checkBox.getText());
             }
         }
 
+        String selectedGrp = selectedGrpBuilder.toString();
+
+        System.out.println("Selected group: " + selectedGrp);
+
         String security = "Public";
-        // Create a new Article object (Assuming Article class has an appropriate constructor)
         long articleUID = new UID_Generator().getUID();
-        Article newArticle = new Article(articleUID, title,CURRENT_USER.getUserName(),level,security, description, keywords, body, referenceLinks, selectedGrp);
+        Article newArticle = new Article(articleUID, title, CURRENT_USER.getUserName(), level, security, description, keywords, body, referenceLinks, selectedGrp);
 
         ARTICLE_LIST.addArticle(newArticle);
         System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
-        clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField,groupCheckBoxes,levelBox);
+        clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox);
     }
+
 
 
     private void showPreviousScreen(Stage primaryStage) {

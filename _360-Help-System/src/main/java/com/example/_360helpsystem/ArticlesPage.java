@@ -266,7 +266,7 @@ public class ArticlesPage extends Application {
         articleContainerVBox.getChildren().clear();
 
         for (Article article : ARTICLE_LIST) {
-            if(article.getGroup().equals(groupName) || groupName.equals("General")) {
+            if(article.hasGroup(groupName) || groupName.equals("General")) {
                 // Create VBox for each article with padding and border
                 VBox articleBox = new VBox(5);
                 articleBox.setPadding(new Insets(10));
