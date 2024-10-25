@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -24,6 +25,15 @@ public class BackupArticles extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);
+        errorLabel.setVisible(false);
+
+        Label createdLabel = new Label();
+        createdLabel.setTextFill(Color.GREEN);
+        createdLabel.setText("Backup Successful");
+        createdLabel.setVisible(false);
 
         // Creating a label for instruction
         Text instructionText = new Text("Please select the groups to Backup:");
@@ -81,7 +91,7 @@ public class BackupArticles extends Application {
         VBox contentLayout = new VBox(20); // 20 is the spacing between elements
         contentLayout.setPadding(new Insets(20));
         contentLayout.setAlignment(Pos.CENTER);
-        contentLayout.getChildren().addAll(instructionText,checkboxesLayout, fileNameLayout,backupButton);
+        contentLayout.getChildren().addAll(instructionText,checkboxesLayout, fileNameLayout,errorLabel,backupButton,createdLabel);
 
         // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -96,7 +106,7 @@ public class BackupArticles extends Application {
 
         backupButton.setOnAction(event -> {
             try {
-                createBackup(fileNameField,groupCheckBoxes);
+                createBackup(fileNameField,groupCheckBoxes,errorLabel,createdLabel);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -138,7 +148,8 @@ public class BackupArticles extends Application {
         }
     }
 
-    public void createBackup(TextField textField, List<CheckBox> CheckBoxList) throws IOException {
+    public void createBackup(TextField textField, List<CheckBox> CheckBoxList,Label error,Label message) throws IOException {
+        message.setVisible(false);
         String fileName = textField.getText();
         boolean isGroupSelected = false;
         for(CheckBox checkBox : CheckBoxList)
@@ -149,8 +160,19 @@ public class BackupArticles extends Application {
             }
         }
 
+        if(!isGroupSelected || fileName.isEmpty())
+        {
+            error.setText("Please select atleast one group and enter a file name.");
+            error.setVisible(true);
+        }
+
         if(!fileName.isEmpty() && isGroupSelected)
         {
+            if(fileName.equals("Backups"))
+            {
+                error.setText("File name in use. Enter another name");
+                error.setVisible(true);
+            }
             List<String> selectedGroups = new ArrayList<>();
 
             for(CheckBox checkBox : CheckBoxList)
@@ -166,6 +188,18 @@ public class BackupArticles extends Application {
             if(!UDB.checkDupBackup(fileName))
             {
                 UDB.writeBackup(fileName,selectedGroups);
+                message.setVisible(true);
+                textField.setText("");
+                for(CheckBox checkBox : CheckBoxList)
+                {
+                    checkBox.setSelected(false);
+                }
+                error.setVisible(false);
+            }
+            else
+            {
+                error.setText("File name in use. Enter another name");
+                error.setVisible(true);
             }
 
         }
