@@ -106,4 +106,17 @@ public class Article {
         return false;
     }
 
+    public void replaceArticle(Article article) {
+        this.UID = article.UID;
+        this.title = article.title;
+        this.author = article.author;
+        this.level = article.level;
+        this.security = article.security;
+        this.abs = article.abs;
+        this.keywords = article.keywords;
+        this.body = article.body;
+        this.links = article.links;
+        this.groups = article.groups;
+    }
+
 }

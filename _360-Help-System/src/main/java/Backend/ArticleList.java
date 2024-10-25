@@ -15,10 +15,6 @@ public class ArticleList implements Iterable<Article> {
         return articles;
     }
 
-    public void setArticles(ArrayList<Article> articles) {
-        this.articles = articles;
-    }
-
     // Add or remove an article
     public void addArticle(Article article) {
         articles.add(article);
@@ -31,6 +27,19 @@ public class ArticleList implements Iterable<Article> {
     // Return the number of articles
     public int getSize() {
         return articles.size();
+    }
+
+    public Article getArticleByUID(long UID) {
+        for (Article article : articles) {
+            if (article.getUID() == UID) {
+                return article;
+            }
+        }
+        return null;
+    }
+
+    public boolean contains(Article article) {
+        return articles.contains(article);
     }
 
     // Implement the Iterable interface

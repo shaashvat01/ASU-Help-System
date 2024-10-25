@@ -1,66 +1,69 @@
 package com.example._360helpsystem;
 
+import Backend.Article;
+import Backend.ArticleList;
+import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 
 public class RestoreArticles extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         // Creating a label for instruction
-        Text instructionText = new Text("Please select the groups to Restore:");
+        Text instructionText = new Text("Choose the backup file to be restored");
         instructionText.setFont(Font.font("Arial", 20));
 
-        // Creating Checkboxes for groups and setting font
-        CheckBox eclipseCheckbox = new CheckBox("Eclipse");
-        eclipseCheckbox.setFont(Font.font("Arial", 18));
-        eclipseCheckbox.setPrefWidth(200);  // Ensure consistent width
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);
+        errorLabel.setVisible(false);
 
-        CheckBox javaFxCheckbox = new CheckBox("JavaFX");
-        javaFxCheckbox.setFont(Font.font("Arial", 18));
-        javaFxCheckbox.setPrefWidth(200);  // Ensure consistent width
+        Label createdLabel = new Label();
+        createdLabel.setTextFill(Color.GREEN);
+        createdLabel.setText("Backup Successful");
+        createdLabel.setVisible(false);
 
-        CheckBox h2DatabaseCheckbox = new CheckBox("H2 Database");
-        h2DatabaseCheckbox.setFont(Font.font("Arial", 18));
-        h2DatabaseCheckbox.setPrefWidth(200);  // Ensure consistent width
 
-        CheckBox sqlFiddleCheckbox = new CheckBox("SQL Fiddle");
-        sqlFiddleCheckbox.setFont(Font.font("Arial", 18));
-        sqlFiddleCheckbox.setPrefWidth(200);  // Ensure consistent width
+        ComboBox<String> backupListBox = new ComboBox<>();
+        backupListBox.getItems().addAll(new Update_DB().getBackupList());
+        backupListBox.setValue("");
 
-        CheckBox gitHubCheckbox = new CheckBox("GitHub");
-        gitHubCheckbox.setFont(Font.font("Arial", 18));
-        gitHubCheckbox.setPrefWidth(200);  // Ensure consistent width
 
         // Remove all the existing help articles from the selected groups Button
-        Button removeAllButton = new Button("Remove all the existing help articles from the selected groups");
+        Button removeAllButton = new Button("Overwrite existing articles");
         removeAllButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         removeAllButton.setFont(javafx.scene.text.Font.font("Arial", 18));
-        removeAllButton.setPrefWidth(750);
+        removeAllButton.setMinWidth(Control.USE_COMPUTED_SIZE);
+        removeAllButton.setPrefWidth(Control.USE_COMPUTED_SIZE);
+        removeAllButton.setOnAction(e -> {overwriteBackup(backupListBox,errorLabel,createdLabel);});
 
-        Button mergeToExistingButton = new Button("Merge the backed-up copies with the current help articles");
-       mergeToExistingButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        // Merge with existing articles Button
+        Button mergeToExistingButton = new Button("Merge with existing articles");
+        mergeToExistingButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         mergeToExistingButton.setFont(javafx.scene.text.Font.font("Arial", 18));
-        mergeToExistingButton.setPrefWidth(750);
-
-        // VBox for checkboxes and instruction text centered and just above the Backup button
-        VBox checkboxesLayout = new VBox(15); // 15 is the spacing between elements
-        checkboxesLayout.setAlignment(Pos.CENTER);  // Align everything to the center
-        checkboxesLayout.getChildren().addAll(instructionText, eclipseCheckbox, javaFxCheckbox, h2DatabaseCheckbox, sqlFiddleCheckbox, gitHubCheckbox);
+        mergeToExistingButton.setMinWidth(Control.USE_COMPUTED_SIZE);
+        mergeToExistingButton.setPrefWidth(Control.USE_COMPUTED_SIZE);
+        mergeToExistingButton.setOnAction(e -> {mergeBackup(backupListBox,errorLabel,createdLabel);});
 
         // Center layout for checkboxes and backup button
         VBox contentLayout = new VBox(20); // 20 is the spacing between elements
         contentLayout.setPadding(new Insets(20));
         contentLayout.setAlignment(Pos.CENTER);
-        contentLayout.getChildren().addAll(checkboxesLayout, removeAllButton, mergeToExistingButton);
+        contentLayout.getChildren().addAll(instructionText,backupListBox,errorLabel, removeAllButton, mergeToExistingButton,createdLabel);
 
         // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -71,7 +74,7 @@ public class RestoreArticles extends Application {
         logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         logoutButton.setFont(javafx.scene.text.Font.font("Arial", 18));
         logoutButton.setPrefWidth(100);  // Set preferred width to control the button size
-        logoutButton.setOnAction(e -> showSignInPage(primaryStage));
+        logoutButton.setVisible(false);
 
         // Top bar layout with Back and Logout button
         HBox topBar = new HBox();
@@ -92,7 +95,7 @@ public class RestoreArticles extends Application {
         root.setCenter(contentLayout); // Add checkboxes and backup button in the center
         root.setStyle("-fx-background-color: #f8f5f3;");  // Set the background color similar to AdminPage
 
-        Scene backupScene = new Scene(root, 900, 700);  // Set the window size to 800x600
+        Scene backupScene = new Scene(root, 900, 700);  // Set the window size to 900x700
 
         primaryStage.setTitle("Backup Page");
         primaryStage.setScene(backupScene);
@@ -109,14 +112,64 @@ public class RestoreArticles extends Application {
         }
     }
 
-    private void showSignInPage(Stage primaryStage) {
-        SignIn signin = new SignIn();
-        try {
-            signin.start(primaryStage);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    public void mergeBackup(ComboBox<String> backupListBox,Label errorLabel,Label createdLabel)
+    {
+        String fileToRestore = backupListBox.getValue();
+        if(fileToRestore.isEmpty())
+        {
+            errorLabel.setVisible(true);
+            errorLabel.setText("Choose a backup file!");
         }
+        else{
+            ArticleList articles = new Update_DB().readBackup(fileToRestore);
+
+            for(Article article : articles)
+            {
+                if(!ARTICLE_LIST.contains(article))
+                {
+                    ARTICLE_LIST.addArticle(article);
+                }
+            }
+        }
+
+        createdLabel.setVisible(true);
+        createdLabel.setText("Restore Successful");
+        backupListBox.setValue("");
     }
+
+    public void overwriteBackup(ComboBox<String> backupListBox,Label errorLabel,Label createdLabel)
+    {
+        String fileToRestore = backupListBox.getValue();
+        if(fileToRestore.isEmpty())
+        {
+            errorLabel.setVisible(true);
+            errorLabel.setText("Choose a backup file!");
+        }
+        else{
+            ArticleList articles = new Update_DB().readBackup(fileToRestore);
+
+            for(Article article : articles)
+            {
+                if(!ARTICLE_LIST.contains(article))
+                {
+                    ARTICLE_LIST.addArticle(article);
+                }
+                else{
+                    Article editArticle = ARTICLE_LIST.getArticleByUID(article.getUID());
+
+                    if(editArticle != null)
+                    {
+                        editArticle.replaceArticle(article);
+                    }
+                }
+            }
+        }
+
+        createdLabel.setVisible(true);
+        createdLabel.setText("Restore Successful");
+        backupListBox.setValue("");
+    }
+
 
     public static void main(String[] args) {
         launch(args);

@@ -306,6 +306,69 @@ public class Update_DB {
         return false;  // No duplicate found, new filename added to the file
     }
 
+    public List<String> getBackupList()
+    {
+        List<String> backupList = new ArrayList<>();
+
+        File backupDBFile = new File(path_to_BackupDB);
+
+        // First check if the file exists and contains the fileName
+        if (backupDBFile.exists()) { // If BackupDB.txt exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(backupDBFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String backupName = line.trim();
+                    backupList.add(backupName);
+                }
+                return backupList;
+            } catch (IOException e) {
+                System.out.println("Error loading Backup database: " + e.getMessage());
+            }
+        }
+        return backupList;
+    }
+
+    public ArticleList readBackup(String fileName) {
+        File backupDBFile = new File(fileName);
+        if (backupDBFile.exists()) {
+            ArticleList articleList = new ArticleList();
+            try (BufferedReader reader = new BufferedReader(new FileReader(backupDBFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().isEmpty()) {
+                        break; // Stop reading if a blank line is encountered
+                    }
+                    String[] data = line.split("-");
+                    if (data.length == 10) {
+                        long UID = Long.parseLong(data[0]);
+                        String level = data[1];
+                        String security = data[2];
+                        String author = data[3];
+                        String title = data[4];
+                        String abstractText = data[5];
+                        String keywords = data[6];
+                        String body = data[7];
+                        String links = data[8];
+                        String group = data[9];
+
+                        Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
+                        articleList.addArticle(article);
+                    } else {
+                        System.out.println("Data length mismatch. Expected 10, found: " + data.length);
+                    }
+                }
+                return articleList;
+            } catch (IOException e) {
+                System.out.println("Error loading backup database: " + e.getMessage());
+            }
+        } else {
+
+            System.out.println("Backup database file does not exist");
+        }
+        return null;
+    }
 }
+
+
 
 
