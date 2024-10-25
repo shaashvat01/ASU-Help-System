@@ -158,18 +158,17 @@ public class CreateAdminAccount extends Application {
     {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
-        System.out.println("Size before load - "+ARTICLE_LIST.getSize());
         UDB.loadArticleDB(ARTICLE_LIST);
-        System.out.println("Size after load - "+ARTICLE_LIST.getSize());
+        UDB.loadGrpDB(GROUP_LIST);
     }
     // This method saves the databases when the application is closing.
     public void stop() {
         // Save user and OTP databases when the application is closing
         UDB.saveUserDB(USER_LIST);
         UDB.saveOTPDB(OTP_LIST);
-        System.out.println("Size before save - "+ARTICLE_LIST.getSize());
         UDB.saveArticleDB(ARTICLE_LIST);
-        System.out.println("Size after save - "+ARTICLE_LIST.getSize());
+        UDB.saveGrpDB(GROUP_LIST);
+
         System.out.println("Databases saved successfully.");
     }
 }

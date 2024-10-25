@@ -25,6 +25,7 @@ public class Update_DB {
     private final String path_to_UserDB = "Users.txt";
     private final String path_to_OTPDB = "OTPs.txt";
     private final String path_to_ArticleDB = "Articles.txt";
+    private final String path_to_GroupDB = "Groups.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -89,10 +90,9 @@ public class Update_DB {
     }
 
     public void loadArticleDB(ArticleList articleL) {
-        int iterations = 0;
-        File userDBFile = new File(path_to_ArticleDB);
-        if (userDBFile.exists()) { // Check if the file exists
-            try (BufferedReader reader = new BufferedReader(new FileReader(userDBFile))) {
+        File articleDBFile = new File(path_to_ArticleDB);
+        if (articleDBFile.exists()) { // Check if the file exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(articleDBFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (line.trim().isEmpty()) {
@@ -113,15 +113,8 @@ public class Update_DB {
 
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
                         articleL.addArticle(article);
-                        System.out.println("Article added to user database: " + article.getTitle() + " - " + article.getKeywords());
-                        iterations++;
-                        System.out.println("Iteration - " + iterations);
+                        System.out.println("Article added to article database: " + article.getTitle() + " - " + article.getKeywords());
 
-                        if(!GROUP_LIST.contains(group))
-                        {
-                            GROUP_LIST.addGroup(group);
-                            System.out.println("Group added to group list: " + group);
-                        }
                     } else {
                         System.out.println("Data length mismatch. Expected 10, found: " + data.length);
                     }
@@ -152,6 +145,24 @@ public class Update_DB {
         } else {
             // File doesn't exist; leave OTP_LIST empty
             System.out.println("OTP database file does not exist. Starting with an empty OTPList.");
+        }
+    }
+
+    public void loadGrpDB(GroupList grpList) {
+        File grpDBFile = new File(path_to_GroupDB);
+        if (grpDBFile.exists()) { // Check if the file exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    grpList.addGroup(line);
+                }
+            } catch (IOException e) {
+                System.out.println("Error loading Group database: " + e.getMessage());
+            }
+        } else {
+            // File doesn't exist; leave OTP_LIST empty
+            System.out.println("Group database file does not exist. Starting with an empty OTPList.");
+            grpList.addGroup("General");
         }
     }
 
@@ -223,6 +234,17 @@ public class Update_DB {
             }
         } catch (IOException e) {
             System.out.println("Error saving OTP database: " + e.getMessage());
+        }
+    }
+
+    public void saveGrpDB(GroupList grpList) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_GroupDB, false))) { // Set append to false
+            for (String grpName : grpList) { // Accessing OTP_LIST directly from OTPList class
+                writer.write(grpName);
+                writer.newLine(); // Add a new line after each OTP
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving Group database: " + e.getMessage());
         }
     }
 

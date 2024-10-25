@@ -3,7 +3,7 @@ package Backend;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class GroupList {
+public class GroupList implements Iterable<String>{
     private ArrayList<String> groups;
 
     public GroupList() {
