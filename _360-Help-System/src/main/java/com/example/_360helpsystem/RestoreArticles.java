@@ -146,23 +146,8 @@ public class RestoreArticles extends Application {
             errorLabel.setText("Choose a backup file!");
         }
         else{
-            ArticleList articles = new Update_DB().readBackup(fileToRestore);
 
-            for(Article article : articles)
-            {
-                if(!ARTICLE_LIST.contains(article))
-                {
-                    ARTICLE_LIST.addArticle(article);
-                }
-                else{
-                    Article editArticle = ARTICLE_LIST.getArticleByUID(article.getUID());
-
-                    if(editArticle != null)
-                    {
-                        editArticle.replaceArticle(article);
-                    }
-                }
-            }
+            ARTICLE_LIST = new Update_DB().readBackup(fileToRestore);
         }
 
         createdLabel.setVisible(true);
