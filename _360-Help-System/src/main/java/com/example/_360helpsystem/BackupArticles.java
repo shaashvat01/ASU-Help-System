@@ -1,44 +1,33 @@
 package com.example._360helpsystem;
 
+import Backend.Article;
+import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+
 public class BackupArticles extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         // Creating a label for instruction
         Text instructionText = new Text("Please select the groups to Backup:");
         instructionText.setFont(Font.font("Arial", 20));
-
-        // Creating Checkboxes for groups and setting font
-        CheckBox eclipseCheckbox = new CheckBox("Eclipse");
-        eclipseCheckbox.setFont(Font.font("Arial", 18));
-        eclipseCheckbox.setPrefWidth(200);  // Ensure consistent width
-
-        CheckBox javaFxCheckbox = new CheckBox("JavaFX");
-        javaFxCheckbox.setFont(Font.font("Arial", 18));
-        javaFxCheckbox.setPrefWidth(200);  // Ensure consistent width
-
-        CheckBox h2DatabaseCheckbox = new CheckBox("H2 Database");
-        h2DatabaseCheckbox.setFont(Font.font("Arial", 18));
-        h2DatabaseCheckbox.setPrefWidth(200);  // Ensure consistent width
-
-        CheckBox sqlFiddleCheckbox = new CheckBox("SQL Fiddle");
-        sqlFiddleCheckbox.setFont(Font.font("Arial", 18));
-        sqlFiddleCheckbox.setPrefWidth(200);  // Ensure consistent width
-
-        CheckBox gitHubCheckbox = new CheckBox("GitHub");
-        gitHubCheckbox.setFont(Font.font("Arial", 18));
-        gitHubCheckbox.setPrefWidth(200);  // Ensure consistent width
 
         // Backup Button
         Button backupButton = new Button("Backup Articles");
@@ -46,16 +35,53 @@ public class BackupArticles extends Application {
         backupButton.setFont(javafx.scene.text.Font.font("Arial", 18));
         backupButton.setPrefWidth(150);
 
+
         // VBox for checkboxes and instruction text centered and just above the Backup button
         VBox checkboxesLayout = new VBox(15); // 15 is the spacing between elements
         checkboxesLayout.setAlignment(Pos.CENTER);  // Align everything to the center
-        checkboxesLayout.getChildren().addAll(instructionText, eclipseCheckbox, javaFxCheckbox, h2DatabaseCheckbox, sqlFiddleCheckbox, gitHubCheckbox);
+
+        List<CheckBox> groupCheckBoxes = new ArrayList<>();
+
+        int iterations = 0;
+        HBox currentHBox = new HBox(15);  // Create the first HBox with 15px spacing
+        currentHBox.setAlignment(Pos.CENTER);  // Center-align the elements
+
+        for (String grpName : GROUP_LIST) {
+            CheckBox checkBox = new CheckBox(grpName);
+            checkBox.setFont(Font.font("Arial", 14));
+            groupCheckBoxes.add(checkBox);
+            currentHBox.getChildren().add(checkBox);  // Add checkboxes to the current HBox
+            iterations++;
+
+            // If 6 checkboxes have been added, create a new HBox
+            if (iterations % 6 == 0) {
+                checkboxesLayout.getChildren().add(currentHBox);  // Add the current HBox to the VBox
+                currentHBox = new HBox(15);  // Create a new HBox for the next set of 6 checkboxes
+                currentHBox.setAlignment(Pos.CENTER);  // Center-align the new HBox
+            }
+        }
+
+        // If there are remaining checkboxes (less than 6 in the last row), add the last HBox
+        if (!currentHBox.getChildren().isEmpty()) {
+            checkboxesLayout.getChildren().add(currentHBox);  // Add the last HBox to the VBox
+        }
+
+        // Label and TextField for entering the backup file name, placed side by side in an HBox
+        Label fileNameLabel = new Label("Enter backup file name:");
+        fileNameLabel.setFont(Font.font("Arial", 14));
+        TextField fileNameField = new TextField();
+        fileNameField.setPrefWidth(200);
+
+        // HBox to align the label and text field horizontally
+        HBox fileNameLayout = new HBox(10); // 10px spacing between label and text field
+        fileNameLayout.setAlignment(Pos.CENTER);
+        fileNameLayout.getChildren().addAll(fileNameLabel, fileNameField);
 
         // Center layout for checkboxes and backup button
         VBox contentLayout = new VBox(20); // 20 is the spacing between elements
         contentLayout.setPadding(new Insets(20));
         contentLayout.setAlignment(Pos.CENTER);
-        contentLayout.getChildren().addAll(checkboxesLayout, backupButton);
+        contentLayout.getChildren().addAll(instructionText,checkboxesLayout, fileNameLayout,backupButton);
 
         // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -66,7 +92,15 @@ public class BackupArticles extends Application {
         logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         logoutButton.setFont(javafx.scene.text.Font.font("Arial", 18));
         logoutButton.setPrefWidth(100);  // Set preferred width to control the button size
-        logoutButton.setOnAction(e -> showSignInPage(primaryStage));
+        logoutButton.setVisible(false);
+
+        backupButton.setOnAction(event -> {
+            try {
+                createBackup(fileNameField,groupCheckBoxes);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         // Top bar layout with Back and Logout button
         HBox topBar = new HBox();
@@ -104,14 +138,41 @@ public class BackupArticles extends Application {
         }
     }
 
-    private void showSignInPage(Stage primaryStage) {
-        SignIn signin = new SignIn();
-        try {
-            signin.start(primaryStage);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    public void createBackup(TextField textField, List<CheckBox> CheckBoxList) throws IOException {
+        String fileName = textField.getText();
+        boolean isGroupSelected = false;
+        for(CheckBox checkBox : CheckBoxList)
+        {
+            if(checkBox.isSelected())
+            {
+                isGroupSelected = true;
+            }
         }
+
+        if(!fileName.isEmpty() && isGroupSelected)
+        {
+            List<String> selectedGroups = new ArrayList<>();
+
+            for(CheckBox checkBox : CheckBoxList)
+            {
+                if(checkBox.isSelected())
+                {
+                    selectedGroups.add(checkBox.getText());
+                }
+            }
+
+            fileName = fileName + ".txt";
+            Update_DB UDB = new Update_DB();
+            if(!UDB.checkDupBackup(fileName))
+            {
+                UDB.writeBackup(fileName,selectedGroups);
+            }
+
+        }
+
+
     }
+
 
     public static void main(String[] args) {
         launch(args);

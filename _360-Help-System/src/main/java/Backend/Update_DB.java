@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
@@ -26,6 +27,7 @@ public class Update_DB {
     private final String path_to_OTPDB = "OTPs.txt";
     private final String path_to_ArticleDB = "Articles.txt";
     private final String path_to_GroupDB = "Groups.txt";
+    private final String path_to_BackupDB = "Backups.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -248,6 +250,62 @@ public class Update_DB {
         }
     }
 
+    public void writeBackup(String fileName, List<String> selectedGroups) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false))) {// Set append to false
+            for (Article article : ARTICLE_LIST) {
+                for (String selectedGroup : selectedGroups) {
+                    if(article.hasGroup(selectedGroup))
+                    {
+                        writer.write(article.getUID() + "-" +
+                                article.getLevel() + "-" +
+                                article.getSecurity() + "-" +
+                                article.getAuthor() + "-" +
+                                article.getTitle() + "-" +
+                                article.getAbs() + "-" +
+                                article.getKeywords() + "-" +
+                                article.getBody() + "-" +
+                                article.getLinks() + "-" +
+                                article.getGroup());
+                        writer.newLine();
+                        break;
+                    }
+                }
+
+            }
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean checkDupBackup(String fileName) {
+        File backupDBFile = new File(path_to_BackupDB);
+
+        // First check if the file exists and contains the fileName
+        if (backupDBFile.exists()) { // If BackupDB.txt exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(backupDBFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String backupName = line.trim();
+                    if (backupName.equals(fileName)) {
+                        return true;  // Duplicate found, return true
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Error loading Backup database: " + e.getMessage());
+            }
+        }
+
+        // Append the new file name to the BackupDB.txt, either if it doesn't exist or if no duplicate was found
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_BackupDB, true))) { // Append mode
+            writer.write(fileName);
+            writer.newLine();  // Make sure to add a newline after the filename
+        } catch (IOException ex) {
+            throw new RuntimeException("Error writing to BackupDB.txt: " + ex.getMessage());
+        }
+
+        return false;  // No duplicate found, new filename added to the file
+    }
 
 }
+
 
