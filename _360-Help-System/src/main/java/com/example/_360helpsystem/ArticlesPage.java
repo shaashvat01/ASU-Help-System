@@ -151,6 +151,7 @@ public class ArticlesPage extends Application {
         searchButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
+        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText()));
 
         // Search bar layout
         HBox searchBar = new HBox(5, searchField, searchButton);
@@ -304,6 +305,51 @@ public class ArticlesPage extends Application {
                 articleContainerVBox.getChildren().add(articleBox);
             }
 
+        }
+    }
+
+    public void displayArticlesForSearch(String searchText)
+    {
+        articleContainerVBox.getChildren().clear();
+
+        for (Article article : ARTICLE_LIST) {
+            if(article.hasKeyword(searchText)) {
+                // Create VBox for each article with padding and border
+                VBox articleBox = new VBox(5);
+                articleBox.setPadding(new Insets(10));
+                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                articleBox.setAlignment(Pos.TOP_LEFT);
+
+                // Create HBox for title and level
+                HBox titleLevelBox = new HBox(10);
+                Label titleLabel = new Label(article.getTitle());
+                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
+                titleLabel.setFont(Font.font("Arial", 17));
+
+                Label levelLabel = new Label("(" + article.getLevel() + ")");
+                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
+                levelLabel.setFont(Font.font("Arial", 14));
+
+                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
+                titleLevelBox.setAlignment(Pos.TOP_LEFT);
+
+                // Create the 3-dots button for options
+                Button optionsButton = new Button("...");
+                optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton)); // Pass button reference
+
+                // Create HBox for title, level, and options button
+                HBox titleOptionsBox = new HBox();
+                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
+                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
+                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
+
+                // Add titleOptionsBox and abstract to articleBox (VBox)
+                articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
+
+                // Add the articleBox (for each article) to the main VBox
+                articleContainerVBox.getChildren().add(articleBox);
+            }
         }
     }
 

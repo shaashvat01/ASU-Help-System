@@ -119,4 +119,12 @@ public class Article {
         this.groups = article.groups;
     }
 
+    public boolean hasKeyword(String keyword) {
+        if(this.keywords.contains(keyword))
+        {
+            return true;
+        }
+        return false;
+    }
+
 }
