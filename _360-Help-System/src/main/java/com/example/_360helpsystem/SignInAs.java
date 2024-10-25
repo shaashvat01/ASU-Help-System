@@ -57,7 +57,7 @@ public class SignInAs extends Application {
             layout.getChildren().add(instructorButton);
 
             // Instructor page action
-            instructorButton.setOnAction(e -> showHomePageScreen(primaryStage));
+            instructorButton.setOnAction(e -> showInstructorPageScreen(primaryStage));
         }
 
         if (currentUser.isStudent()) {
@@ -68,7 +68,7 @@ public class SignInAs extends Application {
             layout.getChildren().add(studentButton);
 
             // Student page action
-            studentButton.setOnAction(e -> showHomePageScreen(primaryStage));
+            studentButton.setOnAction(e -> showStudentPageScreen(primaryStage));
         }
 
         // Create the circular back button using ButtonStyleUtil
@@ -87,7 +87,7 @@ public class SignInAs extends Application {
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
 
         // Create scene for the "Login As" screen with a window size of 600x600
-        Scene loginAsScene = new Scene(root, 600, 600);  // Set the window size to 600x600
+        Scene loginAsScene = new Scene(root, 900, 700);  // Set the window size to 600x600
 
         // Set the scene and show the stage
         primaryStage.setScene(loginAsScene);
@@ -114,11 +114,21 @@ public class SignInAs extends Application {
             ex.printStackTrace();
         }
     }
-    // method to show home page
-    private void showHomePageScreen(Stage primaryStage) {
-        HomePage homePage = new HomePage();
+    // method to show instructor home page
+    private void showInstructorPageScreen(Stage primaryStage) {
+        InstructorPage homePage = new InstructorPage();
         try {
             homePage.start(primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // method to show student home page
+    private void showStudentPageScreen(Stage primaryStage) {
+        StudentPage studentPage = new StudentPage();
+        try {
+            studentPage.start(primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

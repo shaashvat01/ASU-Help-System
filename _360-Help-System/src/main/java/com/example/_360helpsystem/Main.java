@@ -32,7 +32,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         // StackPane to hold the background
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey, size adjusted to 600x600
+        Rectangle background = new Rectangle(900, 700, Color.web("#f8f5f3"));  // Very light grey, size adjusted to 600x600
         backgroundPane.getChildren().add(background);
 
         // VBox layout to hold the heading and buttons
@@ -60,7 +60,7 @@ public class Main extends Application {
         backgroundPane.getChildren().add(layout);
 
         // Create scene for the initial screen and set the window size to 600x600
-        Scene scene = new Scene(backgroundPane, 600, 600);
+        Scene scene = new Scene(backgroundPane, 900, 700);
 
         primaryStage.setTitle("Signin/Signup");
         primaryStage.setScene(scene);

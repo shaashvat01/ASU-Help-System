@@ -37,7 +37,7 @@ public class ForgotPasswordOtp extends Application {
     public void start(Stage primaryStage) {
         // Create background
         StackPane backgroundPane = new StackPane();
-        Rectangle background = new Rectangle(600, 600, Color.web("#f8f5f3"));  // Very light grey background with size adjusted to 600x600
+        Rectangle background = new Rectangle(900, 700, Color.web("#f8f5f3"));  // Very light grey background with size adjusted to 600x600
         backgroundPane.getChildren().add(background);
 
         // Create OTP label and text field
@@ -78,8 +78,8 @@ public class ForgotPasswordOtp extends Application {
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
 
-        // Create scene and set stage with size 600x600
-        Scene scene = new Scene(root, 600, 600);
+        // Create scene and set stage with size 900x700
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Forgot Password");
         primaryStage.show();

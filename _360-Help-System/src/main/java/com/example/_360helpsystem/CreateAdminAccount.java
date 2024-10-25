@@ -1,9 +1,6 @@
 package com.example._360helpsystem;
 
-import Backend.OTPList;
-import Backend.PasswordEvaluator;
-import Backend.Update_DB;
-import Backend.UserList;
+import Backend.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +14,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 /*******
  * <p> CreateAdminAccount Class </p>
@@ -32,6 +31,8 @@ public class CreateAdminAccount extends Application {
 
     public static UserList USER_LIST = new UserList();
     public static OTPList OTP_LIST = new OTPList();
+    public static ArticleList ARTICLE_LIST = new ArticleList();
+    public static GroupList GROUP_LIST = new GroupList();
     Update_DB UDB = new Update_DB();
 
     public static void main(String[] args) {
@@ -120,7 +121,7 @@ public class CreateAdminAccount extends Application {
 
         // Set standardized window size
         Scene scene = new Scene(root);
-        WindowUtil.setWindowSize(primaryStage, scene, 600, 600);  // Standard size applied
+        WindowUtil.setWindowSize(primaryStage, scene, 900, 700);  // Standard size applied
 
         primaryStage.show();
     }
@@ -157,12 +158,17 @@ public class CreateAdminAccount extends Application {
     {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
+        UDB.loadArticleDB(ARTICLE_LIST);
+        UDB.loadGrpDB(GROUP_LIST);
     }
     // This method saves the databases when the application is closing.
     public void stop() {
         // Save user and OTP databases when the application is closing
         UDB.saveUserDB(USER_LIST);
         UDB.saveOTPDB(OTP_LIST);
+        UDB.saveArticleDB(ARTICLE_LIST);
+        UDB.saveGrpDB(GROUP_LIST);
+
         System.out.println("Databases saved successfully.");
     }
 }
