@@ -53,9 +53,9 @@ public class AdminPage extends Application {
 
         // Sidebar VBox with buttons
         VBox sidebar = new VBox(10);
-        sidebar.setPadding(new Insets(20, 5, 10, 5));  // Reduced left-side padding
+        sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
-        sidebar.setPrefWidth(160);  // Reduced sidebar width to match the smaller size
+        sidebar.setPrefWidth(160);
         sidebar.getChildren().addAll(userModificationsButton, articleButton);
 
         // Logout Button
@@ -66,7 +66,7 @@ public class AdminPage extends Application {
 
         // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage)); // Call the showPreviousScreen method
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
         // Top bar layout with Back and Logout button
         HBox topBar = new HBox();
@@ -74,49 +74,35 @@ public class AdminPage extends Application {
         topBar.setSpacing(10);
 
         HBox leftBox = new HBox(backButton);
-        leftBox.setAlignment(Pos.TOP_LEFT);  // Align back button to the left
+        leftBox.setAlignment(Pos.TOP_LEFT);
 
         HBox rightBox = new HBox(logoutButton);
-        rightBox.setAlignment(Pos.TOP_RIGHT);  // Align logout button to the right
+        rightBox.setAlignment(Pos.TOP_RIGHT);
 
         topBar.getChildren().addAll(leftBox, rightBox);
-        HBox.setHgrow(rightBox, Priority.ALWAYS); // Make the rightBox grow to push the logout button to the right
+        HBox.setHgrow(rightBox, Priority.ALWAYS);
 
         // Main content area to show buttons dynamically
-        mainContentArea = new VBox(20);
-        mainContentArea.setAlignment(Pos.CENTER);
-        mainContentArea.setPadding(new Insets(20));
-
-        // Main layout with sidebar and main content area
-        HBox mainLayout = new HBox(sidebar, mainContentArea);
+        mainContentArea = new VBox();
+        mainContentArea.setAlignment(Pos.CENTER); // Center main content area in the middle of the screen
 
         BorderPane root = new BorderPane();
         root.setTop(topBar);
-        root.setCenter(mainLayout);
+        root.setLeft(sidebar);
+        root.setCenter(mainContentArea); // Place mainContentArea in the center of the BorderPane
         root.setStyle("-fx-background-color: #f8f5f3;");
 
-        Scene adminScene = new Scene(root, 900, 700);  // Set the window size to 800x600
+        Scene adminScene = new Scene(root, 900, 700);
 
         primaryStage.setTitle("Admin Dashboard");
         primaryStage.setScene(adminScene);
-        primaryStage.setResizable(false);  // Disable resizing if you want a fixed size
+        primaryStage.setResizable(false);
         primaryStage.show();
-    }
-
-    // Helper method to create a sidebar button with an icon
-    private Button createSidebarButtonWithIcon(String text, String icon) {
-        Button button = new Button(icon + " " + text);
-        button.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT;");
-        button.setMaxWidth(Double.MAX_VALUE);  // Make the button fill the width of the side bar
-        button.setPadding(new Insets(10, 10, 10, 10));  // Reduced left-side padding for button
-        button.setAlignment(Pos.CENTER_LEFT);
-        return button;
     }
 
     // Function to update the content when "User Account" is clicked
     private void showUserSettingsScreen(Stage primaryStage) {
         mainContentArea.getChildren().clear(); // Clear current content
-        mainContentArea.setAlignment(Pos.CENTER); // Center the main content area vertically and horizontally
 
         // Invite User Button
         Button inviteUserButton = new Button("Invite User");
@@ -148,12 +134,21 @@ public class AdminPage extends Application {
 
         // VBox to hold buttons with spacing, and center everything
         VBox buttonContainer = new VBox(20);
-        buttonContainer.setAlignment(Pos.CENTER); // Center the buttons horizontally
+        buttonContainer.setAlignment(Pos.CENTER);
         buttonContainer.getChildren().addAll(inviteUserButton, listAccountsButton, resetAccountButton, deleteAccountButton);
 
-        // Center the button container vertically and horizontally in the main content area
+        // Set the mainContentArea to contain the centered button container
         mainContentArea.getChildren().add(buttonContainer);
-        VBox.setVgrow(buttonContainer, Priority.ALWAYS);  // Allow the button container to grow and center vertically
+    }
+
+    // Helper method to create a sidebar button with an icon
+    private Button createSidebarButtonWithIcon(String text, String icon) {
+        Button button = new Button(icon + " " + text);
+        button.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT;");
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setPadding(new Insets(10, 10, 10, 10));
+        button.setAlignment(Pos.CENTER_LEFT);
+        return button;
     }
 
 
