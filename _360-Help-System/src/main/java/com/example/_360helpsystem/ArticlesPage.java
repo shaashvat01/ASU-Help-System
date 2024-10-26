@@ -16,7 +16,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
@@ -25,6 +24,8 @@ public class ArticlesPage extends Application {
 
     private VBox articleContainerVBox; // The container to display the articles
     private Button activeButton = null;
+    public static Article selectedArticle = null;
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -61,7 +62,7 @@ public class ArticlesPage extends Application {
 
         for(String grpName : GROUP_LIST)
         {
-            Button groupButton = createGroupButton(grpName);
+            Button groupButton = createGroupButton(grpName,primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -96,7 +97,7 @@ public class ArticlesPage extends Application {
         createGrpBtn.setPrefWidth(125);
         createGrpBtn.setPrefHeight(35);
         createGrpBtn.setFont(Font.font("Arial", 15));
-        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar));
+        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar,primaryStage));
 
         Button deleteGrpBtn = new Button("Delete Group");
         deleteGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
@@ -151,7 +152,7 @@ public class ArticlesPage extends Application {
         searchButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
-        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText()));
+        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText(),primaryStage));
 
         // Search bar layout
         HBox searchBar = new HBox(5, searchField, searchButton);
@@ -190,8 +191,7 @@ public class ArticlesPage extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        // Load articles for the default group (e.g., Eclipse) when the app starts
-        displayArticlesForGroup("General");
+        displayArticlesForGroup("General",primaryStage);
     }
 
     private void showPreviousScreen(Stage primaryStage) {
@@ -205,7 +205,7 @@ public class ArticlesPage extends Application {
     }
 
     // Helper method to create a sidebar group button
-    private Button createGroupButton(String text) {
+    private Button createGroupButton(String text,Stage primaryStage) {
         Button button = new Button(text);
 
         // Consistent button styling for default, hover, and active states
@@ -252,7 +252,7 @@ public class ArticlesPage extends Application {
             activeButton = button; // Update the active button reference
 
             // Handle the action for displaying articles
-            displayArticlesForGroup(text);
+            displayArticlesForGroup(text,primaryStage);
         });
 
         return button;
@@ -262,7 +262,7 @@ public class ArticlesPage extends Application {
 
 
     // Method to dynamically display articles for a specific group
-    private void displayArticlesForGroup(String groupName) {
+    private void displayArticlesForGroup(String groupName,Stage primaryStage) {
         // Clear previous articles
         articleContainerVBox.getChildren().clear();
 
@@ -290,7 +290,7 @@ public class ArticlesPage extends Application {
                 // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
 
                 // Create HBox for title, level, and options button
                 HBox titleOptionsBox = new HBox();
@@ -308,7 +308,7 @@ public class ArticlesPage extends Application {
         }
     }
 
-    public void displayArticlesForSearch(String searchText)
+    public void displayArticlesForSearch(String searchText,Stage primaryStage)
     {
         articleContainerVBox.getChildren().clear();
 
@@ -336,7 +336,7 @@ public class ArticlesPage extends Application {
                 // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
 
                 // Create HBox for title, level, and options button
                 HBox titleOptionsBox = new HBox();
@@ -356,7 +356,7 @@ public class ArticlesPage extends Application {
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton) {
+    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
@@ -365,7 +365,7 @@ public class ArticlesPage extends Application {
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
             ARTICLE_LIST.removeArticle(article);
-            displayArticlesForGroup("General");
+            displayArticlesForGroup("General",primaryStage);
             contextMenu.hide(); // Hide the context menu after action
         });
 
@@ -373,7 +373,9 @@ public class ArticlesPage extends Application {
         MenuItem updateItem = new MenuItem("Update Article");
         updateItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         updateItem.setOnAction(e -> {
-            System.out.println("Updating article: " + article.getTitle());
+            System.out.println("Updating article: " + article.getUID());
+            selectedArticle = article;
+            showCreateArticleScreen(primaryStage); //go to article screen
             contextMenu.hide(); // Hide the context menu after action
         });
 
@@ -384,7 +386,7 @@ public class ArticlesPage extends Application {
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
 
-    private void showCreateGroup(VBox sidebar) {
+    private void showCreateGroup(VBox sidebar,Stage primaryStage) {
         // Create a new Stage (window) for the pop-up
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
@@ -416,7 +418,7 @@ public class ArticlesPage extends Application {
                 if(!GROUP_LIST.contains(groupName)) {
                     GROUP_LIST.addGroup(groupName);
                     System.out.println("Group Created: " + groupName);
-                    sidebar.getChildren().add(createGroupButton(groupName));
+                    sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
                     // Close the pop-up after creation
                     popupStage.close();
                 }

@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example._360helpsystem.ArticlesPage.selectedArticle;
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
@@ -161,6 +162,24 @@ public class CreateArticle extends Application {
         topBar.getChildren().addAll(leftBox, rightBox);
         HBox.setHgrow(rightBox, Priority.ALWAYS);  // Make the right box grow to push the Logout button to the right
 
+
+        if(selectedArticle != null)
+        {
+            titleField.setText(selectedArticle.getTitle());
+            levelComboBox.setValue(selectedArticle.getLevel());
+            descriptionField.setText(selectedArticle.getBody());
+            keywordsField.setText(selectedArticle.getKeywords());
+            bodyField.setText(selectedArticle.getBody());
+            referenceLinksField.setText(selectedArticle.getLinks());
+            for(CheckBox checkBox : groupCheckBoxes)
+            {
+                if(selectedArticle.hasGroup(checkBox.getText()))
+                {
+                    checkBox.setSelected(true);
+                }
+            }
+        }
+
         // Main layout
         BorderPane root = new BorderPane();
         root.setTop(topBar);
@@ -224,12 +243,24 @@ public class CreateArticle extends Application {
         System.out.println("Selected group: " + selectedGrp);
 
         String security = "Public";
-        long articleUID = new UID_Generator().getUID();
-        Article newArticle = new Article(articleUID, title, CURRENT_USER.getUserName(), level, security, description, keywords, body, referenceLinks, selectedGrp);
 
-        ARTICLE_LIST.addArticle(newArticle);
-        System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
-        clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox);
+        if(selectedArticle == null)
+        {
+            long articleUID = new UID_Generator().getUID();
+            Article newArticle = new Article(articleUID, title, CURRENT_USER.getUserName(), level, security, description, keywords, body, referenceLinks, selectedGrp);
+
+            ARTICLE_LIST.addArticle(newArticle);
+            System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
+            clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox);
+        }
+        else {
+            Article newArticle = new Article(selectedArticle.getUID(), title, selectedArticle.getAuthor(), level, security, description, keywords, body, referenceLinks, selectedGrp);
+            ARTICLE_LIST.getArticleByUID(selectedArticle.getUID()).replaceArticle(newArticle);
+            clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox);
+            selectedArticle = null;
+        }
+
+
     }
 
 
@@ -237,6 +268,7 @@ public class CreateArticle extends Application {
     private void showPreviousScreen(Stage primaryStage) {
         ArticlesPage articles = new ArticlesPage();
         try{
+            selectedArticle = null;
             articles.start(primaryStage);
         }
         catch(Exception ex){
