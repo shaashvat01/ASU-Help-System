@@ -90,9 +90,9 @@ public class InstructorPage extends Application {
     }
 
     private void showArticleScreen(Stage primaryStage) {
-       ArticlesPage articles = new ArticlesPage();
+        InstructorsArticlePage articlePage = new InstructorsArticlePage();
         try{
-            articles.start(primaryStage);
+            articlePage.start(primaryStage);
         }
         catch(Exception ex){
             ex.printStackTrace();
