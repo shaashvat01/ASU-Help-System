@@ -42,6 +42,17 @@ public class RestoreArticles extends Application {
         backupListBox.getItems().addAll(new Update_DB().getBackupList());
         backupListBox.setValue("");
 
+        boolean backupExist;
+
+        if(backupListBox.getItems().isEmpty()) {
+            backupListBox.setVisible(false);
+            errorLabel.setText("No backups found!");
+            errorLabel.setVisible(true);
+            backupExist = false;
+        } else {
+            backupExist = true;
+        }
+
 
         // Remove all the existing help articles from the selected groups Button
         Button removeAllButton = new Button("Overwrite existing articles");
@@ -49,7 +60,10 @@ public class RestoreArticles extends Application {
         removeAllButton.setFont(javafx.scene.text.Font.font("Arial", 18));
         removeAllButton.setMinWidth(Control.USE_COMPUTED_SIZE);
         removeAllButton.setPrefWidth(Control.USE_COMPUTED_SIZE);
-        removeAllButton.setOnAction(e -> {overwriteBackup(backupListBox,errorLabel,createdLabel);});
+        removeAllButton.setOnAction(e -> { if(backupExist)
+        {
+            overwriteBackup(backupListBox,errorLabel,createdLabel);
+        }});
 
         // Merge with existing articles Button
         Button mergeToExistingButton = new Button("Merge with existing articles");
@@ -57,7 +71,10 @@ public class RestoreArticles extends Application {
         mergeToExistingButton.setFont(javafx.scene.text.Font.font("Arial", 18));
         mergeToExistingButton.setMinWidth(Control.USE_COMPUTED_SIZE);
         mergeToExistingButton.setPrefWidth(Control.USE_COMPUTED_SIZE);
-        mergeToExistingButton.setOnAction(e -> {mergeBackup(backupListBox,errorLabel,createdLabel);});
+        mergeToExistingButton.setOnAction(e -> {if(backupExist)
+        {
+            mergeBackup(backupListBox,errorLabel,createdLabel);
+        }});
 
         // Center layout for checkboxes and backup button
         VBox contentLayout = new VBox(20); // 20 is the spacing between elements
@@ -114,45 +131,53 @@ public class RestoreArticles extends Application {
 
     public void mergeBackup(ComboBox<String> backupListBox,Label errorLabel,Label createdLabel)
     {
-        String fileToRestore = backupListBox.getValue();
-        if(fileToRestore.isEmpty())
-        {
-            errorLabel.setVisible(true);
-            errorLabel.setText("Choose a backup file!");
-        }
-        else{
-            ArticleList articles = new Update_DB().readBackup(fileToRestore);
-
-            for(Article article : articles)
+        errorLabel.setVisible(false);
+        createdLabel.setVisible(false);
+            String fileToRestore = backupListBox.getValue();
+            if(fileToRestore.isEmpty())
             {
-                if(!ARTICLE_LIST.contains(article))
+                errorLabel.setVisible(true);
+                errorLabel.setText("Choose a backup file!");
+            }
+            else{
+                ArticleList articles = new Update_DB().readBackup(fileToRestore);
+
+                for(Article article : articles)
                 {
-                    ARTICLE_LIST.addArticle(article);
+                    if(!ARTICLE_LIST.contains(article))
+                    {
+                        ARTICLE_LIST.addArticle(article);
+                        createdLabel.setVisible(true);
+                        createdLabel.setText("Restore Successful");
+                        errorLabel.setVisible(false);
+                        backupListBox.setValue("");
+                    }
                 }
             }
-        }
 
-        createdLabel.setVisible(true);
-        createdLabel.setText("Restore Successful");
-        backupListBox.setValue("");
+
     }
 
     public void overwriteBackup(ComboBox<String> backupListBox,Label errorLabel,Label createdLabel)
     {
-        String fileToRestore = backupListBox.getValue();
-        if(fileToRestore.isEmpty())
-        {
-            errorLabel.setVisible(true);
-            errorLabel.setText("Choose a backup file!");
-        }
-        else{
+        errorLabel.setVisible(false);
+        createdLabel.setVisible(false);
+            String fileToRestore = backupListBox.getValue();
+            if(fileToRestore.isEmpty())
+            {
+                errorLabel.setVisible(true);
+                errorLabel.setText("Choose a backup file!");
+            }
+            else{
 
-            ARTICLE_LIST = new Update_DB().readBackup(fileToRestore);
-        }
+                ARTICLE_LIST = new Update_DB().readBackup(fileToRestore);
+                createdLabel.setVisible(true);
+                createdLabel.setText("Restore Successful");
+                errorLabel.setVisible(false);
+                backupListBox.setValue("");
+            }
 
-        createdLabel.setVisible(true);
-        createdLabel.setText("Restore Successful");
-        backupListBox.setValue("");
+
     }
 
 

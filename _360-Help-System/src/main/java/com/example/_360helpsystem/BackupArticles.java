@@ -150,6 +150,7 @@ public class BackupArticles extends Application {
 
     public void createBackup(TextField textField, List<CheckBox> CheckBoxList,Label error,Label message) throws IOException {
         message.setVisible(false);
+        error.setVisible(false);
         String fileName = textField.getText();
         boolean isGroupSelected = false;
         for(CheckBox checkBox : CheckBoxList)

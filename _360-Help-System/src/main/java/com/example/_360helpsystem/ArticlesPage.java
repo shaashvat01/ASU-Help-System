@@ -415,7 +415,7 @@ public class ArticlesPage extends Application {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
                 // Handle group creation logic here
-                if(!GROUP_LIST.contains(groupName)) {
+                if(!GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
                     GROUP_LIST.addGroup(groupName);
                     System.out.println("Group Created: " + groupName);
                     sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
