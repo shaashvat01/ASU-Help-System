@@ -102,6 +102,7 @@ public class CreateAdminAccount extends Application {
 
         // Create the circular back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setVisible(false);
 
         // Handle back button action
         backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here

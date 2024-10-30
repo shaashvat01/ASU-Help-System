@@ -267,7 +267,7 @@ public class CreateArticle extends Application {
             ARTICLE_LIST.addArticle(newArticle);
             System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
             clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox,errorLabel,message);
-            message.setText("Article Updated!");
+            message.setText("Article Created!");
             message.setVisible(true);
         }
         else {
@@ -275,7 +275,7 @@ public class CreateArticle extends Application {
             ARTICLE_LIST.getArticleByUID(selectedArticle.getUID()).replaceArticle(newArticle);
             clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox,errorLabel,message);
             selectedArticle = null;
-            message.setText("Article Created!");
+            message.setText("Article Updated!");
             message.setVisible(true);
         }
 
