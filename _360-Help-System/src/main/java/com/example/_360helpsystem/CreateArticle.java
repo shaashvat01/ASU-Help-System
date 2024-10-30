@@ -22,6 +22,17 @@ import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
+/*******
+ * <p> CreateArticle Class </p>
+ *
+ * <p> Description: This class manages the creation of new articles within the help system.
+ * It provides an interface for users to input and save article information, enabling
+ * organized addition of content to the system. </p>
+ *
+ * @version 1.00, 2024-10-30
+ * author Team - Th15
+ *
+ *******/
 
 public class CreateArticle extends Application {
 

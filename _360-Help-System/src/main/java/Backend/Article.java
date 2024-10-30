@@ -2,6 +2,21 @@ package Backend;
 
 import java.util.ArrayList;
 
+/*******
+ * <p> Article Class </p>
+ *
+ * <p> Description: This class defines the structure and properties of an article in the help system.
+ * Articles contain information such as title, author, level, security, abstract, keywords,
+ * body, and other metadata relevant to managing help content within the system. </p>
+ *
+ * <p> Articles serve as the main content managed by users with specific roles, allowing them
+ * to categorize, update, and secure information as needed. </p>
+ *
+ * @version 1.00, 2024-10-30
+ * @author Team - Th15
+ *
+ *******/
+
 public class Article {
     private long UID;
     private String title;
@@ -14,6 +29,7 @@ public class Article {
     private String links;
     private ArrayList<String> groups;
 
+    //Unique identifier for the article.
     public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
         this.keywords = new ArrayList<>();
         this.groups = new ArrayList<>();
@@ -106,6 +122,7 @@ public class Article {
         return false;
     }
 
+    // method to replace article
     public void replaceArticle(Article article) {
         this.UID = article.UID;
         this.title = article.title;

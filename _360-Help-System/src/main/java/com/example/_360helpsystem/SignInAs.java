@@ -13,6 +13,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import Backend.*;
 
+/*******
+ * <p> SignInAs Class </p>
+ *
+ * <p> Description: This class provides the functionality to sign in as a specific user role within the help system.
+ * It enables users to choose their role upon signing in, allowing customized access and interactions
+ * based on their selected role (e.g., Admin, Instructor, Student). </p>
+ *
+ * @version 1.00, 2024-10-30
+ * author Team - Th15
+ *
+ *******/
+
 public class SignInAs extends Application {
     // This method sets up the screen where users can select their role (Admin, Instructor, Student).
     @Override

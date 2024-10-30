@@ -20,6 +20,18 @@ import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
+/*******
+ * <p> ArticlesPage Class </p>
+ *
+ * <p> Description: This class manages the user interface for displaying articles in the help system.
+ * It provides functionalities to view, search, and interact with article content.
+ * The class is designed to facilitate a user-friendly experience for browsing help articles. </p>
+ *
+ * @version 1.00, 2024-10-30
+ * author Team - Th15
+ *
+ *******/
+
 public class ArticlesPage extends Application {
 
     private VBox articleContainerVBox; // The container to display the articles

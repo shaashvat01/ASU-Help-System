@@ -18,6 +18,18 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
+/*******
+ * <p> SignIn Class </p>
+ *
+ * <p> Description: This class handles the user sign-in functionality within the help system.
+ * It provides the interface and validation for users to securely log in, ensuring authorized
+ * access to system resources based on user credentials. </p>
+ *
+ * @version 1.00, 2024-10-30
+ * author Team - Th15
+ *
+ *******/
+
 public class SignIn extends Application {
 
     public static User CURRENT_USER;

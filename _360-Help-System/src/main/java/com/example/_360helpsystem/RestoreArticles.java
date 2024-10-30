@@ -20,6 +20,18 @@ import java.util.List;
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 
+/*******
+ * <p> RestoreArticles Class </p>
+ *
+ * <p> Description: This class manages the restoration functionality for articles within the help system.
+ * It provides methods to retrieve and reinstate article data from backups, ensuring data consistency
+ * and availability when needed. </p>
+ *
+ * @version 1.00, 2024-10-30
+ * author Team - Th15
+ *
+ *******/
+
 public class RestoreArticles extends Application {
 
     @Override
