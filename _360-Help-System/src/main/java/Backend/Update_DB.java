@@ -31,6 +31,7 @@ public class Update_DB {
     private final String path_to_genericMsgDB = "GenericMsgs.txt";
     private final String path_to_searchHistory = "History.txt";
     private final String path_to_requestsDB = "Requests.txt";
+    private final String path_to_futureArticleDB = "FutureArticles.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -395,6 +396,20 @@ public class Update_DB {
         }
     }
 
+    public void saveSearchHistory()
+    {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_searchHistory));
+             FileWriter writer = new FileWriter(path_to_futureArticleDB, true)) {  // true enables append mode
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                writer.write(line + System.lineSeparator());  // Append each line with a newline
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  // Print stack trace if an error occurs
+        }
+    }
+
     public void storeAccessRequest(User user,Article article) {
         try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
             writer.write(user.username+"-"+article.getUID()+System.lineSeparator());  // Write message with a newline at the end
@@ -403,10 +418,7 @@ public class Update_DB {
         }
     }
 
-    public void saveRequest()
-    {
 
-    }
 }
 
 
