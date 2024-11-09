@@ -28,6 +28,9 @@ public class Update_DB {
     private final String path_to_ArticleDB = "Articles.txt";
     private final String path_to_GroupDB = "Groups.txt";
     private final String path_to_BackupDB = "Backups.txt";
+    private final String path_to_genericMsgDB = "GenericMsgs.txt";
+    private final String path_to_searchHistory = "History.txt";
+    private final String path_to_requestsDB = "Requests.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -366,6 +369,43 @@ public class Update_DB {
             System.out.println("Backup database file does not exist");
         }
         return null;
+    }
+
+    public void writeToMsgDB(String message) {
+        try (FileWriter writer = new FileWriter(path_to_genericMsgDB, true)) {  // true enables append mode
+            writer.write(message + System.lineSeparator());  // Write message with a newline at the end
+        } catch (IOException e) {
+            e.printStackTrace();  // Print stack trace if an error occurs
+        }
+    }
+
+    public void storeSearch(String search)
+    {
+        try (FileWriter writer = new FileWriter(path_to_searchHistory, true)) {  // true enables append mode
+            writer.write(search + System.lineSeparator());  // Write message with a newline at the end
+        } catch (IOException e) {
+            e.printStackTrace();  // Print stack trace if an error occurs
+        }
+    }
+
+    public void clearSearchHistory() {
+        try (FileWriter writer = new FileWriter(path_to_searchHistory)) {
+        } catch (IOException e) {
+            e.printStackTrace();  // Print stack trace if an error occurs
+        }
+    }
+
+    public void storeAccessRequest(User user,Article article) {
+        try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
+            writer.write(user.username+"-"+article.getUID()+System.lineSeparator());  // Write message with a newline at the end
+        } catch (IOException e) {
+            e.printStackTrace();  // Print stack trace if an error occurs
+        }
+    }
+
+    public void saveRequest()
+    {
+
     }
 }
 
