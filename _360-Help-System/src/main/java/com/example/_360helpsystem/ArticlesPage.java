@@ -358,18 +358,10 @@ public class ArticlesPage extends Application {
             contextMenu.hide(); // Hide the context menu after action
         });
 
-        // Create the Update Article menu item
-        MenuItem updateItem = new MenuItem("Update Article");
-        updateItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        updateItem.setOnAction(e -> {
-            System.out.println("Updating article: " + article.getUID());
-            selectedArticle = article;
-            showCreateArticleScreen(primaryStage); //go to article screen
-            contextMenu.hide(); // Hide the context menu after action
-        });
+
 
         // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem, updateItem);
+        contextMenu.getItems().addAll(deleteItem);
 
         // Show the context menu relative to the clicked 3-dots button
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
