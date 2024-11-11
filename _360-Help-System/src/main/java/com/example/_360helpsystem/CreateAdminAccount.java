@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import javax.crypto.SecretKey;
 import java.util.ArrayList;
 
 /*******
@@ -33,6 +34,7 @@ public class CreateAdminAccount extends Application {
     public static OTPList OTP_LIST = new OTPList();
     public static ArticleList ARTICLE_LIST = new ArticleList();
     public static GroupList GROUP_LIST = new GroupList();
+    public static SecretKey SECRET_KEY;
     Update_DB UDB = new Update_DB();
 
     public static void main(String[] args) {
@@ -41,7 +43,7 @@ public class CreateAdminAccount extends Application {
 
     // This method checks if users exist and either shows the admin creation screen or opens the main screen based on that condition.
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         // Check if users exist (if none exist, show the first-time setup screen)
         initializeDB();
         boolean usersExist = checkIfUsersExist();
@@ -155,12 +157,13 @@ public class CreateAdminAccount extends Application {
         }
     }
     // Loads the user and OTP databases from files.
-    private void initializeDB()
-    {
+    private void initializeDB() throws Exception {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
         UDB.loadArticleDB(ARTICLE_LIST);
         UDB.loadGrpDB(GROUP_LIST);
+        UDB.loadKey();
+        //new Article_Encryption_Test().test(); DEBUG PLS REMOVE
         UDB.clearSearchHistory();
     }
     // This method saves the databases when the application is closing.

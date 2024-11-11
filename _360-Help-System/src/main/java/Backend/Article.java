@@ -28,6 +28,7 @@ public class Article {
     private String body;
     private String links;
     private ArrayList<String> groups;
+    private String iv;
 
     //Unique identifier for the article.
     public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
@@ -57,6 +58,12 @@ public class Article {
             this.groups.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
         }
     }
+
+    public Article()
+    {
+        //DEBUG CONSTRUCTOR PLS REMOVE
+    }
+
     public long getUID() {
         return UID;
     }
@@ -142,6 +149,14 @@ public class Article {
             return true;
         }
         return false;
+    }
+
+    public String getIv() {
+        return iv;
+    }
+
+    public void setIv(String iv) {
+        this.iv = iv;
     }
 
 }

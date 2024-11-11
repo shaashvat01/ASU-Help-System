@@ -181,10 +181,13 @@ public class BackupArticles extends Application {
 
         if(!fileName.isEmpty() && isGroupSelected)
         {
-            if(fileName.equals("Backups"))
+            Update_DB UDB = new Update_DB();
+
+            if(UDB.isFileUnique(fileName))
             {
                 error.setText("File name in use. Enter another name");
                 error.setVisible(true);
+                return;
             }
             List<String> selectedGroups = new ArrayList<>();
 
@@ -196,8 +199,8 @@ public class BackupArticles extends Application {
                 }
             }
 
-            fileName = fileName + ".txt";
-            Update_DB UDB = new Update_DB();
+
+
             if(!UDB.checkDupBackup(fileName))
             {
                 UDB.writeBackup(fileName,selectedGroups);

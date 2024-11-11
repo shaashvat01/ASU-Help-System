@@ -1,14 +1,18 @@
 package Backend;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
-import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
-import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.*;
 
 /*******
  * <p> Update_DB Class </p>
@@ -32,6 +36,7 @@ public class Update_DB {
     private final String path_to_searchHistory = "History.txt";
     private final String path_to_requestsDB = "Requests.txt";
     private final String path_to_futureArticleDB = "FutureArticles.txt";
+    private final String path_to_key = "Key.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -105,7 +110,7 @@ public class Update_DB {
                         break; // Stop reading if a blank line is encountered
                     }
                     String[] data = line.split("-");
-                    if (data.length == 10) {
+                    if (data.length == 11) {
                         long UID = Long.parseLong(data[0]);
                         String level = data[1];
                         String security = data[2];
@@ -116,13 +121,15 @@ public class Update_DB {
                         String body = data[7];
                         String links = data[8];
                         String group = data[9];
+                        String iv = data[10];
 
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
+                        article.setIv(iv);
                         articleL.addArticle(article);
                         System.out.println("Article added to article database: " + article.getTitle() + " - " + article.getKeywords());
 
                     } else {
-                        System.out.println("Data length mismatch. Expected 10, found: " + data.length);
+                        System.out.println("Data length mismatch. Expected 11, found: " + data.length);
                     }
                 }
             } catch (IOException e) {
@@ -223,7 +230,8 @@ public class Update_DB {
                         article.getKeywords() + "-" +
                         article.getBody() + "-" +
                         article.getLinks() + "-" +
-                        article.getGroup());
+                        article.getGroup() + "-" +
+                        article.getIv());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -417,6 +425,89 @@ public class Update_DB {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
     }
+
+    public void loadKey()
+    {
+        File keyFile = new File(path_to_key);
+
+        if (keyFile.exists()) { // Check if the key file exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(keyFile))) {
+                String encodedKey = reader.readLine(); // Read the Base64 encoded key from the first line
+
+                // Decode the Base64 encoded key string
+                byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+
+                // Rebuild the SecretKey from the decoded key bytes
+                SECRET_KEY = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+
+                System.out.println("Secret key loaded successfully from " + path_to_key);
+
+            } catch (IOException e) {
+                System.out.println("Error loading secret key: " + e.getMessage());
+            }
+        } else {
+            // If the key file doesn't exist, handle the case accordingly
+            System.out.println("Secret key file does not exist. Generating new key file!");
+
+
+            try (FileWriter writer = new FileWriter(path_to_key, true)) {  // true enables append mode
+                SECRET_KEY = generateKey();
+                writer.write(Base64.getEncoder().encodeToString(SECRET_KEY.getEncoded())+System.lineSeparator());  // Write message with a newline at the end
+            } catch (IOException e) {
+                e.printStackTrace();  // Print stack trace if an error occurs
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+    public SecretKey generateKey() throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(256); // Key size in bits
+        return keyGenerator.generateKey();
+    }
+
+    public boolean isFileUnique(String name) {
+        name = name + ".txt";
+        System.out.println("Checking file name - " + name);
+
+        if (name.equalsIgnoreCase(path_to_ArticleDB)) {
+            System.out.println("File name matches path_to_ArticleDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_futureArticleDB)) {
+            System.out.println("File name matches path_to_futureArticleDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_BackupDB)) {
+            System.out.println("File name matches path_to_BackupDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_UserDB)) {
+            System.out.println("File name matches path_to_UserDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_OTPDB)) {
+            System.out.println("File name matches path_to_OTPDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_GroupDB)) {
+            System.out.println("File name matches path_to_GroupDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_genericMsgDB)) {
+            System.out.println("File name matches path_to_genericMsgDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_searchHistory)) {
+            System.out.println("File name matches path_to_searchHistory.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_requestsDB)) {
+            System.out.println("File name matches path_to_requestsDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_key)) {
+            System.out.println("File name matches path_to_key.");
+            return false;
+        } else {
+            System.out.println("File name is unique.");
+            return true;
+        }
+    }
+
 
 
 }
