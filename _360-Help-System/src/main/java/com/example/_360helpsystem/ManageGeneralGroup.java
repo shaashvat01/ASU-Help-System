@@ -231,9 +231,9 @@ public class ManageGeneralGroup extends Application {
     }
 
     private void showPreviousScreen(Stage primaryStage) {
-        SignInAs signInAs = new SignInAs();
+        ArticlesPage articlesPage = new ArticlesPage();
         try {
-            signInAs.start(primaryStage);
+            articlesPage.start(primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
