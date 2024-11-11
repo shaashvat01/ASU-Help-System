@@ -154,8 +154,15 @@ public class InstructorsArticlePage extends Application {
         searchButton.setPrefHeight(29);
         searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText(),primaryStage));
 
-        // Search bar layout
-        HBox searchBar = new HBox(5, searchField, searchButton);
+        // Filter Button
+        Button filterButton = new Button("Filter");
+        filterButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        filterButton.setFont(Font.font("Arial", 15));
+        filterButton.setPrefHeight(29);
+        filterButton.setOnAction(e -> showFilterOptions(primaryStage));
+
+// Search bar layout with Search and Filter buttons
+        HBox searchBar = new HBox(5, searchField, searchButton, filterButton);
         searchBar.setAlignment(Pos.CENTER);
         searchBar.setPadding(new Insets(10, 0, 0, 240));
 
@@ -186,12 +193,22 @@ public class InstructorsArticlePage extends Application {
 
         // Create the scene and set it on the stage
         Scene scene = new Scene(root, 900, 700);
-        primaryStage.setTitle("Article Dashboard");
+        primaryStage.setTitle("Instructor Article Dashboard");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
 
         displayArticlesForGroup("General",primaryStage);
+    }
+
+    private void showFilterOptions(Stage primaryStage) {
+        FilterOptions filterOptions = new FilterOptions();
+        try{
+            filterOptions.start(primaryStage);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private void showPreviousScreen(Stage primaryStage) {
@@ -204,6 +221,7 @@ public class InstructorsArticlePage extends Application {
         }
     }
 
+    // Helper method to create a sidebar group button
     // Helper method to create a sidebar group button
     private Button createGroupButton(String text,Stage primaryStage) {
         Button button = new Button(text);
@@ -257,8 +275,6 @@ public class InstructorsArticlePage extends Application {
 
         return button;
     }
-
-
 
 
     // Method to dynamically display articles for a specific group

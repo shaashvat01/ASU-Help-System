@@ -62,7 +62,7 @@ public class ArticlesPage extends Application {
 
         for(String grpName : GROUP_LIST)
         {
-            Button groupButton = createGroupButton(grpName,primaryStage);
+            HBox groupButton = createGroupButton(grpName,primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -204,62 +204,51 @@ public class ArticlesPage extends Application {
         }
     }
 
-    // Helper method to create a sidebar group button
-    private Button createGroupButton(String text,Stage primaryStage) {
-        Button button = new Button(text);
 
-        // Consistent button styling for default, hover, and active states
-        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Updated padding to be equal on left and right
+    private HBox createGroupButton(String text, Stage primaryStage) {
+        // Container for the group name and options button
+        HBox groupButtonContainer = new HBox();
+        groupButtonContainer.setAlignment(Pos.CENTER); // Center align text and dots
+        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; "
+                + "-fx-background-radius: 15; -fx-padding: 5; -fx-spacing: 10;");
 
-        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Same padding as default
+        // Group name label
+        Label groupNameLabel = new Label(text);
+        groupNameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
 
-        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: black; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Style for active button
+        // Three-dots button for options
+        Button optionsButton = new Button("...");
+        optionsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px;");
 
-        button.setStyle(defaultStyle);
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.setAlignment(Pos.CENTER);  // Align text to the center
+        // Create a ContextMenu with a single "Manage" option
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem manageItem = new MenuItem("Manage");
+        manageItem.setOnAction(e -> showManageDialog(primaryStage)); // Opens the manage dialog
+        contextMenu.getItems().add(manageItem);
 
-        // Hover effect while maintaining font size and padding
-        button.setOnMouseEntered(e -> {
-            if (button != activeButton) {
-                button.setStyle(hoverStyle);
-            }
-        });
-        button.setOnMouseExited(e -> {
-            if (button != activeButton) {
-                button.setStyle(defaultStyle);
-            }
+        // Show the context menu when the three-dots button is clicked
+        optionsButton.setOnAction(e -> {
+            contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
         });
 
-        // Set action when the group button is clicked
-        button.setOnAction(e -> {
-            // Reset the currently active button's style to default
-            if (activeButton != null) {
-                activeButton.setStyle(defaultStyle);
-            }
+        // Add the group name label and the options button to the container
+        groupButtonContainer.getChildren().addAll(groupNameLabel, optionsButton);
 
-            // Set this button's style to active
-            button.setStyle(activeStyle);
-            activeButton = button; // Update the active button reference
-
-            // Handle the action for displaying articles
-            displayArticlesForGroup(text,primaryStage);
-        });
-
-        return button;
+        // Return the container as the final group button
+        return groupButtonContainer;
     }
 
 
 
+
+    private void showManageDialog(Stage primaryStage) {
+        ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup();
+        try{
+            manageGeneralGroup.start(primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     // Method to dynamically display articles for a specific group
     private void displayArticlesForGroup(String groupName,Stage primaryStage) {
