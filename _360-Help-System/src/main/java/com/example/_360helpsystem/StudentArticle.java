@@ -1,18 +1,22 @@
 package com.example._360helpsystem;
 
+import Backend.Article;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 
 public class StudentArticle extends Application {
-    // The container to display the articles
+
+    private VBox articleContainerVBox; // The container to display the articles
 
     @Override
     public void start(Stage primaryStage) {
@@ -45,7 +49,6 @@ public class StudentArticle extends Application {
         filterButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         filterButton.setFont(Font.font("Arial", 15));
         filterButton.setPrefHeight(29);
-        filterButton.setOnAction(e -> showFilterOptions(primaryStage));
 
         // Centered layout for search bar, search button, and filter button
         HBox searchBox = new HBox(5, searchField, searchButton, filterButton);
@@ -68,7 +71,7 @@ public class StudentArticle extends Application {
         scrollPane_Article.setStyle("-fx-background-color: transparent;");
 
         // VBox to hold the article container (which will display the articles dynamically)
-        VBox articleContainerVBox = new VBox(10);
+        articleContainerVBox = new VBox(10);
         articleContainerVBox.setPrefSize(800, 600);
         articleContainerVBox.setStyle("-fx-background-color: white;");
 
@@ -81,31 +84,111 @@ public class StudentArticle extends Application {
         articleSection.setPadding(new Insets(20));
 
         // Main layout with only the search bar and article section
-        BorderPane root = new BorderPane();
-        root.setTop(topBar);
-        root.setCenter(articleSection);
-        root.setStyle("-fx-background-color: #f8f5f3;");
+        BorderPane mainContent = new BorderPane();
+        mainContent.setTop(topBar);
+        mainContent.setCenter(articleSection);
+        mainContent.setStyle("-fx-background-color: #f8f5f3;");
 
-        // Create the scene and set it on the stage
+        // Filter options panel (hidden initially)
+        VBox filterPanel = createFilterPanel();
+
+        // StackPane to overlay filter panel on the main content
+        StackPane root = new StackPane(mainContent, filterPanel);
         Scene scene = new Scene(root, 900, 700);
         primaryStage.setTitle("Student Article Dashboard");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        // Slide filter panel in and out
+        TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), filterPanel);
+        slideIn.setFromX(900);
+        slideIn.setToX(0);
+
+        TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), filterPanel);
+        slideOut.setFromX(0);
+        slideOut.setToX(900);
+
+        // Set action for filter button to slide in the filter panel
+        filterButton.setOnAction(e -> {
+            filterPanel.setVisible(true);
+            slideIn.play();
+        });
+
+        // Set action for save button to slide out and hide the filter panel
+        Button saveButton = (Button) filterPanel.lookup("#saveButton");
+        saveButton.setOnAction(e -> slideOut.play());
+        slideOut.setOnFinished(e -> filterPanel.setVisible(false));
+
+        // Display all articles in the "General" group by default
+        displayGeneralArticles();
     }
 
+    private VBox createFilterPanel() {
+        // Filter options panel with Content Level and Group checkboxes
+        VBox filterPanel = new VBox(20);
+        filterPanel.setPadding(new Insets(20));
+        filterPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #ccc;");
+        filterPanel.setPrefWidth(300);
+        filterPanel.setTranslateX(900); // Initially hidden off-screen
+        filterPanel.setVisible(false); // Hidden initially
 
-    private void showFilterOptions(Stage primaryStage) {
-        FilterOptions filterOptions = new FilterOptions();
-        try{
-            filterOptions.start(primaryStage);
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
+        // Content Level heading and checkboxes
+        Label contentLevelLabel = new Label("Content Level:");
+        contentLevelLabel.setFont(Font.font("Arial", 14));
+        contentLevelLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox allContentCheckBox = new CheckBox("All");
+        CheckBox beginnerCheckBox = new CheckBox("Beginner");
+        CheckBox intermediateCheckBox = new CheckBox("Intermediate");
+        CheckBox advancedCheckBox = new CheckBox("Advanced");
+        CheckBox expertCheckBox = new CheckBox("Expert");
+
+        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+
+        // Groups heading and checkboxes
+        Label groupLabel = new Label("Groups:");
+        groupLabel.setFont(Font.font("Arial", 14));
+        groupLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox allGroupCheckBox = new CheckBox("All");
+        CheckBox javafxCheckBox = new CheckBox("JavaFX");
+        CheckBox eclipseCheckBox = new CheckBox("Eclipse");
+        CheckBox githubCheckBox = new CheckBox("GitHub");
+
+        VBox groupOptions = new VBox(10, allGroupCheckBox, javafxCheckBox, eclipseCheckBox, githubCheckBox);
+
+        // Buttons for clearing and saving filter selections
+        Button clearButton = new Button("Clear");
+        clearButton.setFont(Font.font("Arial", 16));
+        clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        clearButton.setPrefWidth(100);
+        clearButton.setOnAction(e -> {
+            allContentCheckBox.setSelected(false);
+            beginnerCheckBox.setSelected(false);
+            intermediateCheckBox.setSelected(false);
+            advancedCheckBox.setSelected(false);
+            expertCheckBox.setSelected(false);
+            allGroupCheckBox.setSelected(false);
+            javafxCheckBox.setSelected(false);
+            eclipseCheckBox.setSelected(false);
+            githubCheckBox.setSelected(false);
+        });
+
+        Button saveButton = new Button("Save");
+        saveButton.setFont(Font.font("Arial", 16));
+        saveButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        saveButton.setPrefWidth(100);
+        saveButton.setId("saveButton");
+
+        HBox buttonLayout = new HBox(20, clearButton, saveButton);
+        buttonLayout.setAlignment(Pos.CENTER);
+
+        // Add all elements to the filter panel
+        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, buttonLayout);
+        return filterPanel;
     }
 
-    // Method to handle back button logic
     private void showPreviousScreen(Stage primaryStage) {
         StudentPage studentPage = new StudentPage();
         try {
@@ -113,6 +196,51 @@ public class StudentArticle extends Application {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    // Display articles in the "General" group
+    private void displayGeneralArticles() {
+        articleContainerVBox.getChildren().clear();
+
+        for (Article article : ARTICLE_LIST) {
+            if (article.hasGroup("General")) {
+                VBox articleBox = new VBox(5);
+                articleBox.setPadding(new Insets(10));
+                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                articleBox.setAlignment(Pos.TOP_LEFT);
+
+                HBox titleLevelBox = new HBox(10);
+                Label titleLabel = new Label(article.getTitle());
+                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
+                titleLabel.setFont(Font.font("Arial", 17));
+
+                Label levelLabel = new Label("(" + article.getLevel() + ")");
+                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
+                levelLabel.setFont(Font.font("Arial", 14));
+
+                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
+                titleLevelBox.setAlignment(Pos.TOP_LEFT);
+
+                Label abstractLabel = new Label(article.getAbs());
+                abstractLabel.setWrapText(true);
+
+                Button requestAccessButton = new Button("Request Access");
+                requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+                requestAccessButton.setFont(Font.font("Arial", 14));
+                requestAccessButton.setOnAction(e -> requestAccessForArticle(article));
+
+                HBox optionsBox = new HBox(requestAccessButton);
+                optionsBox.setAlignment(Pos.TOP_RIGHT);
+
+                articleBox.getChildren().addAll(titleLevelBox, abstractLabel, optionsBox);
+                articleContainerVBox.getChildren().add(articleBox);
+            }
+        }
+    }
+
+    private void requestAccessForArticle(Article article) {
+        // Logic for requesting access to the article
+        System.out.println("Requesting access for article: " + article.getUID());
     }
 
     public static void main(String[] args) {

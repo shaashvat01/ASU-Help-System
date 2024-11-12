@@ -1,20 +1,24 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+
+import javafx.scene.control.Button;
+import javafx.util.Duration;
+
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
@@ -27,50 +31,44 @@ public class InstructorsArticlePage extends Application {
     public static Article selectedArticle = null;
 
     @Override
+
     public void start(Stage primaryStage) {
 
-        // Create a ScrollPane to hold the VBox containing articles
+        // ScrollPane for articles
         ScrollPane scrollPane_Article = new ScrollPane();
-        scrollPane_Article.setFitToWidth(true); // Ensure the ScrollPane fits the width of the content
-        scrollPane_Article.setFitToHeight(true); // Ensure the ScrollPane also fits the height of the window
-
-        // ScrollPane styling (optional)
+        scrollPane_Article.setFitToWidth(true);
+        scrollPane_Article.setFitToHeight(true);
         scrollPane_Article.setStyle("-fx-background-color: transparent;");
 
-        // Create a ScrollPane to hold the VBox containing groups
+        // ScrollPane for groups
         ScrollPane scrollPane_Groups = new ScrollPane();
-        scrollPane_Groups.setFitToWidth(true); // Ensure the ScrollPane fits the width of the content
-        scrollPane_Groups.setFitToHeight(true); // Ensure the ScrollPane also fits the height of the window
-
-        // ScrollPane styling (optional)
+        scrollPane_Groups.setFitToWidth(true);
+        scrollPane_Groups.setFitToHeight(true);
         scrollPane_Groups.setStyle("-fx-background-color: transparent;");
 
-        // Create the sidebar with groups
+        // Sidebar with groups
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
-        sidebar.setPrefWidth(160);  // Adjust the sidebar width
+        sidebar.setPrefWidth(160);
 
         Label grpTitle = new Label("Groups");
         grpTitle.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px;");
         grpTitle.setMaxWidth(Double.MAX_VALUE);
-        grpTitle.setPadding(new Insets(10, 0, 10, 0)); // Even padding for left and right
-        grpTitle.setAlignment(Pos.CENTER);  // Center the label text
-
-
+        grpTitle.setPadding(new Insets(10, 0, 10, 0));
+        grpTitle.setAlignment(Pos.CENTER);
         sidebar.getChildren().add(grpTitle);
 
-        for(String grpName : GROUP_LIST)
-        {
-            Button groupButton = createGroupButton(grpName,primaryStage);
+        for (String grpName : GROUP_LIST) {
+            Button groupButton = createGroupButton(grpName, primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
-        scrollPane_Groups.setContent(sidebar); // Add VBox to ScrollPane
-        scrollPane_Groups.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
-        scrollPane_Groups.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);  // Disable horizontal scrollbar
+        scrollPane_Groups.setContent(sidebar);
+        scrollPane_Groups.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane_Groups.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        // Create article-related buttons (Create Article, Backup, Restore)
+        // Article-related buttons
         Button createArticleBtn = new Button("Create Article");
         createArticleBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         createArticleBtn.setPrefWidth(150);
@@ -78,206 +76,206 @@ public class InstructorsArticlePage extends Application {
         createArticleBtn.setFont(Font.font("Arial", 15));
         createArticleBtn.setOnAction(e -> showCreateArticleScreen(primaryStage));
 
-        Button backupBtn = new Button("Backup");
-        backupBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        backupBtn.setPrefWidth(100);
-        backupBtn.setPrefHeight(35);
-        backupBtn.setFont(Font.font("Arial", 15));
-        backupBtn.setOnAction(e -> showBackupScreen(primaryStage));
+        Button backupBtn = createStyledButton("Backup", e -> showBackupScreen(primaryStage));
+        Button restoreBtn = createStyledButton("Restore", e -> showRestoreArticles(primaryStage));
 
-        Button restoreBtn = new Button("Restore");
-        restoreBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        restoreBtn.setPrefWidth(100);
-        restoreBtn.setPrefHeight(35);
-        restoreBtn.setFont(Font.font("Arial", 15));
-        restoreBtn.setOnAction(e -> showRestoreArticles(primaryStage));
-
-        Button createGrpBtn = new Button("Create Group");
-        createGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        createGrpBtn.setPrefWidth(125);
-        createGrpBtn.setPrefHeight(35);
-        createGrpBtn.setFont(Font.font("Arial", 15));
-        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar,primaryStage));
-
-        Button deleteGrpBtn = new Button("Delete Group");
-        deleteGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        deleteGrpBtn.setPrefWidth(125);
-        deleteGrpBtn.setPrefHeight(35);
-        deleteGrpBtn.setFont(Font.font("Arial", 15));
-        deleteGrpBtn.setOnAction(e -> showDeleteGroup(sidebar));
-
-        HBox articleButtons = new HBox(20);
+        HBox articleButtons = new HBox(20, createArticleBtn, backupBtn, restoreBtn);
         articleButtons.setAlignment(Pos.CENTER);
         articleButtons.setPadding(new Insets(0, 0, 0, 0));
 
-        if(CURRENT_USER != null)
-        {
-            if(CURRENT_USER.isAdmin() || CURRENT_USER.isInstructor())
-            {
-                // HBox to hold article-related buttons
-                articleButtons.getChildren().addAll(createGrpBtn,deleteGrpBtn);
-            }
-
-        }
-
-        // HBox to hold article-related buttons
-        articleButtons.getChildren().addAll(createArticleBtn, backupBtn, restoreBtn);
-
-
-        // VBox to hold the article container (which will display the articles dynamically)
-        articleContainerVBox = new VBox(10); // This will hold dynamically added articles
-        articleContainerVBox.setPrefSize(700, 565); // Set preferred size
+        articleContainerVBox = new VBox(10);
+        articleContainerVBox.setPrefSize(700, 565);
         articleContainerVBox.setStyle("-fx-background-color: white;");
+        scrollPane_Article.setContent(articleContainerVBox);
+        scrollPane_Article.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane_Article.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        scrollPane_Article.setContent(articleContainerVBox); // Add VBox to ScrollPane
-        scrollPane_Article.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
-        scrollPane_Article.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);  // Disable horizontal scrollbar
-        // VBox to hold the article buttons and container
         VBox articleSection = new VBox(20, articleButtons, scrollPane_Article);
         articleSection.setAlignment(Pos.TOP_CENTER);
         articleSection.setPadding(new Insets(20));
 
-        // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage)); // Call the showPreviousScreen method
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
-        // Search Bar
         TextField searchField = new TextField();
         searchField.setPromptText("Search articles...");
-        searchField.setPrefWidth(250);  // Adjust the width of the search field
-        searchField.setPrefHeight(30);
+        searchField.setPrefWidth(250);
 
-        // Search Button with "Search" text
         Button searchButton = new Button("Search");
         searchButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
-        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText(),primaryStage));
+        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText(), primaryStage));
 
-        // Filter Button
         Button filterButton = new Button("Filter");
         filterButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         filterButton.setFont(Font.font("Arial", 15));
         filterButton.setPrefHeight(29);
-        filterButton.setOnAction(e -> showFilterOptions(primaryStage));
 
-// Search bar layout with Search and Filter buttons
         HBox searchBar = new HBox(5, searchField, searchButton, filterButton);
         searchBar.setAlignment(Pos.CENTER);
         searchBar.setPadding(new Insets(10, 0, 0, 240));
 
-
-        // Top bar layout with Back, Search, and Logout buttons
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10, 10, 0, 10));
         topBar.setSpacing(10);
-
         HBox leftBox = new HBox(backButton);
         leftBox.setAlignment(Pos.TOP_LEFT);
-
         HBox rightBox = new HBox(createArticleBtn);
         rightBox.setAlignment(Pos.TOP_RIGHT);
-
         topBar.getChildren().addAll(leftBox, searchBar, rightBox);
         topBar.setAlignment(Pos.CENTER);
-        HBox.setHgrow(rightBox, Priority.ALWAYS); // Make the right box grow to fit
+        HBox.setHgrow(rightBox, Priority.ALWAYS);
 
-        // Main layout with sidebar and main content area (article section)
         HBox mainLayout = new HBox(scrollPane_Groups, articleSection);
 
-        // Create the root layout and set the top bar and main layout
-        BorderPane root = new BorderPane();
-        root.setTop(topBar);
-        root.setCenter(mainLayout);
-        root.setStyle("-fx-background-color: #f8f5f3;");
+        BorderPane mainContent = new BorderPane();
+        mainContent.setTop(topBar);
+        mainContent.setCenter(mainLayout);
+        mainContent.setStyle("-fx-background-color: #f8f5f3;");
 
-        // Create the scene and set it on the stage
+        VBox filterPanel = createFilterPanel();
+
+        StackPane root = new StackPane(mainContent, filterPanel);
         Scene scene = new Scene(root, 900, 700);
         primaryStage.setTitle("Instructor Article Dashboard");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        displayArticlesForGroup("General",primaryStage);
+        TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), filterPanel);
+        slideIn.setFromX(900);
+        slideIn.setToX(0);
+
+        TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), filterPanel);
+        slideOut.setFromX(0);
+        slideOut.setToX(900);
+
+        filterButton.setOnAction(e -> {
+            filterPanel.setVisible(true);
+            slideIn.play();
+        });
+
+        Button saveButton = (Button) filterPanel.lookup("#saveButton");
+        saveButton.setOnAction(e -> slideOut.play());
+        slideOut.setOnFinished(e -> filterPanel.setVisible(false));
+
+        displayArticlesForGroup("General", primaryStage);
     }
 
-    private void showFilterOptions(Stage primaryStage) {
-        FilterOptions filterOptions = new FilterOptions();
-        try{
-            filterOptions.start(primaryStage);
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
+    private VBox createFilterPanel() {
+        VBox filterPanel = new VBox(20);
+        filterPanel.setPadding(new Insets(20));
+        filterPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #ccc;");
+        filterPanel.setPrefWidth(300);
+        filterPanel.setTranslateX(900);
+        filterPanel.setVisible(false);
+
+        Label contentLevelLabel = new Label("Content Level:");
+        contentLevelLabel.setFont(Font.font("Arial", 14));
+        contentLevelLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox allContentCheckBox = new CheckBox("All");
+        CheckBox beginnerCheckBox = new CheckBox("Beginner");
+        CheckBox intermediateCheckBox = new CheckBox("Intermediate");
+        CheckBox advancedCheckBox = new CheckBox("Advanced");
+        CheckBox expertCheckBox = new CheckBox("Expert");
+
+        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+
+        Label groupLabel = new Label("Groups:");
+        groupLabel.setFont(Font.font("Arial", 14));
+        groupLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox allGroupCheckBox = new CheckBox("All");
+        CheckBox javafxCheckBox = new CheckBox("JavaFX");
+        CheckBox eclipseCheckBox = new CheckBox("Eclipse");
+        CheckBox githubCheckBox = new CheckBox("GitHub");
+        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
+        VBox groupOptions = new VBox(10, allGroupCheckBox, javafxCheckBox, eclipseCheckBox, githubCheckBox, specialGroupCheckBox);
+
+        Button clearButton = new Button("Clear");
+        clearButton.setFont(Font.font("Arial", 16));
+        clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        clearButton.setPrefWidth(100);
+        clearButton.setOnAction(e -> {
+            allContentCheckBox.setSelected(false);
+            beginnerCheckBox.setSelected(false);
+            intermediateCheckBox.setSelected(false);
+            advancedCheckBox.setSelected(false);
+            expertCheckBox.setSelected(false);
+            allGroupCheckBox.setSelected(false);
+            javafxCheckBox.setSelected(false);
+            eclipseCheckBox.setSelected(false);
+            githubCheckBox.setSelected(false);
+        });
+
+        Button saveButton = new Button("Save");
+        saveButton.setFont(Font.font("Arial", 16));
+        saveButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        saveButton.setPrefWidth(100);
+        saveButton.setId("saveButton");
+
+        HBox buttonLayout = new HBox(20, clearButton, saveButton);
+        buttonLayout.setAlignment(Pos.CENTER);
+
+        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, buttonLayout);
+        return filterPanel;
     }
 
-    private void showPreviousScreen(Stage primaryStage) {
-        InstructorPage instructorPage = new InstructorPage();
-        try{
-            instructorPage.start(primaryStage);
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
 
-    // Helper method to create a sidebar group button
-    // Helper method to create a sidebar group button
-    private Button createGroupButton(String text,Stage primaryStage) {
+    private Button createGroupButton(String text, Stage primaryStage) {
         Button button = new Button(text);
 
-        // Consistent button styling for default, hover, and active states
+        // Default, hover, and active styles
         String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
                 + "-fx-border-radius: 15; -fx-background-radius: 15; "
                 + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Updated padding to be equal on left and right
+                + "-fx-padding: 10 0 10 0;";  // Padding for uniformity
 
         String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
                 + "-fx-border-radius: 15; -fx-background-radius: 15; "
                 + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Same padding as default
+                + "-fx-padding: 10 0 10 0;";
 
         String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: black; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Style for active button
+                + "-fx-background-radius: 15;";
 
         button.setStyle(defaultStyle);
         button.setMaxWidth(Double.MAX_VALUE);
-        button.setAlignment(Pos.CENTER);  // Align text to the center
+        button.setAlignment(Pos.CENTER);
 
-        // Hover effect while maintaining font size and padding
+        // Set hover effect
         button.setOnMouseEntered(e -> {
-            if (button != activeButton) {
-                button.setStyle(hoverStyle);
-            }
+            if (button != activeButton) button.setStyle(hoverStyle);
         });
         button.setOnMouseExited(e -> {
-            if (button != activeButton) {
-                button.setStyle(defaultStyle);
-            }
+            if (button != activeButton) button.setStyle(defaultStyle);
         });
 
-        // Set action when the group button is clicked
+        // Set action for when the button is clicked
         button.setOnAction(e -> {
-            // Reset the currently active button's style to default
-            if (activeButton != null) {
-                activeButton.setStyle(defaultStyle);
-            }
-
-            // Set this button's style to active
-            button.setStyle(activeStyle);
-            activeButton = button; // Update the active button reference
-
-            // Handle the action for displaying articles
-            displayArticlesForGroup(text,primaryStage);
+            if (activeButton != null) activeButton.setStyle(defaultStyle);  // Reset previous active button
+            button.setStyle(activeStyle);  // Apply active style to the clicked button
+            activeButton = button;
+            displayArticlesForGroup(text, primaryStage);
         });
 
         return button;
     }
 
 
-    // Method to dynamically display articles for a specific group
+    private Button createStyledButton(String text, EventHandler<ActionEvent> action) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        button.setPrefWidth(100);
+        button.setPrefHeight(35);
+        button.setFont(Font.font("Arial", 15));
+        button.setOnAction(action);
+        return button;
+    }
+
     private void displayArticlesForGroup(String groupName,Stage primaryStage) {
         // Clear previous articles
         articleContainerVBox.getChildren().clear();
@@ -324,6 +322,18 @@ public class InstructorsArticlePage extends Application {
         }
     }
 
+
+    private void showPreviousScreen(Stage primaryStage) {
+        InstructorPage instructorPage = new InstructorPage();
+        try{
+            instructorPage.start(primaryStage);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+
     public void displayArticlesForSearch(String searchText,Stage primaryStage)
     {
         articleContainerVBox.getChildren().clear();
@@ -368,8 +378,6 @@ public class InstructorsArticlePage extends Application {
             }
         }
     }
-
-
 
     // Show options for updating or deleting an article
     private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {

@@ -39,6 +39,9 @@ public class ManageGeneralGroup extends Application {
         HBox.setHgrow(rightBox, Priority.ALWAYS);
         topBar.getChildren().addAll(leftBox, rightBox);
 
+        Button articlesButton = createSidebarButtonWithIcon("Articles", "📄");
+        articlesButton.setOnAction(e -> showArticlesScreen(primaryStage));
+
         Button addUserButton = createSidebarButtonWithIcon("Add User", "➕");
         addUserButton.setOnAction(e -> showAddUserScreen(primaryStage));
 
@@ -52,7 +55,7 @@ public class ManageGeneralGroup extends Application {
         sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
         sidebar.setPrefWidth(160);
-        sidebar.getChildren().addAll(addUserButton, removeUserButton, permissionsButton);
+        sidebar.getChildren().addAll(articlesButton, addUserButton, removeUserButton, permissionsButton);
 
         VBox mainContentArea = new VBox(20);
         mainContentArea.setAlignment(Pos.CENTER);
@@ -69,6 +72,9 @@ public class ManageGeneralGroup extends Application {
         primaryStage.setTitle("Manage General Group");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void showArticlesScreen(Stage primaryStage) {
     }
 
     private void showPermissionsScreen(Stage primaryStage) {
@@ -240,6 +246,8 @@ public class ManageGeneralGroup extends Application {
     }
 
     public static void main(String[] args) {
+
         launch(args);
     }
 }
+
