@@ -2,6 +2,8 @@ package Backend;
 
 import java.util.ArrayList;
 
+import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+
 public class Group {
     private String name;
     private ArrayList<String> users;
@@ -12,6 +14,7 @@ public class Group {
         this.name = name;
         this.users = new ArrayList<>();
         this.admins = new ArrayList<>();
+        admins.add(USER_LIST.getUserList().getFirst().username);
         this.isSpecial = special;
     }
 

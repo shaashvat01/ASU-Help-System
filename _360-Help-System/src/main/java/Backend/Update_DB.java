@@ -28,16 +28,16 @@ import static com.example._360helpsystem.CreateAdminAccount.*;
  */
 
 public class Update_DB {
-    private final String path_to_UserDB = "Users.txt";
-    private final String path_to_OTPDB = "OTPs.txt";
-    private final String path_to_ArticleDB = "Articles.txt";
-    private final String path_to_GroupDB = "Groups.txt";
-    private final String path_to_BackupDB = "Backups.txt";
-    private final String path_to_genericMsgDB = "GenericMsgs.txt";
-    private final String path_to_searchHistory = "History.txt";
-    private final String path_to_requestsDB = "Requests.txt";
-    private final String path_to_futureArticleDB = "FutureArticles.txt";
-    private final String path_to_key = "Key.txt";
+    private final String path_to_UserDB = "Users-DB.txt";
+    private final String path_to_OTPDB = "OTPs-DB.txt";
+    private final String path_to_ArticleDB = "Articles-DB.txt";
+    private final String path_to_GroupDB = "Groups-DB.txt";
+    private final String path_to_BackupDB = "Backups-DB.txt";
+    private final String path_to_genericMsgDB = "GenericMsgs-DB.txt";
+    private final String path_to_searchHistory = "History-DB.txt";
+    private final String path_to_requestsDB = "Requests-DB.txt";
+    private final String path_to_futureArticleDB = "FutureArticles-DB.txt";
+    private final String path_to_key = "Key-DB.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {

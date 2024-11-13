@@ -60,4 +60,13 @@ public class GroupList implements Iterable<Group> {
         }
         return false;
     }
+
+    public boolean isSpecialGroup(String group) {
+        for(Group g : GROUP_LIST) {
+            if(g.getName().equals(group) && g.isSpecial()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
