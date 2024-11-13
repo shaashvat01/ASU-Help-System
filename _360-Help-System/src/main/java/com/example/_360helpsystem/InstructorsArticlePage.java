@@ -20,6 +20,10 @@ import javafx.scene.control.Button;
 import javafx.util.Duration;
 
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
@@ -31,9 +35,7 @@ public class InstructorsArticlePage extends Application {
     public static Article selectedArticle = null;
 
     @Override
-
     public void start(Stage primaryStage) {
-
         // ScrollPane for articles
         ScrollPane scrollPane_Article = new ScrollPane();
         scrollPane_Article.setFitToWidth(true);
@@ -293,10 +295,6 @@ public class InstructorsArticlePage extends Application {
     }
 
 
-
-
-
-
     private Button createStyledButton(String text, EventHandler<ActionEvent> action) {
         Button button = new Button(text);
         button.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
@@ -343,6 +341,134 @@ public class InstructorsArticlePage extends Application {
         }
     }
 
+    private void displayArticlesForSearch(String searchText, Stage primaryStage) {
+        articleContainerVBox.getChildren().clear();
+
+        // Filter articles based on search text
+        List<Article> filteredArticles = ARTICLE_LIST.getArticles().stream()
+                .filter(article -> article.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
+                        article.getAuthor().toLowerCase().contains(searchText.toLowerCase()) ||
+                        article.getKeywords().toLowerCase().contains(searchText.toLowerCase()))
+                .collect(Collectors.toList());
+
+        // Display search results
+        Label groupLabel = new Label("Search Results");
+        groupLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        articleContainerVBox.getChildren().add(groupLabel);
+
+        // Display articles by level count
+        Map<String, Long> levelCounts = filteredArticles.stream()
+                .collect(Collectors.groupingBy(Article::getLevel, Collectors.counting()));
+
+        levelCounts.forEach((level, count) -> {
+            Label levelLabel = new Label(level + ": " + count + " articles");
+            levelLabel.setFont(Font.font("Arial", 14));
+            articleContainerVBox.getChildren().add(levelLabel);
+        });
+
+        // Display articles in short form
+        int sequenceNumber = 1;
+        for (Article article : filteredArticles) {
+            VBox articleBox = new VBox(5);
+            articleBox.setPadding(new Insets(10));
+            articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+            articleBox.setAlignment(Pos.TOP_LEFT);
+
+            HBox titleLevelBox = new HBox(10);
+            Label titleLabel = new Label(sequenceNumber + ". Title: " + article.getTitle());
+            titleLabel.setFont(Font.font("Arial", 14));
+            titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #8b0000;");
+
+            Label levelLabel = new Label("(" + article.getLevel() + ")");
+            levelLabel.setFont(Font.font("Arial", 14));
+            levelLabel.setStyle("-fx-text-fill: gray;");
+
+            titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
+            titleLevelBox.setAlignment(Pos.TOP_LEFT);
+
+            Label abstractLabel = new Label("Abstract: " + article.getAbs());
+            abstractLabel.setWrapText(true);
+            abstractLabel.setFont(Font.font("Arial", 14));
+
+            Button requestAccessButton = new Button("View Article");
+            requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            requestAccessButton.setFont(Font.font("Arial", 14));
+            requestAccessButton.setOnAction(e -> showArticleDetails(article));
+
+            HBox optionsBox = new HBox(requestAccessButton);
+            optionsBox.setAlignment(Pos.TOP_RIGHT);
+
+            articleBox.getChildren().addAll(titleLevelBox, abstractLabel, optionsBox);
+            articleContainerVBox.getChildren().add(articleBox);
+
+            sequenceNumber++;
+        }
+    }
+
+    private void showArticleDetails(Article article) {
+        // Create a new stage for the details window
+        Stage detailStage = new Stage();
+        detailStage.setTitle("Article Details - " + article.getTitle());
+
+        // Article details layout
+        VBox detailsLayout = new VBox(10);
+        detailsLayout.setPadding(new Insets(20));
+        detailsLayout.setAlignment(Pos.TOP_LEFT);
+
+        // Title
+        Label titleLabel = new Label("Title: " + article.getTitle());
+        titleLabel.setFont(Font.font("Arial", 18));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Level
+        Label levelLabel = new Label("Level: " + article.getLevel());
+        levelLabel.setFont(Font.font("Arial", 14));
+        levelLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #7f8c8d;");
+
+        // Abstract
+        Label abstractHeading = new Label("Abstract:");
+        abstractHeading.setFont(Font.font("Arial", 14));
+        abstractHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label abstractLabel = new Label(article.getAbs());
+        abstractLabel.setWrapText(true);
+
+        // Keywords
+        Label keywordsHeading = new Label("Keywords:");
+        keywordsHeading.setFont(Font.font("Arial", 14));
+        keywordsHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label keywordsLabel = new Label(article.getKeywords());
+        keywordsLabel.setWrapText(true);
+
+        // Reference Links
+        Label referenceLinksHeading = new Label("Reference Links:");
+        referenceLinksHeading.setFont(Font.font("Arial", 14));
+        referenceLinksHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label referenceLinksLabel = new Label(article.getLinks());
+        referenceLinksLabel.setWrapText(true);
+
+        // Body or Content
+        Label bodyHeading = new Label("Body:");
+        bodyHeading.setFont(Font.font("Arial", 14));
+        bodyHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label bodyLabel = new Label(article.getBody());
+        bodyLabel.setWrapText(true);
+
+        // Add all details to the layout
+        detailsLayout.getChildren().addAll(
+                titleLabel,
+                levelLabel,
+                abstractHeading, abstractLabel,
+                keywordsHeading, keywordsLabel,
+                referenceLinksHeading, referenceLinksLabel,
+                bodyHeading, bodyLabel
+        );
+
+        // Create and set the scene
+        Scene detailScene = new Scene(detailsLayout, 600, 500);
+        detailStage.setScene(detailScene);
+        detailStage.show();
+    }
+
     private void showPreviousScreen(Stage primaryStage) {
         InstructorPage instructorPage = new InstructorPage();
         try{
@@ -353,51 +479,6 @@ public class InstructorsArticlePage extends Application {
         }
     }
 
-
-    public void displayArticlesForSearch(String searchText,Stage primaryStage)
-    {
-        articleContainerVBox.getChildren().clear();
-
-        for (Article article : ARTICLE_LIST) {
-            if(article.hasKeyword(searchText)) {
-                // Create VBox for each article with padding and border
-                VBox articleBox = new VBox(5);
-                articleBox.setPadding(new Insets(10));
-                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
-                articleBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create HBox for title and level
-                HBox titleLevelBox = new HBox(10);
-                Label titleLabel = new Label(article.getTitle());
-                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
-                titleLabel.setFont(Font.font("Arial", 17));
-
-                Label levelLabel = new Label("(" + article.getLevel() + ")");
-                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
-                levelLabel.setFont(Font.font("Arial", 14));
-
-                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
-                titleLevelBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create the 3-dots button for options
-                Button optionsButton = new Button("...");
-                optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
-
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
-
-                // Add titleOptionsBox and abstract to articleBox (VBox)
-                articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
-                articleContainerVBox.getChildren().add(articleBox);
-            }
-        }
-    }
 
     // Show options for updating or deleting an article
     private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {

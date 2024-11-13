@@ -12,6 +12,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 
 public class StudentArticle extends Application {
@@ -43,6 +47,8 @@ public class StudentArticle extends Application {
         searchButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
+
+        searchButton.setOnAction(e -> performSearch(searchField.getText()));
 
         // Filter Button
         Button filterButton = new Button("Filter");
@@ -204,6 +210,65 @@ public class StudentArticle extends Application {
         return filterPanel;
     }
 
+    private void performSearch(String searchText) {
+        articleContainerVBox.getChildren().clear();
+
+        // Filter articles based on searchText (search by title, author, or keywords)
+        List<Article> filteredArticles = ARTICLE_LIST.getArticles().stream()
+                .filter(article -> article.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
+                        article.getAuthor().toLowerCase().contains(searchText.toLowerCase()) ||
+                        article.getKeywords().toLowerCase().contains(searchText.toLowerCase()))
+                .collect(Collectors.toList());
+
+        // Display active group
+        Label groupLabel = new Label("Active Group: General");  // Example active group
+        groupLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        articleContainerVBox.getChildren().add(groupLabel);
+
+        // Count articles by level and display
+        Map<String, Long> levelCounts = filteredArticles.stream()
+                .collect(Collectors.groupingBy(Article::getLevel, Collectors.counting()));
+
+        levelCounts.forEach((level, count) -> {
+            Label levelLabel = new Label(level + ": " + count + " articles");
+            levelLabel.setFont(Font.font("Arial", 14));
+            articleContainerVBox.getChildren().add(levelLabel);
+        });
+
+        // Display filtered articles in short form with consistent font style and "Request Access" button
+        int sequenceNumber = 1;
+        for (Article article : filteredArticles) {
+            VBox articleBox = new VBox(5);
+            articleBox.setPadding(new Insets(10));
+            articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+            articleBox.setAlignment(Pos.TOP_LEFT);
+
+            Label titleLabel = new Label(sequenceNumber + ". Title: " + article.getTitle());
+            titleLabel.setFont(Font.font("Arial", 14));
+            titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #8b0000;");  // Consistent font style
+
+            Label authorLabel = new Label("Author(s): " + article.getAuthor());
+            authorLabel.setFont(Font.font("Arial", 14));
+
+            Label abstractLabel = new Label("Abstract: " + article.getAbs());
+            abstractLabel.setWrapText(true);
+            abstractLabel.setFont(Font.font("Arial", 14));
+
+            Button requestAccessButton = new Button("Request Access");
+            requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            requestAccessButton.setFont(Font.font("Arial", 14));
+            requestAccessButton.setOnAction(e -> showArticleDetails(article));
+
+            HBox optionsBox = new HBox(requestAccessButton);
+            optionsBox.setAlignment(Pos.TOP_RIGHT);
+
+            articleBox.getChildren().addAll(titleLabel, authorLabel, abstractLabel, optionsBox);
+            articleContainerVBox.getChildren().add(articleBox);
+
+            sequenceNumber++;
+        }
+    }
+
     private void showPreviousScreen(Stage primaryStage) {
         StudentPage studentPage = new StudentPage();
         try {
@@ -294,8 +359,6 @@ public class StudentArticle extends Application {
         Label referenceLinksLabel = new Label(article.getLinks());
         referenceLinksLabel.setWrapText(true);
 
-
-
         // Body or Content
         Label bodyHeading = new Label("Body:");
         bodyHeading.setFont(Font.font("Arial", 14));
@@ -318,8 +381,6 @@ public class StudentArticle extends Application {
         detailStage.setScene(detailScene);
         detailStage.show();
     }
-
-
 
     public static void main(String[] args) {
         launch(args);
