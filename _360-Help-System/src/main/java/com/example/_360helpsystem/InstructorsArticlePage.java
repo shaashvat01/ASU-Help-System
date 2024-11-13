@@ -246,63 +246,55 @@ public class InstructorsArticlePage extends Application {
 
 
     private HBox createGroupButton(String text, Stage primaryStage) {
-        // Main button with group name
         Button groupNameButton = new Button(text);
-
-        // Default, hover, and active styles
-        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-background-radius: 15; -fx-padding: 10 0 10 0;";
-        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-background-radius: 15; -fx-padding: 10 0 10 0;";
+        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
+        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
         String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15;";
 
         groupNameButton.setStyle(defaultStyle);
         groupNameButton.setMaxWidth(Double.MAX_VALUE);
         groupNameButton.setAlignment(Pos.CENTER);
 
-        // Set action for when the button is clicked
         groupNameButton.setOnAction(e -> {
-            if (activeButton != null) activeButton.setStyle(defaultStyle);  // Reset previous active button
-            groupNameButton.setStyle(activeStyle);  // Apply active style to the clicked button
+            if (activeButton != null) activeButton.setStyle(defaultStyle);
+            groupNameButton.setStyle(activeStyle);
             activeButton = groupNameButton;
             displayArticlesForGroup(text, primaryStage);
         });
 
-        // Three-dots button for options
         Button optionsButton = new Button("...");
         optionsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 19px;");
 
-        // Create a ContextMenu with a single "Manage" option
         ContextMenu contextMenu = new ContextMenu();
         MenuItem manageItem = new MenuItem("Manage");
-        manageItem.setOnAction(e -> showManageDialog(primaryStage)); // Opens the manage dialog
+        manageItem.setOnAction(e -> showManageDialog(primaryStage, text));
         contextMenu.getItems().add(manageItem);
 
-        // Show the context menu when the three-dots button is clicked
         optionsButton.setOnAction(e -> contextMenu.show(optionsButton, Side.BOTTOM, 0, 0));
 
-        // Container for the group name button and options button
         HBox groupButtonContainer = new HBox(groupNameButton, optionsButton);
         groupButtonContainer.setAlignment(Pos.CENTER);
-        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; "
-                + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"); // Outer border only
-
-        // Apply hover effect to the entire HBox container
+        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
         groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
         groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
 
         return groupButtonContainer;
     }
 
-    private void showManageDialog(Stage primaryStage) {
+
+    private void showManageDialog(Stage primaryStage, String groupName) {
         ManageGeneralGroup generalGroup = new ManageGeneralGroup();
-        try{
-            generalGroup.start(primaryStage);
-        }
-        catch (Exception ex) {
+        try {
+            generalGroup.start(primaryStage);  // Start with only the primaryStage
+            generalGroup.initialize(primaryStage, groupName);  // Pass groupName via initialize
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
+
+
+
 
 
     private Button createStyledButton(String text, EventHandler<ActionEvent> action) {
@@ -315,19 +307,16 @@ public class InstructorsArticlePage extends Application {
         return button;
     }
 
-    private void displayArticlesForGroup(String groupName,Stage primaryStage) {
-        // Clear previous articles
+    private void displayArticlesForGroup(String groupName, Stage primaryStage) {
         articleContainerVBox.getChildren().clear();
 
         for (Article article : ARTICLE_LIST) {
-            if(article.hasGroup(groupName) || groupName.equals("General")) {
-                // Create VBox for each article with padding and border
+            if (article.hasGroup(groupName)) {
                 VBox articleBox = new VBox(5);
                 articleBox.setPadding(new Insets(10));
                 articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
                 articleBox.setAlignment(Pos.TOP_LEFT);
 
-                // Create HBox for title and level
                 HBox titleLevelBox = new HBox(10);
                 Label titleLabel = new Label(article.getTitle());
                 titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
@@ -340,27 +329,19 @@ public class InstructorsArticlePage extends Application {
                 titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
                 titleLevelBox.setAlignment(Pos.TOP_LEFT);
 
-                // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
 
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
+                HBox titleOptionsBox = new HBox(titleLevelBox, optionsButton);
+                HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
+                titleOptionsBox.setAlignment(Pos.TOP_RIGHT);
 
-                // Add titleOptionsBox and abstract to articleBox (VBox)
                 articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
                 articleContainerVBox.getChildren().add(articleBox);
             }
-
         }
     }
-
 
     private void showPreviousScreen(Stage primaryStage) {
         InstructorPage instructorPage = new InstructorPage();
@@ -569,10 +550,6 @@ public class InstructorsArticlePage extends Application {
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
-
-
-
-
 
     private void showRestoreArticles(Stage primaryStage) {
         RestoreArticles restoreArticles = new RestoreArticles();
