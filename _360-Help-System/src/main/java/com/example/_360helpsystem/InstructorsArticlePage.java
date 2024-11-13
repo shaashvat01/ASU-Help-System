@@ -164,13 +164,15 @@ public class InstructorsArticlePage extends Application {
     }
 
     private VBox createFilterPanel() {
+        // Filter options panel with Content Level and Group checkboxes
         VBox filterPanel = new VBox(20);
         filterPanel.setPadding(new Insets(20));
         filterPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #ccc;");
         filterPanel.setPrefWidth(300);
-        filterPanel.setTranslateX(900);
-        filterPanel.setVisible(false);
+        filterPanel.setTranslateX(900); // Initially hidden off-screen
+        filterPanel.setVisible(false); // Hidden initially
 
+        // Content Level heading and checkboxes
         Label contentLevelLabel = new Label("Content Level:");
         contentLevelLabel.setFont(Font.font("Arial", 14));
         contentLevelLabel.setStyle("-fx-font-weight: bold;");
@@ -183,6 +185,7 @@ public class InstructorsArticlePage extends Application {
 
         VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
 
+        // Groups heading and checkboxes
         Label groupLabel = new Label("Groups:");
         groupLabel.setFont(Font.font("Arial", 14));
         groupLabel.setStyle("-fx-font-weight: bold;");
@@ -191,15 +194,27 @@ public class InstructorsArticlePage extends Application {
         CheckBox javafxCheckBox = new CheckBox("JavaFX");
         CheckBox eclipseCheckBox = new CheckBox("Eclipse");
         CheckBox githubCheckBox = new CheckBox("GitHub");
-        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
 
-        VBox groupOptions = new VBox(10, allGroupCheckBox, javafxCheckBox, eclipseCheckBox, githubCheckBox, specialGroupCheckBox);
+        VBox groupOptions = new VBox(10, allGroupCheckBox, javafxCheckBox, eclipseCheckBox, githubCheckBox);
 
+        // Search By heading and checkboxes
+        Label searchByLabel = new Label("Search By:");
+        searchByLabel.setFont(Font.font("Arial", 14));
+        searchByLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox titleCheckBox = new CheckBox("Title");
+        CheckBox authorCheckBox = new CheckBox("Author");
+        CheckBox uidCheckBox = new CheckBox("UID");
+
+        VBox searchByOptions = new VBox(10, titleCheckBox, authorCheckBox, uidCheckBox);
+
+        // Buttons for clearing and saving filter selections
         Button clearButton = new Button("Clear");
         clearButton.setFont(Font.font("Arial", 16));
         clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         clearButton.setPrefWidth(100);
         clearButton.setOnAction(e -> {
+            // Clear all checkboxes
             allContentCheckBox.setSelected(false);
             beginnerCheckBox.setSelected(false);
             intermediateCheckBox.setSelected(false);
@@ -209,6 +224,9 @@ public class InstructorsArticlePage extends Application {
             javafxCheckBox.setSelected(false);
             eclipseCheckBox.setSelected(false);
             githubCheckBox.setSelected(false);
+            titleCheckBox.setSelected(false);
+            authorCheckBox.setSelected(false);
+            uidCheckBox.setSelected(false);
         });
 
         Button saveButton = new Button("Save");
@@ -220,9 +238,11 @@ public class InstructorsArticlePage extends Application {
         HBox buttonLayout = new HBox(20, clearButton, saveButton);
         buttonLayout.setAlignment(Pos.CENTER);
 
-        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, buttonLayout);
+        // Add all elements to the filter panel
+        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, searchByLabel, searchByOptions, buttonLayout);
         return filterPanel;
     }
+
 
 
     private Button createGroupButton(String text, Stage primaryStage) {
