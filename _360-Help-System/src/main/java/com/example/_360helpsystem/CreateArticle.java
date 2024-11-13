@@ -1,8 +1,6 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
-import Backend.Encryption;
-import Backend.Group;
 import Backend.UID_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -16,12 +14,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,11 +112,11 @@ public class CreateArticle extends Application {
 
         List<CheckBox> groupCheckBoxes = new ArrayList<>();
 
-        for(Group grp : GROUP_LIST)
+        for(String grpName : GROUP_LIST)
         {
-            if(!grp.getName().equals("General"))
+            if(!grpName.equals("General"))
             {
-                CheckBox checkBox = new CheckBox(grp.getName());
+                CheckBox checkBox = new CheckBox(grpName);
                 checkBox.setFont(Font.font("Arial", 14));
                 groupCheckBoxes.add(checkBox);
                 groupCheckBoxLayout.getChildren().addAll(checkBox);
@@ -147,21 +139,7 @@ public class CreateArticle extends Application {
         saveButton.setFont(Font.font("Arial", 16));
         saveButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         saveButton.setPrefWidth(150);  // Button width
-        saveButton.setOnAction(e -> {
-            try {
-                createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel,message);
-            } catch (NoSuchPaddingException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalBlockSizeException ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new RuntimeException(ex);
-            } catch (BadPaddingException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvalidKeyException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        saveButton.setOnAction(e -> createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel,message));
 
 
         Button clearButton = new Button("Clear Fields");
@@ -252,7 +230,7 @@ public class CreateArticle extends Application {
         }
     }
 
-    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes, ComboBox<String> levelBox, Label errorLabel,Label message) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes, ComboBox<String> levelBox, Label errorLabel,Label message) {
         // Print diagnostic info
         System.out.println("Creating article with fields:");
         System.out.println("Title: " + titleField.getText());
@@ -279,18 +257,11 @@ public class CreateArticle extends Application {
         }
 
         // Collect selected group identifiers
-
-        boolean isEncrypted = false;
         StringBuilder selectedGrpBuilder = new StringBuilder("General");
         for (CheckBox checkBox : groupCheckBoxes) {
-            if (GROUP_LIST.isSpecialGroup(checkBox.getText())) {
-                isEncrypted = true;
-            }
-            if(checkBox.isSelected())
-            {
+            if (checkBox.isSelected()) {
                 selectedGrpBuilder.append(",").append(checkBox.getText());
             }
-
         }
 
         String selectedGrp = selectedGrpBuilder.toString();
@@ -305,19 +276,10 @@ public class CreateArticle extends Application {
             Article newArticle = new Article(articleUID, title, CURRENT_USER.getUserName(), level, security, description, keywords, body, referenceLinks, selectedGrp);
 
             ARTICLE_LIST.addArticle(newArticle);
-            System.out.println("Article created: " + newArticle.getBody()); // Placeholder for actual save operation
+            System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
             clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox,errorLabel,message);
             message.setText("Article Created!");
             message.setVisible(true);
-
-            //Encryption
-            if(isEncrypted)
-            {
-                new Encryption().encryptBody(newArticle);
-                System.out.println("Encrypted article: " + newArticle.getBody());
-            }
-
-
         }
         else {
             Article newArticle = new Article(selectedArticle.getUID(), title, selectedArticle.getAuthor(), level, security, description, keywords, body, referenceLinks, selectedGrp);
@@ -345,4 +307,3 @@ public class CreateArticle extends Application {
     }
 
 }
-
