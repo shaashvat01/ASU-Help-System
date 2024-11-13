@@ -84,6 +84,7 @@ public class ManageGeneralGroup extends Application {
         permissionsLayout.setHgap(20);
         permissionsLayout.setAlignment(Pos.CENTER);
 
+        // Headers
         Label usernameHeader = new Label("Username");
         Label roleHeader = new Label("Roles");
         Label actionsHeader = new Label("Actions");
@@ -92,49 +93,69 @@ public class ManageGeneralGroup extends Application {
         permissionsLayout.add(roleHeader, 1, 0);
         permissionsLayout.add(actionsHeader, 2, 0);
 
-        int rowIndex = 1;
+        // Role labels under header
+        Label studentLabel = new Label("S");
+        Label instructorLabel = new Label("I");
+        Label adminLabel = new Label("A");
+
+        // Action labels under header
+        Label viewLabel = new Label("Read");
+        Label adminRightsLabel = new Label("Admin");
+
+        permissionsLayout.add(studentLabel, 1, 1);
+        permissionsLayout.add(instructorLabel, 2, 1);
+        permissionsLayout.add(adminLabel, 3, 1);
+
+        permissionsLayout.add(viewLabel, 4, 1);
+        permissionsLayout.add(adminRightsLabel, 5, 1);
+
+        int rowIndex = 2;
 
         String[] mockUsers = {"User1", "User2"};
 
         for (String username : mockUsers) {
             Label usernameLabel = new Label(username);
 
-            // Role checkboxes
-            CheckBox studentCheckbox = new CheckBox("S");
-            CheckBox instructorCheckbox = new CheckBox("I");
-            CheckBox adminCheckbox = new CheckBox("A");
-            adminCheckbox.setSelected(true);
+            // Role checkboxes (set as non-interactive)
+            CheckBox studentCheckbox = new CheckBox();
+            studentCheckbox.setDisable(true);
+
+            CheckBox instructorCheckbox = new CheckBox();
+            instructorCheckbox.setDisable(true);
+
+            CheckBox adminCheckbox = new CheckBox();
+            adminCheckbox.setSelected(true);  // Assuming admin role is selected by default
             adminCheckbox.setDisable(true);
 
-            // Action checkboxes
-            CheckBox viewCheckbox = new CheckBox("V");
-            CheckBox adminRightsCheckbox = new CheckBox("AR");
+            // Action checkboxes (set as non-interactive)
+            CheckBox viewCheckbox = new CheckBox();
+            viewCheckbox.setDisable(true);
+
+            CheckBox adminRightsCheckbox = new CheckBox();
+            adminRightsCheckbox.setDisable(true);
 
             // Buttons for granting options
-            Button grantViewButton = new Button("Grant View Option");
+            Button grantViewButton = new Button("Grant Read Access");
             grantViewButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            grantViewButton.setOnAction(e -> viewCheckbox.setSelected(true));  // Grant read access
 
-            Button grantAdminButton = new Button("Grant Admin Rights");
+            Button grantAdminButton = new Button("Grant Admin Access");
             grantAdminButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            grantAdminButton.setOnAction(e -> adminRightsCheckbox.setSelected(true));  // Grant admin access
 
-            // Actions for buttons
-            grantViewButton.setOnAction(e -> viewCheckbox.setSelected(true));
-            grantAdminButton.setOnAction(e -> adminRightsCheckbox.setSelected(true));
-
-            // Organize buttons in HBox to display side by side
-            HBox buttonsBox = new HBox(10, grantViewButton, grantAdminButton);
-
-            HBox rolesBox = new HBox(5, studentCheckbox, instructorCheckbox, adminCheckbox);
-            HBox actionsBox = new HBox(5, viewCheckbox, adminRightsCheckbox);
-
+            // Add components to layout
             permissionsLayout.add(usernameLabel, 0, rowIndex);
-            permissionsLayout.add(rolesBox, 1, rowIndex);
-            permissionsLayout.add(actionsBox, 2, rowIndex);
-            permissionsLayout.add(buttonsBox, 3, rowIndex);
+            permissionsLayout.add(studentCheckbox, 1, rowIndex);
+            permissionsLayout.add(instructorCheckbox, 2, rowIndex);
+            permissionsLayout.add(adminCheckbox, 3, rowIndex);
+            permissionsLayout.add(viewCheckbox, 4, rowIndex);
+            permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
+            permissionsLayout.add(new HBox(10, grantViewButton, grantAdminButton), 6, rowIndex);
 
             rowIndex++;
         }
 
+        // Back Button
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
 
@@ -148,6 +169,7 @@ public class ManageGeneralGroup extends Application {
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
     }
+
 
 
     private void showCreateArticleScreen(Stage primaryStage) {

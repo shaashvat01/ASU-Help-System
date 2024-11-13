@@ -60,7 +60,7 @@ public class InstructorsArticlePage extends Application {
         sidebar.getChildren().add(grpTitle);
 
         for (String grpName : GROUP_LIST) {
-            Button groupButton = createGroupButton(grpName, primaryStage);
+            HBox groupButton = createGroupButton(grpName, primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -245,44 +245,63 @@ public class InstructorsArticlePage extends Application {
 
 
 
-    private Button createGroupButton(String text, Stage primaryStage) {
-        Button button = new Button(text);
+    private HBox createGroupButton(String text, Stage primaryStage) {
+        // Main button with group name
+        Button groupNameButton = new Button(text);
 
         // Default, hover, and active styles
         String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Padding for uniformity
-
+                + "-fx-background-radius: 15; -fx-padding: 10 0 10 0;";
         String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";
+                + "-fx-background-radius: 15; -fx-padding: 10 0 10 0;";
+        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15;";
 
-        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-background-radius: 15;";
-
-        button.setStyle(defaultStyle);
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.setAlignment(Pos.CENTER);
-
-        // Set hover effect
-        button.setOnMouseEntered(e -> {
-            if (button != activeButton) button.setStyle(hoverStyle);
-        });
-        button.setOnMouseExited(e -> {
-            if (button != activeButton) button.setStyle(defaultStyle);
-        });
+        groupNameButton.setStyle(defaultStyle);
+        groupNameButton.setMaxWidth(Double.MAX_VALUE);
+        groupNameButton.setAlignment(Pos.CENTER);
 
         // Set action for when the button is clicked
-        button.setOnAction(e -> {
+        groupNameButton.setOnAction(e -> {
             if (activeButton != null) activeButton.setStyle(defaultStyle);  // Reset previous active button
-            button.setStyle(activeStyle);  // Apply active style to the clicked button
-            activeButton = button;
+            groupNameButton.setStyle(activeStyle);  // Apply active style to the clicked button
+            activeButton = groupNameButton;
             displayArticlesForGroup(text, primaryStage);
         });
 
-        return button;
+        // Three-dots button for options
+        Button optionsButton = new Button("...");
+        optionsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 19px;");
+
+        // Create a ContextMenu with a single "Manage" option
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem manageItem = new MenuItem("Manage");
+        manageItem.setOnAction(e -> showManageDialog(primaryStage)); // Opens the manage dialog
+        contextMenu.getItems().add(manageItem);
+
+        // Show the context menu when the three-dots button is clicked
+        optionsButton.setOnAction(e -> contextMenu.show(optionsButton, Side.BOTTOM, 0, 0));
+
+        // Container for the group name button and options button
+        HBox groupButtonContainer = new HBox(groupNameButton, optionsButton);
+        groupButtonContainer.setAlignment(Pos.CENTER);
+        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; "
+                + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"); // Outer border only
+
+        // Apply hover effect to the entire HBox container
+        groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
+        groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
+
+        return groupButtonContainer;
+    }
+
+    private void showManageDialog(Stage primaryStage) {
+        ManageGeneralGroup generalGroup = new ManageGeneralGroup();
+        try{
+            generalGroup.start(primaryStage);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 
