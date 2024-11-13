@@ -204,7 +204,6 @@ public class StudentArticle extends Application {
         return filterPanel;
     }
 
-
     private void showPreviousScreen(Stage primaryStage) {
         StudentPage studentPage = new StudentPage();
         try {
@@ -243,7 +242,7 @@ public class StudentArticle extends Application {
                 Button requestAccessButton = new Button("Request Access");
                 requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
                 requestAccessButton.setFont(Font.font("Arial", 14));
-                requestAccessButton.setOnAction(e -> requestAccessForArticle(article));
+                requestAccessButton.setOnAction(e -> showArticleDetails(article));
 
                 HBox optionsBox = new HBox(requestAccessButton);
                 optionsBox.setAlignment(Pos.TOP_RIGHT);
@@ -254,10 +253,73 @@ public class StudentArticle extends Application {
         }
     }
 
-    private void requestAccessForArticle(Article article) {
-        // Logic for requesting access to the article
-        System.out.println("Requesting access for article: " + article.getUID());
+    private void showArticleDetails(Article article) {
+        // Create a new stage for the details window
+        Stage detailStage = new Stage();
+        detailStage.setTitle("Article Details - " + article.getTitle());
+
+        // Article details layout
+        VBox detailsLayout = new VBox(10);
+        detailsLayout.setPadding(new Insets(20));
+        detailsLayout.setAlignment(Pos.TOP_LEFT);
+
+        // Title
+        Label titleLabel = new Label("Title: " + article.getTitle());
+        titleLabel.setFont(Font.font("Arial", 18));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Level
+        Label levelLabel = new Label("Level: " + article.getLevel());
+        levelLabel.setFont(Font.font("Arial", 14));
+        levelLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #7f8c8d;");
+
+        // Abstract
+        Label abstractHeading = new Label("Abstract:");
+        abstractHeading.setFont(Font.font("Arial", 14));
+        abstractHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label abstractLabel = new Label(article.getAbs());
+        abstractLabel.setWrapText(true);
+
+        // Keywords
+        Label keywordsHeading = new Label("Keywords:");
+        keywordsHeading.setFont(Font.font("Arial", 14));
+        keywordsHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label keywordsLabel = new Label(article.getKeywords());
+        keywordsLabel.setWrapText(true);
+
+        // Reference Links
+        Label referenceLinksHeading = new Label("Reference Links:");
+        referenceLinksHeading.setFont(Font.font("Arial", 14));
+        referenceLinksHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label referenceLinksLabel = new Label(article.getLinks());
+        referenceLinksLabel.setWrapText(true);
+
+
+
+        // Body or Content
+        Label bodyHeading = new Label("Body:");
+        bodyHeading.setFont(Font.font("Arial", 14));
+        bodyHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label bodyLabel = new Label(article.getBody());
+        bodyLabel.setWrapText(true);
+
+        // Add all details to the layout
+        detailsLayout.getChildren().addAll(
+                titleLabel,
+                levelLabel,
+                abstractHeading, abstractLabel,
+                keywordsHeading, keywordsLabel,
+                referenceLinksHeading, referenceLinksLabel,
+                bodyHeading, bodyLabel
+        );
+
+        // Create and set the scene
+        Scene detailScene = new Scene(detailsLayout, 600, 500);
+        detailStage.setScene(detailScene);
+        detailStage.show();
     }
+
+
 
     public static void main(String[] args) {
         launch(args);
