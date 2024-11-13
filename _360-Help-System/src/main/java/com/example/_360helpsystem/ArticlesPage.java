@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Group;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -60,9 +61,9 @@ public class ArticlesPage extends Application {
 
         sidebar.getChildren().add(grpTitle);
 
-        for(String grpName : GROUP_LIST)
+        for(Group grp : GROUP_LIST)
         {
-            HBox groupButton = createGroupButton(grpName,primaryStage);
+            HBox groupButton = createGroupButton(grp.getName(),primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -510,8 +511,7 @@ public class ArticlesPage extends Application {
                     String groupType = generalGroupCheckBox.isSelected() ? "General" : "Special";
 
                     // Handle group creation logic here
-                    GROUP_LIST.addGroup(groupName);
-                    GROUP_LIST.addGroup(groupName);
+                    GROUP_LIST.addGroup(new Group(groupName,specialGroupCheckBox.isSelected()));
                     System.out.println("Group Created: " + groupName + " (" + groupType + ")");
 
                     sidebar.getChildren().add(createGroupButton(groupName, primaryStage));

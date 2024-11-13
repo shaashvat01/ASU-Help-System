@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Group;
 import Backend.UID_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -112,11 +113,11 @@ public class CreateArticle extends Application {
 
         List<CheckBox> groupCheckBoxes = new ArrayList<>();
 
-        for(String grpName : GROUP_LIST)
+        for(Group grp : GROUP_LIST)
         {
-            if(!grpName.equals("General"))
+            if(!grp.getName().equals("General"))
             {
-                CheckBox checkBox = new CheckBox(grpName);
+                CheckBox checkBox = new CheckBox(grp.getName());
                 checkBox.setFont(Font.font("Arial", 14));
                 groupCheckBoxes.add(checkBox);
                 groupCheckBoxLayout.getChildren().addAll(checkBox);

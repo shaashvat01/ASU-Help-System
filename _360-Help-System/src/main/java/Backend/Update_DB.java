@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -167,15 +168,44 @@ public class Update_DB {
             try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    grpList.addGroup(line);
+                    // Parse the group name
+                    int nameEndIndex = line.indexOf(", [");
+                    String name = line.substring(0, nameEndIndex);
+
+                    // Parse the users list
+                    int usersStartIndex = nameEndIndex + 2;
+                    int usersEndIndex = line.indexOf("], [");
+                    String usersPart = line.substring(usersStartIndex, usersEndIndex + 1).replaceAll("[\\[\\]]", "").trim();
+                    ArrayList<String> users = new ArrayList<>();
+                    if (!usersPart.isEmpty()) {
+                        for (String user : usersPart.split(", ")) {
+                            users.add(user.trim()); // Assuming `User` has a constructor that takes a username
+                        }
+                    }
+
+                    // Parse the admins list
+                    int adminsStartIndex = usersEndIndex + 4;
+                    int adminsEndIndex = line.lastIndexOf("] -");
+                    String adminsPart = line.substring(adminsStartIndex, adminsEndIndex + 1).replaceAll("[\\[\\]]", "").trim();
+                    ArrayList<String> admins = new ArrayList<>();
+                    if (!adminsPart.isEmpty()) {
+                        admins.addAll(Arrays.asList(adminsPart.split(", ")));
+                    }
+
+                    // Parse the special flag
+                    boolean isSpecial = Boolean.parseBoolean(line.substring(adminsEndIndex + 3).trim());
+
+                    // Create a Group object and add it to grpList
+                    Group group = new Group(name, isSpecial, users, admins);
+                    grpList.addGroup(group);
                 }
             } catch (IOException e) {
                 System.out.println("Error loading Group database: " + e.getMessage());
             }
         } else {
-            // File doesn't exist; leave OTP_LIST empty
-            System.out.println("Group database file does not exist. Starting with an empty OTPList.");
-            grpList.addGroup("General");
+            // File doesn't exist; initialize with a default group if needed
+            System.out.println("Group database file does not exist. Starting with an empty GroupList.");
+            grpList.addGroup(new Group("General", false));
         }
     }
 
@@ -253,8 +283,11 @@ public class Update_DB {
 
     public void saveGrpDB(GroupList grpList) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_GroupDB, false))) { // Set append to false
-            for (String grpName : grpList) { // Accessing OTP_LIST directly from OTPList class
-                writer.write(grpName);
+            for (Group grp : grpList) { // Accessing OTP_LIST directly from OTPList class
+                writer.write(grp.getName());
+                writer.write(String.join(", ", grp.getUsers().toString()));
+                writer.write(String.join(", ", grp.getAdmins().toString()));
+                writer.write("-" + grp.isSpecial());
                 writer.newLine(); // Add a new line after each OTP
             }
         } catch (IOException e) {

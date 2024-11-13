@@ -164,7 +164,6 @@ public class CreateAdminAccount extends Application {
         UDB.loadArticleDB(ARTICLE_LIST);
         UDB.loadGrpDB(GROUP_LIST);
         UDB.loadKey();
-        //new Article_Encryption_Test().test(); DEBUG PLS REMOVE
         UDB.clearSearchHistory();
     }
     // This method saves the databases when the application is closing.

@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Group;
 import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -68,8 +69,8 @@ public class BackupArticles extends Application {
         HBox currentHBox = new HBox(15);  // Create the first HBox with 15px spacing
         currentHBox.setAlignment(Pos.CENTER);  // Center-align the elements
 
-        for (String grpName : GROUP_LIST) {
-            CheckBox checkBox = new CheckBox(grpName);
+        for (Group grp : GROUP_LIST) {
+            CheckBox checkBox = new CheckBox(grp.getName());
             checkBox.setFont(Font.font("Arial", 14));
             groupCheckBoxes.add(checkBox);
             currentHBox.getChildren().add(checkBox);  // Add checkboxes to the current HBox

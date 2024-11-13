@@ -29,12 +29,13 @@ public class Article {
     private String links;
     private ArrayList<String> groups;
     private String iv;
+    private ArrayList<String> Users;
 
     //Unique identifier for the article.
     public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
         this.keywords = new ArrayList<>();
         this.groups = new ArrayList<>();
-
+        this.Users = new ArrayList<>();
         this.UID = UID;
         this.title = title;
         this.author = author;
@@ -59,10 +60,6 @@ public class Article {
         }
     }
 
-    public Article()
-    {
-        //DEBUG CONSTRUCTOR PLS REMOVE
-    }
 
     public long getUID() {
         return UID;
@@ -157,6 +154,18 @@ public class Article {
 
     public void setIv(String iv) {
         this.iv = iv;
+    }
+
+    public void addUser(String user) {
+        Users.add(user);
+    }
+
+    public void removeUser(String user) {
+        Users.remove(user);
+    }
+
+    public boolean hasUser(String user) {
+        return Users.contains(user);
     }
 
 }
