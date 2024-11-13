@@ -404,15 +404,17 @@ public class Update_DB {
         }
     }
 
-    public void saveSearchHistory()
+    public void saveSearchHistory(String message)
     {
         try (BufferedReader reader = new BufferedReader(new FileReader(path_to_searchHistory));
              FileWriter writer = new FileWriter(path_to_futureArticleDB, true)) {  // true enables append mode
-
+            writer.write("Help Message : "+message + System.lineSeparator());
+            writer.write("User's search history - "+ System.lineSeparator());
             String line;
             while ((line = reader.readLine()) != null) {
                 writer.write(line + System.lineSeparator());  // Append each line with a newline
             }
+            writer.write("--------------------------------------------------------" + System.lineSeparator());
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
@@ -507,7 +509,6 @@ public class Update_DB {
             return true;
         }
     }
-
 
 
 }
