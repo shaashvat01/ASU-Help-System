@@ -158,12 +158,24 @@ public class StudentArticle extends Application {
 
         VBox groupOptions = new VBox(10, allGroupCheckBox, javafxCheckBox, eclipseCheckBox, githubCheckBox);
 
+        // Search By heading and checkboxes
+        Label searchByLabel = new Label("Search By:");
+        searchByLabel.setFont(Font.font("Arial", 14));
+        searchByLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox titleCheckBox = new CheckBox("Title");
+        CheckBox authorCheckBox = new CheckBox("Author");
+        CheckBox uidCheckBox = new CheckBox("UID");
+
+        VBox searchByOptions = new VBox(10, titleCheckBox, authorCheckBox, uidCheckBox);
+
         // Buttons for clearing and saving filter selections
         Button clearButton = new Button("Clear");
         clearButton.setFont(Font.font("Arial", 16));
         clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         clearButton.setPrefWidth(100);
         clearButton.setOnAction(e -> {
+            // Clear all checkboxes
             allContentCheckBox.setSelected(false);
             beginnerCheckBox.setSelected(false);
             intermediateCheckBox.setSelected(false);
@@ -173,6 +185,9 @@ public class StudentArticle extends Application {
             javafxCheckBox.setSelected(false);
             eclipseCheckBox.setSelected(false);
             githubCheckBox.setSelected(false);
+            titleCheckBox.setSelected(false);
+            authorCheckBox.setSelected(false);
+            uidCheckBox.setSelected(false);
         });
 
         Button saveButton = new Button("Save");
@@ -185,9 +200,10 @@ public class StudentArticle extends Application {
         buttonLayout.setAlignment(Pos.CENTER);
 
         // Add all elements to the filter panel
-        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, buttonLayout);
+        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, searchByLabel, searchByOptions, buttonLayout);
         return filterPanel;
     }
+
 
     private void showPreviousScreen(Stage primaryStage) {
         StudentPage studentPage = new StudentPage();
