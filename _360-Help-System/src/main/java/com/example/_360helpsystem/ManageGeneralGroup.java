@@ -38,6 +38,7 @@ public class ManageGeneralGroup extends Application {
         createArticleBtn.setFont(Font.font("Arial", 15));
         createArticleBtn.setPrefWidth(150);
         createArticleBtn.setPrefHeight(35);
+        createArticleBtn.setOnAction(e -> showCreateArticleScreen(primaryStage));
 
         HBox leftBox = new HBox(backButton);
         leftBox.setAlignment(Pos.CENTER_LEFT);
@@ -95,6 +96,16 @@ public class ManageGeneralGroup extends Application {
 
         // Initially display articles for the given group
         showArticlesForGroup();
+    }
+
+    private void showCreateArticleScreen(Stage primaryStage) {
+        CreateArticle createArticle = new CreateArticle();
+        try{
+            createArticle.start(primaryStage);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private Button createSidebarButtonWithIcon(String text, String icon) {
