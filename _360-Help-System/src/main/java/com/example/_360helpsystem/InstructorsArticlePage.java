@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Group;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -61,8 +62,8 @@ public class InstructorsArticlePage extends Application {
         grpTitle.setAlignment(Pos.CENTER);
         sidebar.getChildren().add(grpTitle);
 
-        for (String grpName : GROUP_LIST) {
-            HBox groupButton = createGroupButton(grpName, primaryStage);
+        for (Group grp : GROUP_LIST) {
+            HBox groupButton = createGroupButton(grp.getName(), primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -541,7 +542,7 @@ public class InstructorsArticlePage extends Application {
             if (!groupName.isEmpty()) {
                 // Handle group creation logic here
                 if(!GROUP_LIST.contains(groupName)) {
-                    GROUP_LIST.addGroup(groupName);
+                    GROUP_LIST.addGroup(new Group(groupName,false));// NEED TO CHECK
                     System.out.println("Group Created: " + groupName);
                     sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
                     // Close the pop-up after creation

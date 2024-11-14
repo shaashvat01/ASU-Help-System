@@ -103,13 +103,11 @@ public class Update_DB {
 
     public void loadArticleDB(ArticleList articleL) {
         File articleDBFile = new File(path_to_ArticleDB);
-        if (articleDBFile.exists()) { // Check if the file exists
+        if (articleDBFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(articleDBFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.trim().isEmpty()) {
-                        break; // Stop reading if a blank line is encountered
-                    }
+                    if (line.trim().isEmpty()) continue; // Skip empty lines
                     String[] data = line.split("-");
                     if (data.length == 11) {
                         long UID = Long.parseLong(data[0]);
@@ -127,18 +125,15 @@ public class Update_DB {
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
                         article.setIv(iv);
                         articleL.addArticle(article);
-                        System.out.println("Article added to article database: " + article.getTitle() + " - " + article.getKeywords());
-
                     } else {
-                        System.out.println("Data length mismatch. Expected 11, found: " + data.length);
+                        System.out.println("Data length mismatch. Expected 11 fields.");
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Error loading article database: " + e.getMessage());
+                System.out.println("Error loading articles: " + e.getMessage());
             }
         } else {
-            // File doesn't exist; leave articleL empty
-            System.out.println("Article database file does not exist. Starting with an empty ArticleList.");
+            System.out.println("Article database file does not exist.");
         }
     }
 
@@ -164,48 +159,44 @@ public class Update_DB {
 
     public void loadGrpDB(GroupList grpList) {
         File grpDBFile = new File(path_to_GroupDB);
-        if (grpDBFile.exists()) { // Check if the file exists
-            try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Parse the group name
-                    int nameEndIndex = line.indexOf(", [");
-                    String name = line.substring(0, nameEndIndex);
 
-                    // Parse the users list
-                    int usersStartIndex = nameEndIndex + 2;
-                    int usersEndIndex = line.indexOf("], [");
-                    String usersPart = line.substring(usersStartIndex, usersEndIndex + 1).replaceAll("[\\[\\]]", "").trim();
-                    ArrayList<String> users = new ArrayList<>();
-                    if (!usersPart.isEmpty()) {
-                        for (String user : usersPart.split(", ")) {
-                            users.add(user.trim()); // Assuming `User` has a constructor that takes a username
-                        }
-                    }
+        if (!grpDBFile.exists()) {
+            System.out.println("Group database file does not exist.");
+            return;
+        }
 
-                    // Parse the admins list
-                    int adminsStartIndex = usersEndIndex + 4;
-                    int adminsEndIndex = line.lastIndexOf("] -");
-                    String adminsPart = line.substring(adminsStartIndex, adminsEndIndex + 1).replaceAll("[\\[\\]]", "").trim();
-                    ArrayList<String> admins = new ArrayList<>();
-                    if (!adminsPart.isEmpty()) {
-                        admins.addAll(Arrays.asList(adminsPart.split(", ")));
-                    }
+        try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue; // Skip empty lines
 
-                    // Parse the special flag
-                    boolean isSpecial = Boolean.parseBoolean(line.substring(adminsEndIndex + 3).trim());
-
-                    // Create a Group object and add it to grpList
-                    Group group = new Group(name, isSpecial, users, admins);
-                    grpList.addGroup(group);
+                String[] parts = line.split("-");
+                if (parts.length != 4) {
+                    System.out.println("Invalid group format: " + line);
+                    continue;
                 }
-            } catch (IOException e) {
-                System.out.println("Error loading Group database: " + e.getMessage());
+
+                String groupID = parts[0].trim();
+                String usersPart = parts[1].replaceAll("[\\[\\]]", "").trim();
+                String adminsPart = parts[2].replaceAll("[\\[\\]]", "").trim();
+                boolean isSpecial;
+
+                try {
+                    isSpecial = Boolean.parseBoolean(parts[3].trim());
+                } catch (Exception e) {
+                    System.out.println("Invalid boolean value for special flag in line: " + line);
+                    continue;
+                }
+
+                List<String> users = usersPart.isEmpty() ? new ArrayList<>() : Arrays.asList(usersPart.split(", "));
+                List<String> admins = adminsPart.isEmpty() ? new ArrayList<>() : Arrays.asList(adminsPart.split(", "));
+
+                Group group = new Group(groupID, isSpecial, new ArrayList<>(users), new ArrayList<>(admins));
+                grpList.addGroup(group);
             }
-        } else {
-            // File doesn't exist; initialize with a default group if needed
-            System.out.println("Group database file does not exist. Starting with an empty GroupList.");
-            grpList.addGroup(new Group("General", false));
+        } catch (IOException e) {
+            System.out.println("Error loading groups: " + e.getMessage());
         }
     }
 
@@ -285,8 +276,8 @@ public class Update_DB {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_GroupDB, false))) { // Set append to false
             for (Group grp : grpList) { // Accessing OTP_LIST directly from OTPList class
                 writer.write(grp.getName());
-                writer.write(String.join(", ", grp.getUsers().toString()));
-                writer.write(String.join(", ", grp.getAdmins().toString()));
+                writer.write("-"+String.join(", ", grp.getUsers().toString()));
+                writer.write("-"+String.join(", ", grp.getAdmins().toString()));
                 writer.write("-" + grp.isSpecial());
                 writer.newLine(); // Add a new line after each OTP
             }
@@ -486,7 +477,7 @@ public class Update_DB {
 
 
             try (FileWriter writer = new FileWriter(path_to_key, true)) {  // true enables append mode
-                SECRET_KEY = generateKey();
+                SECRET_KEY = new Encryption().generateKey();
                 writer.write(Base64.getEncoder().encodeToString(SECRET_KEY.getEncoded())+System.lineSeparator());  // Write message with a newline at the end
             } catch (IOException e) {
                 e.printStackTrace();  // Print stack trace if an error occurs

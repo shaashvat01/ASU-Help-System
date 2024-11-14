@@ -173,7 +173,7 @@ public class CreateAdminAccount extends Application {
         UDB.saveOTPDB(OTP_LIST);
         UDB.saveArticleDB(ARTICLE_LIST);
         UDB.saveGrpDB(GROUP_LIST);
-
+        UDB.clearSearchHistory();
         System.out.println("Databases saved successfully.");
     }
 }

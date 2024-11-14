@@ -1,6 +1,8 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Encryption;
+import Backend.Group;
 import Backend.UID_Generator;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -14,6 +16,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,11 +120,11 @@ public class CreateArticle extends Application {
 
         List<CheckBox> groupCheckBoxes = new ArrayList<>();
 
-        for(String grpName : GROUP_LIST)
+        for(Group grp : GROUP_LIST)
         {
-            if(!grpName.equals("General"))
+            if(!grp.getName().equals("General"))
             {
-                CheckBox checkBox = new CheckBox(grpName);
+                CheckBox checkBox = new CheckBox(grp.getName());
                 checkBox.setFont(Font.font("Arial", 14));
                 groupCheckBoxes.add(checkBox);
                 groupCheckBoxLayout.getChildren().addAll(checkBox);
@@ -139,7 +147,21 @@ public class CreateArticle extends Application {
         saveButton.setFont(Font.font("Arial", 16));
         saveButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         saveButton.setPrefWidth(150);  // Button width
-        saveButton.setOnAction(e -> createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel,message));
+        saveButton.setOnAction(e -> {
+            try {
+                createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel,message);
+            } catch (NoSuchPaddingException ex) {
+                throw new RuntimeException(ex);
+            } catch (IllegalBlockSizeException ex) {
+                throw new RuntimeException(ex);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new RuntimeException(ex);
+            } catch (BadPaddingException ex) {
+                throw new RuntimeException(ex);
+            } catch (InvalidKeyException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
 
         Button clearButton = new Button("Clear Fields");
@@ -230,7 +252,7 @@ public class CreateArticle extends Application {
         }
     }
 
-    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes, ComboBox<String> levelBox, Label errorLabel,Label message) {
+    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes, ComboBox<String> levelBox, Label errorLabel,Label message) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         // Print diagnostic info
         System.out.println("Creating article with fields:");
         System.out.println("Title: " + titleField.getText());
@@ -256,10 +278,16 @@ public class CreateArticle extends Application {
             return;
         }
 
+        boolean isEncrypted = false;
+
         // Collect selected group identifiers
         StringBuilder selectedGrpBuilder = new StringBuilder("General");
         for (CheckBox checkBox : groupCheckBoxes) {
             if (checkBox.isSelected()) {
+                if(GROUP_LIST.isSpecialGroup(checkBox.getText()))
+                {
+                    isEncrypted = true;
+                }
                 selectedGrpBuilder.append(",").append(checkBox.getText());
             }
         }
@@ -274,6 +302,11 @@ public class CreateArticle extends Application {
         {
             long articleUID = new UID_Generator().getUID();
             Article newArticle = new Article(articleUID, title, CURRENT_USER.getUserName(), level, security, description, keywords, body, referenceLinks, selectedGrp);
+
+            if(isEncrypted)
+            {
+                new Encryption().encryptBody(newArticle);
+            }
 
             ARTICLE_LIST.addArticle(newArticle);
             System.out.println("Article created: " + newArticle); // Placeholder for actual save operation

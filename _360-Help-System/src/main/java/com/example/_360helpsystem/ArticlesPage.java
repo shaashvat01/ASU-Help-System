@@ -192,7 +192,6 @@ public class ArticlesPage extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        displayArticlesForGroup("General",primaryStage);
     }
 
     private void showPreviousScreen(Stage primaryStage) {
@@ -472,22 +471,8 @@ public class ArticlesPage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
-        // Create checkboxes for General Group and Special Group
-        CheckBox generalGroupCheckBox = new CheckBox("General Group");
+        // Create checkboxes for Special Group
         CheckBox specialGroupCheckBox = new CheckBox("Special Group");
-
-        // Ensure only one checkbox can be selected at a time
-        generalGroupCheckBox.setOnAction(e -> {
-            if (generalGroupCheckBox.isSelected()) {
-                specialGroupCheckBox.setSelected(false);
-            }
-        });
-
-        specialGroupCheckBox.setOnAction(e -> {
-            if (specialGroupCheckBox.isSelected()) {
-                generalGroupCheckBox.setSelected(false);
-            }
-        });
 
         // Create the "Create" button
         Button createButton = new Button("Create");
@@ -501,19 +486,10 @@ public class ArticlesPage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
-                // Check if a group type is selected
-                if (!generalGroupCheckBox.isSelected() && !specialGroupCheckBox.isSelected()) {
-                    errorLabel.setText("Please select a group type.");
-                    return;
-                }
 
                 if (!GROUP_LIST.contains(groupName)) {
-                    String groupType = generalGroupCheckBox.isSelected() ? "General" : "Special";
-
-                    // Handle group creation logic here
                     GROUP_LIST.addGroup(new Group(groupName,specialGroupCheckBox.isSelected()));
-                    System.out.println("Group Created: " + groupName + " (" + groupType + ")");
-
+                    System.out.println("Group created - "+groupName+"-"+specialGroupCheckBox.isSelected());
                     sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
 
                     // Close the pop-up after creation
@@ -528,8 +504,7 @@ public class ArticlesPage extends Application {
         });
 
         // Add the TextField, checkboxes, and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,
-                generalGroupCheckBox, specialGroupCheckBox,
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, specialGroupCheckBox,
                 errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
