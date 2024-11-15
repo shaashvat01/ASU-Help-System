@@ -330,7 +330,7 @@ public class ArticlesPage extends Application {
 
 
     private void showManageDialog(Stage primaryStage) {
-        ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup();
+        ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup("Admin");
         try{
             manageGeneralGroup.start(primaryStage);
         } catch (Exception ex) {
@@ -550,7 +550,7 @@ public class ArticlesPage extends Application {
     }
 
     private void showCreateArticleScreen(Stage primaryStage) {
-        CreateArticle createArticle = new CreateArticle();
+        CreateArticle createArticle = new CreateArticle("Admin");
         try{
             createArticle.start(primaryStage);
         }

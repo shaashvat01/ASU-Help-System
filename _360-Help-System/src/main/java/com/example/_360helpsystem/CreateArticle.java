@@ -36,6 +36,13 @@ import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 public class CreateArticle extends Application {
 
+    private String previousScreen; // To store the reference to the previous screen
+
+    // Constructor to accept the previous screen
+    public CreateArticle(String previousScreen) {
+        this.previousScreen = previousScreen;
+    }
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -293,17 +300,23 @@ public class CreateArticle extends Application {
 
     }
 
-
-
     private void showPreviousScreen(Stage primaryStage) {
-        ArticlesPage articles = new ArticlesPage();
-        try{
-            selectedArticle = null;
-            articles.start(primaryStage);
-        }
-        catch(Exception ex){
+        try {
+            switch (previousScreen) {
+                case "Admin":
+                    new ArticlesPage().start(primaryStage);
+                    break;
+                case "Instructor":
+                    new InstructorsArticlePage().start(primaryStage);
+                    break;
+                case "ManageGeneralGroup":
+                    new ManageGeneralGroup("AdminOrInstructor").start(primaryStage); // Pass "AdminOrInstructor" or similar identifier to distinguish between Admin or Instructor
+                    break;
+                default:
+                    System.out.println("Unknown previous screen: " + previousScreen);
+            }
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-
 }

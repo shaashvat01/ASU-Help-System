@@ -18,6 +18,13 @@ public class ManageGeneralGroup extends Application {
     private VBox mainContentArea;
     private String groupName;
 
+    private String previousScreen; // To store the reference to the previous screen
+
+    // Constructor to accept the previous screen
+    public ManageGeneralGroup(String previousScreen) {
+        this.previousScreen = previousScreen;
+    }
+
     @Override
     public void start(Stage primaryStage) {
         // Default to "General" group if no group name is provided
@@ -201,7 +208,7 @@ public class ManageGeneralGroup extends Application {
 
 
     private void showCreateArticleScreen(Stage primaryStage) {
-        CreateArticle createArticle = new CreateArticle();
+        CreateArticle createArticle = new CreateArticle("Manage");
         try{
             createArticle.start(primaryStage);
         }
@@ -400,9 +407,17 @@ public class ManageGeneralGroup extends Application {
 
 
     private void showPreviousScreen(Stage primaryStage) {
-        ArticlesPage articlesPage = new ArticlesPage();
         try {
-            articlesPage.start(primaryStage);
+            switch (previousScreen) {
+                case "Admin":
+                    new ArticlesPage().start(primaryStage);
+                    break;
+                case "Instructor":
+                    new InstructorsArticlePage().start(primaryStage);
+                    break;
+                default:
+                    System.out.println("Unknown previous screen: " + previousScreen);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }

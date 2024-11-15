@@ -302,7 +302,7 @@ public class InstructorsArticlePage extends Application {
 
 
     private void showManageDialog(Stage primaryStage, String groupName) {
-        ManageGeneralGroup generalGroup = new ManageGeneralGroup();
+        ManageGeneralGroup generalGroup = new ManageGeneralGroup("Instructor");
         try {
             generalGroup.start(primaryStage);  // Start with only the primaryStage
             generalGroup.initialize(primaryStage, groupName);  // Pass groupName via initialize
@@ -688,7 +688,7 @@ public class InstructorsArticlePage extends Application {
     }
 
     private void showCreateArticleScreen(Stage primaryStage) {
-        CreateArticle createArticle = new CreateArticle();
+        CreateArticle createArticle = new CreateArticle("Instructor");
         try{
             createArticle.start(primaryStage);
         }
