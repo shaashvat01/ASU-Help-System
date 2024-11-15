@@ -81,7 +81,23 @@ public class InstructorsArticlePage extends Application {
         Button backupBtn = createStyledButton("Backup", e -> showBackupScreen(primaryStage));
         Button restoreBtn = createStyledButton("Restore", e -> showRestoreArticles(primaryStage));
 
-        HBox articleButtons = new HBox(20, createArticleBtn, backupBtn, restoreBtn);
+        // Create Group button
+        Button createGrpBtn = new Button("Create Group");
+        createGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        createGrpBtn.setPrefWidth(125);
+        createGrpBtn.setPrefHeight(35);
+        createGrpBtn.setFont(Font.font("Arial", 15));
+        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar, primaryStage));
+
+        // Delete Group button
+        Button deleteGrpBtn = new Button("Delete Group");
+        deleteGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        deleteGrpBtn.setPrefWidth(125);
+        deleteGrpBtn.setPrefHeight(35);
+        deleteGrpBtn.setFont(Font.font("Arial", 15));
+        deleteGrpBtn.setOnAction(e -> showDeleteGroup(sidebar));
+
+        HBox articleButtons = new HBox(20, createArticleBtn, createGrpBtn, deleteGrpBtn, backupBtn, restoreBtn);
         articleButtons.setAlignment(Pos.CENTER);
         articleButtons.setPadding(new Insets(0, 0, 0, 0));
 
@@ -164,6 +180,7 @@ public class InstructorsArticlePage extends Application {
 
         displayArticlesForGroup("General", primaryStage);
     }
+
 
     private VBox createFilterPanel() {
         // Filter options panel with Content Level and Group checkboxes

@@ -53,17 +53,20 @@ public class ManageGeneralGroup extends Application {
         Button addUserButton = createSidebarButtonWithIcon("Add User", "➕");
         Button removeUserButton = createSidebarButtonWithIcon("Remove User", "➖");
         Button permissionsButton = createSidebarButtonWithIcon("Permissions", "🔑");
+        Button studentsRequestsButton = createSidebarButtonWithIcon("Requests", "‍🎓"); // Unicode for "user-graduate" icon
+
 
         articlesButton.setOnAction(e -> showArticlesForGroup());
         addUserButton.setOnAction(e -> showAddUserScreen());
         removeUserButton.setOnAction(e -> showRemoveUserScreen());
         permissionsButton.setOnAction(e -> showPermissionsScreen());
+        studentsRequestsButton.setOnAction(e -> showStudentRequestsScreen());
 
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
         sidebar.setPrefWidth(160);  // Fixed width for sidebar
-        sidebar.getChildren().addAll(articlesButton, addUserButton, removeUserButton, permissionsButton);
+        sidebar.getChildren().addAll(articlesButton, addUserButton, removeUserButton, permissionsButton, studentsRequestsButton);
 
         // Set up a ScrollPane for the main content area with fixed dimensions
         ScrollPane scrollPane = new ScrollPane();
@@ -97,6 +100,105 @@ public class ManageGeneralGroup extends Application {
         // Initially display articles for the given group
         showArticlesForGroup();
     }
+
+    private void showStudentRequestsScreen() {
+        mainContentArea.getChildren().clear();
+
+        GridPane permissionsLayout = new GridPane();
+        permissionsLayout.setPadding(new Insets(20));
+        permissionsLayout.setVgap(10); // Reduced vertical gap
+        permissionsLayout.setHgap(20); // Adjusted horizontal gap for spacing between columns
+        permissionsLayout.setAlignment(Pos.CENTER);
+
+        // Headers with centered alignment and bold style
+        Label usernameHeader = new Label("Username");
+        usernameHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
+        Label nameHeader = new Label("Name");
+        nameHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
+        Label roleHeader = new Label("Roles");
+        roleHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
+        Label articleHeader = new Label("Article"); // New Article column header
+        articleHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
+        Label actionsHeader = new Label("Actions");
+        actionsHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
+
+        // Add headers to the grid with no padding
+        permissionsLayout.add(usernameHeader, 0, 0);
+        permissionsLayout.add(nameHeader, 1, 0);
+        permissionsLayout.add(roleHeader, 2, 0, 3, 1); // Spanning the Roles header across columns 2, 3, and 4
+        permissionsLayout.add(articleHeader, 5, 0); // Positioned Article column
+        permissionsLayout.add(actionsHeader, 6, 0); // Positioned Actions above buttons
+
+        // Role labels for the role columns under "Roles" header with no padding
+        Label studentLabel = new Label("S");
+        Label instructorLabel = new Label("I");
+        Label adminLabel = new Label("A");
+
+        // Add role labels in appropriate columns under the Roles header
+        permissionsLayout.add(studentLabel, 2, 1);
+        permissionsLayout.add(instructorLabel, 3, 1);
+        permissionsLayout.add(adminLabel, 4, 1);
+
+        int rowIndex = 2;
+        String[] mockUsers = {"User1", "User2"};
+        String[] mockArticles = {"Article A", "Article B"}; // Mock article data
+        String[] mockArticleLevels = {" - Intermediate", " - Advanced"};
+
+        for (int i = 0; i < mockUsers.length; i++) {
+            Label usernameLabel = new Label(mockUsers[i]);
+            Label nameLabel = new Label("User");
+
+            // Combine article name and level into two separate labels
+            Label articleNameLabel = new Label(mockArticles[i]);
+            articleNameLabel.setStyle("-fx-text-fill: #8b0000;");
+            Label articleLevelLabel = new Label(mockArticleLevels[i]);
+            articleLevelLabel.setStyle("-fx-text-fill: #7f8c8d;");
+
+            HBox articleBox = new HBox(articleNameLabel, articleLevelLabel);
+
+            CheckBox studentCheckbox = new CheckBox();
+            studentCheckbox.setDisable(true);
+
+            CheckBox instructorCheckbox = new CheckBox();
+            instructorCheckbox.setDisable(true);
+
+            CheckBox adminCheckbox = new CheckBox();
+            adminCheckbox.setSelected(true);
+            adminCheckbox.setDisable(true);
+
+            Button declineButton = new Button("Decline");
+            declineButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            declineButton.setOnAction(e -> studentCheckbox.setSelected(false));
+
+            Button acceptButton = new Button("Accept");
+            acceptButton.setStyle("-fx-background-color: #64B45F; -fx-text-fill: white;");
+            acceptButton.setOnAction(e -> adminCheckbox.setSelected(true));
+
+            // Add user details, article label, and checkboxes in the appropriate columns
+            permissionsLayout.add(usernameLabel, 0, rowIndex);
+            permissionsLayout.add(nameLabel, 1, rowIndex);
+            permissionsLayout.add(studentCheckbox, 2, rowIndex);
+            permissionsLayout.add(instructorCheckbox, 3, rowIndex);
+            permissionsLayout.add(adminCheckbox, 4, rowIndex);
+            permissionsLayout.add(articleBox, 5, rowIndex); // Added article label
+            permissionsLayout.add(new HBox(10, declineButton, acceptButton), 6, rowIndex); // Added buttons in Actions column
+
+            rowIndex++;
+        }
+
+        Region topSpacer = new Region();
+        VBox.setVgrow(topSpacer, Priority.ALWAYS);
+
+        Region bottomSpacer = new Region();
+        VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
+
+        VBox wrapper = new VBox(topSpacer, permissionsLayout, bottomSpacer);
+        wrapper.setAlignment(Pos.CENTER);
+
+        mainContentArea.getChildren().add(wrapper);
+    }
+
+
 
     private void showCreateArticleScreen(Stage primaryStage) {
         CreateArticle createArticle = new CreateArticle();
@@ -208,18 +310,24 @@ public class ManageGeneralGroup extends Application {
 
         GridPane permissionsLayout = new GridPane();
         permissionsLayout.setPadding(new Insets(20));
-        permissionsLayout.setVgap(20);
-        permissionsLayout.setHgap(20);
+        permissionsLayout.setVgap(10);
+        permissionsLayout.setHgap(20); // Added spacing between columns
         permissionsLayout.setAlignment(Pos.CENTER);
 
         // Headers
         Label usernameHeader = new Label("Username");
+        usernameHeader.setStyle("-fx-font-weight: bold;");
+        Label nameHeader = new Label("Name");
+        nameHeader.setStyle("-fx-font-weight: bold;");
         Label roleHeader = new Label("Roles");
+        roleHeader.setStyle("-fx-font-weight: bold;");
         Label actionsHeader = new Label("Actions");
+        actionsHeader.setStyle("-fx-font-weight: bold;");
 
         permissionsLayout.add(usernameHeader, 0, 0);
-        permissionsLayout.add(roleHeader, 1, 0);
-        permissionsLayout.add(actionsHeader, 2, 0);
+        permissionsLayout.add(nameHeader, 1, 0);
+        permissionsLayout.add(roleHeader, 2, 0, 3, 1); // Span 3 columns for SIA
+        permissionsLayout.add(actionsHeader, 5, 0, 2, 1); // Span 2 columns for RA
 
         // Role and Action labels
         Label studentLabel = new Label("S");
@@ -228,17 +336,19 @@ public class ManageGeneralGroup extends Application {
         Label viewLabel = new Label("Read");
         Label adminRightsLabel = new Label("Admin");
 
-        permissionsLayout.add(studentLabel, 1, 1);
-        permissionsLayout.add(instructorLabel, 2, 1);
-        permissionsLayout.add(adminLabel, 3, 1);
-        permissionsLayout.add(viewLabel, 4, 1);
-        permissionsLayout.add(adminRightsLabel, 5, 1);
+        permissionsLayout.add(studentLabel, 2, 1);
+        permissionsLayout.add(instructorLabel, 3, 1);
+        permissionsLayout.add(adminLabel, 4, 1);
+        permissionsLayout.add(viewLabel, 5, 1);
+        permissionsLayout.add(adminRightsLabel, 6, 1);
 
         int rowIndex = 2;
         String[] mockUsers = {"User1", "User2"};
+        String[] mockNames = {"John Doe", "Jane Smith"};
 
-        for (String username : mockUsers) {
-            Label usernameLabel = new Label(username);
+        for (int i = 0; i < mockUsers.length; i++) {
+            Label usernameLabel = new Label(mockUsers[i]);
+            Label nameLabel = new Label(mockNames[i]);
 
             CheckBox studentCheckbox = new CheckBox();
             studentCheckbox.setDisable(true);
@@ -265,12 +375,13 @@ public class ManageGeneralGroup extends Application {
             grantAdminButton.setOnAction(e -> adminRightsCheckbox.setSelected(true));
 
             permissionsLayout.add(usernameLabel, 0, rowIndex);
-            permissionsLayout.add(studentCheckbox, 1, rowIndex);
-            permissionsLayout.add(instructorCheckbox, 2, rowIndex);
-            permissionsLayout.add(adminCheckbox, 3, rowIndex);
-            permissionsLayout.add(viewCheckbox, 4, rowIndex);
-            permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
-            permissionsLayout.add(new HBox(10, grantViewButton, grantAdminButton), 6, rowIndex);
+            permissionsLayout.add(nameLabel, 1, rowIndex);
+            permissionsLayout.add(studentCheckbox, 2, rowIndex);
+            permissionsLayout.add(instructorCheckbox, 3, rowIndex);
+            permissionsLayout.add(adminCheckbox, 4, rowIndex);
+            permissionsLayout.add(viewCheckbox, 5, rowIndex);
+            permissionsLayout.add(adminRightsCheckbox, 6, rowIndex);
+            permissionsLayout.add(new HBox(10, grantViewButton, grantAdminButton), 7, rowIndex);
 
             rowIndex++;
         }
@@ -286,6 +397,7 @@ public class ManageGeneralGroup extends Application {
 
         mainContentArea.getChildren().add(wrapper);
     }
+
 
     private void showPreviousScreen(Stage primaryStage) {
         ArticlesPage articlesPage = new ArticlesPage();
