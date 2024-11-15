@@ -37,6 +37,7 @@ public class CreateAdminAccount extends Application {
     public static GroupList GROUP_LIST = new GroupList();
     public static SecretKey SECRET_KEY;
     Update_DB UDB = new Update_DB();
+    //DEBUG
 
     public static void main(String[] args) {
         launch(args);
