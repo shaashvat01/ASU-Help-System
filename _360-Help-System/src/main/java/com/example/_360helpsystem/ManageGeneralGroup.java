@@ -1,6 +1,8 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Group;
+import Backend.User;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,7 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.*;
 
 public class ManageGeneralGroup extends Application {
 
@@ -21,11 +23,11 @@ public class ManageGeneralGroup extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Default to "General" group if no group name is provided
-        initialize(primaryStage, "General");
+        System.out.println("Current Group - "+this.groupName);
+        initialize(primaryStage,this.groupName);
     }
 
     public void initialize(Stage primaryStage, String groupName) {
-        this.groupName = groupName;
 
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10, 10, 10, 10));
@@ -160,7 +162,7 @@ public class ManageGeneralGroup extends Application {
         Button addButton = new Button("Add User");
         addButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         addButton.setFont(Font.font("Arial", 18));
-        addButton.setOnAction(e -> System.out.println("User added with name: " + nameField.getText()));
+        addButton.setOnAction(e -> addUser(nameField.getText()));
 
         VBox addUserContent = new VBox(10, nameTitle, nameField, addButton);
         addUserContent.setAlignment(Pos.CENTER);
@@ -188,7 +190,7 @@ public class ManageGeneralGroup extends Application {
         Button removeButton = new Button("Remove User");
         removeButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         removeButton.setFont(Font.font("Arial", 18));
-        removeButton.setOnAction(e -> System.out.println("User removed with name: " + nameField.getText()));
+        removeButton.setOnAction(e -> removeUser(nameField.getText()));
 
         VBox removeUserContent = new VBox(10, nameTitle, nameField, removeButton);
         removeUserContent.setAlignment(Pos.CENTER);
@@ -218,26 +220,25 @@ public class ManageGeneralGroup extends Application {
         Label actionsHeader = new Label("Actions");
 
         permissionsLayout.add(usernameHeader, 0, 0);
-        permissionsLayout.add(roleHeader, 1, 0);
-        permissionsLayout.add(actionsHeader, 2, 0);
+        permissionsLayout.add(roleHeader, 2, 0);
+        permissionsLayout.add(actionsHeader, 3, 0);
 
         // Role and Action labels
         Label studentLabel = new Label("S");
         Label instructorLabel = new Label("I");
-        Label adminLabel = new Label("A");
         Label viewLabel = new Label("Read");
         Label adminRightsLabel = new Label("Admin");
 
         permissionsLayout.add(studentLabel, 1, 1);
         permissionsLayout.add(instructorLabel, 2, 1);
-        permissionsLayout.add(adminLabel, 3, 1);
         permissionsLayout.add(viewLabel, 4, 1);
         permissionsLayout.add(adminRightsLabel, 5, 1);
 
         int rowIndex = 2;
-        String[] mockUsers = {"User1", "User2"};
 
-        for (String username : mockUsers) {
+
+
+        for (String username : GROUP_LIST.getGroup(this.groupName).getUsers()) {
             Label usernameLabel = new Label(username);
 
             CheckBox studentCheckbox = new CheckBox();
@@ -246,31 +247,51 @@ public class ManageGeneralGroup extends Application {
             CheckBox instructorCheckbox = new CheckBox();
             instructorCheckbox.setDisable(true);
 
-            CheckBox adminCheckbox = new CheckBox();
-            adminCheckbox.setSelected(true);
-            adminCheckbox.setDisable(true);
-
             CheckBox viewCheckbox = new CheckBox();
             viewCheckbox.setDisable(true);
 
             CheckBox adminRightsCheckbox = new CheckBox();
             adminRightsCheckbox.setDisable(true);
 
-            Button grantViewButton = new Button("Grant Read Access");
-            grantViewButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-            grantViewButton.setOnAction(e -> viewCheckbox.setSelected(true));
 
-            Button grantAdminButton = new Button("Grant Admin Access");
+            if(USER_LIST.findUser(username).isInstructor())
+            {
+                instructorCheckbox.setSelected(true);
+            }
+            if(USER_LIST.findUser(username).isStudent())
+            {
+                studentCheckbox.setSelected(true);
+            }
+
+            Button grantAdminButton = new Button();
+            if(GROUP_LIST.getGroup(this.groupName).isAdmin(username))
+            {
+                adminRightsCheckbox.setSelected(true);
+                grantAdminButton.setText("Remove Admin");
+            }
+            else{
+                viewCheckbox.setSelected(true);
+                grantAdminButton.setText("Grant Admin");
+            }
+
+
+
             grantAdminButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-            grantAdminButton.setOnAction(e -> adminRightsCheckbox.setSelected(true));
+            grantAdminButton.setOnAction(e -> {
+                if (adminRightsCheckbox.isSelected()) {
+                    removeAdmin(username, adminRightsCheckbox, viewCheckbox, grantAdminButton);
+                } else {
+                    makeAdmin(username, adminRightsCheckbox, viewCheckbox, grantAdminButton);
+                }
+            });
+
 
             permissionsLayout.add(usernameLabel, 0, rowIndex);
             permissionsLayout.add(studentCheckbox, 1, rowIndex);
             permissionsLayout.add(instructorCheckbox, 2, rowIndex);
-            permissionsLayout.add(adminCheckbox, 3, rowIndex);
             permissionsLayout.add(viewCheckbox, 4, rowIndex);
             permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
-            permissionsLayout.add(new HBox(10, grantViewButton, grantAdminButton), 6, rowIndex);
+            permissionsLayout.add(new HBox(10, grantAdminButton), 6, rowIndex);
 
             rowIndex++;
         }
@@ -294,6 +315,57 @@ public class ManageGeneralGroup extends Application {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public void addUser(String username) {
+        Group group = GROUP_LIST.getGroup(groupName);
+        User user = USER_LIST.findUser(username);
+
+        if (user != null) {
+            if(group.getUsers().contains(username)) {
+                System.out.println("User is already added to group");
+            }
+            else{
+                group.addUser(user);
+                System.out.println("Added user - "+user.getUserName());
+            }
+
+        }
+        else{
+            System.out.println("User does not exist");
+        }
+    }
+
+    public void removeUser(String username) {
+        Group group = GROUP_LIST.getGroup(groupName);
+        User user = USER_LIST.findUser(username);
+        if (user != null && group.getUsers().contains(username)) {
+            group.removeUser(user);
+            System.out.println("removed user - "+username);
+        }
+        else {
+            System.out.println("User does not exist");
+        }
+    }
+
+    public void makeAdmin(String username,CheckBox adminCheckBox,CheckBox viewCheckBox,Button grantAdminButton)
+    {
+        GROUP_LIST.getGroup(this.groupName).addAdmin(username);
+        adminCheckBox.setSelected(true);
+        viewCheckBox.setSelected(false);
+        grantAdminButton.setText("Remove Admin");
+    }
+
+    public void removeAdmin(String username,CheckBox adminCheckBox,CheckBox viewCheckBox,Button grantAdminButton)
+    {
+        GROUP_LIST.getGroup(this.groupName).removeAdmin(username);
+        adminCheckBox.setSelected(false);
+        viewCheckBox.setSelected(true);
+        grantAdminButton.setText("Grant Admin");
     }
 
     public static void main(String[] args) {

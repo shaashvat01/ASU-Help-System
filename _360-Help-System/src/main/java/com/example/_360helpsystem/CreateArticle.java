@@ -110,15 +110,25 @@ public class CreateArticle extends Application {
         referenceLinksField.setPrefWidth(400);
 
         // Grouping Identifiers Label and CheckBoxes
-        Label groupLabel = new Label("Grouping Identifiers:");
+
+
+        Label groupLabel = new Label("General Groups:");
         groupLabel.setFont(Font.font("Arial", 14));
         groupLabel.setStyle("-fx-font-weight: bold;");
+
+        Label splGroupLabel = new Label("Special Groups:");
+        splGroupLabel.setFont(Font.font("Arial", 14));
+        splGroupLabel.setStyle("-fx-font-weight: bold;");
 
         // HBox to hold the CheckBoxes in a row
         HBox groupCheckBoxLayout = new HBox(10);  // Horizontal layout with 10px spacing
         groupCheckBoxLayout.setAlignment(Pos.CENTER_LEFT);
 
+        HBox splGroupCheckBoxLayout = new HBox(10);  // Horizontal layout with 10px spacing
+        groupCheckBoxLayout.setAlignment(Pos.CENTER_LEFT);
+
         List<CheckBox> groupCheckBoxes = new ArrayList<>();
+        List<CheckBox> splGroupCheckBoxes = new ArrayList<>();
 
         for(Group grp : GROUP_LIST)
         {
@@ -126,8 +136,16 @@ public class CreateArticle extends Application {
             {
                 CheckBox checkBox = new CheckBox(grp.getName());
                 checkBox.setFont(Font.font("Arial", 14));
-                groupCheckBoxes.add(checkBox);
-                groupCheckBoxLayout.getChildren().addAll(checkBox);
+                if(grp.isSpecial())
+                {
+                    splGroupCheckBoxes.add(checkBox);
+                    splGroupCheckBoxLayout.getChildren().addAll(checkBox);
+                }
+                else{
+                    groupCheckBoxes.add(checkBox);
+                    groupCheckBoxLayout.getChildren().addAll(checkBox);
+                }
+
             }
         }
 
@@ -149,7 +167,7 @@ public class CreateArticle extends Application {
         saveButton.setPrefWidth(150);  // Button width
         saveButton.setOnAction(e -> {
             try {
-                createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel,message);
+                createArticle(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,splGroupCheckBoxes,levelComboBox,errorLabel,message);
             } catch (NoSuchPaddingException ex) {
                 throw new RuntimeException(ex);
             } catch (IllegalBlockSizeException ex) {
@@ -168,18 +186,23 @@ public class CreateArticle extends Application {
         clearButton.setFont(Font.font("Arial", 16));
         clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         clearButton.setPrefWidth(150);  // Button width
-        clearButton.setOnAction(e -> clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,levelComboBox,errorLabel,message));
+        clearButton.setOnAction(e -> clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,splGroupCheckBoxes,levelComboBox,errorLabel,message));
 
         // Layout for buttons (centered horizontally)
         HBox buttonLayout = new HBox(20);  // Horizontal box layout with spacing between buttons
         buttonLayout.setAlignment(Pos.CENTER);  // Center the buttons
         buttonLayout.getChildren().addAll(saveButton, clearButton);
 
+        // Layout for group checkboxes
+        VBox GroupSelectors = new VBox(10);
+        GroupSelectors.setAlignment(Pos.CENTER_LEFT);
+        GroupSelectors.getChildren().addAll(splGroupLabel,splGroupCheckBoxLayout,groupLabel ,groupCheckBoxLayout);
+
         // Layout for form fields (stacked vertically)
         VBox formLayout = new VBox(15);
         formLayout.setPadding(new Insets(20));
         formLayout.setAlignment(Pos.CENTER_LEFT);  // Align fields to the left
-        formLayout.getChildren().addAll(titleAndLevelLayout, descriptionLabel, descriptionField, keywordsLabel, keywordsField, referenceLinksLabel, referenceLinksField, groupLabel, groupCheckBoxLayout, bodyLabel, bodyField,errorLabelContainer, buttonLayout,messageContainer);
+        formLayout.getChildren().addAll(titleAndLevelLayout, descriptionLabel, descriptionField, keywordsLabel, keywordsField, referenceLinksLabel, referenceLinksField,GroupSelectors, bodyLabel, bodyField,errorLabelContainer, buttonLayout,messageContainer);
 
         // Create Back button using ButtonStyleUtil
         Button backButton = ButtonStyleUtil.createCircularBackButton();
@@ -238,7 +261,7 @@ public class CreateArticle extends Application {
     }
 
     // Method to clear all fields
-    private void clearFields(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes,ComboBox<String> levelBox,Label errorLabel,Label message) {
+    private void clearFields(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes,List<CheckBox> splGroupCheckBoxes,ComboBox<String> levelBox,Label errorLabel,Label message) {
         errorLabel.setVisible(false);
         message.setVisible(false);
         titleField.clear();
@@ -250,17 +273,13 @@ public class CreateArticle extends Application {
         for (CheckBox checkBox : groupCheckBoxes) {
             checkBox.setSelected(false);  // Deselect all checkboxes
         }
+        for (CheckBox checkBox : splGroupCheckBoxes) {
+            checkBox.setSelected(false);  // Deselect all checkboxes
+        }
     }
 
-    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes, ComboBox<String> levelBox, Label errorLabel,Label message) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        // Print diagnostic info
-        System.out.println("Creating article with fields:");
-        System.out.println("Title: " + titleField.getText());
-        System.out.println("Description: " + descriptionField.getText());
-        System.out.println("Keywords: " + keywordsField.getText());
-        System.out.println("Body: " + bodyField.getText());
-        System.out.println("Reference Links: " + referenceLinksField.getText());
-        System.out.println("Level: " + levelBox.getValue());
+    public void createArticle(TextField titleField, TextField descriptionField, TextField keywordsField, TextArea bodyField, TextField referenceLinksField, List<CheckBox> groupCheckBoxes,List<CheckBox> splGroupCheckBoxes, ComboBox<String> levelBox, Label errorLabel,Label message) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+
 
         message.setVisible(false);
         errorLabel.setVisible(false);
@@ -281,14 +300,29 @@ public class CreateArticle extends Application {
         boolean isEncrypted = false;
 
         // Collect selected group identifiers
-        StringBuilder selectedGrpBuilder = new StringBuilder("General");
+        StringBuilder selectedGrpBuilder = new StringBuilder();
+        String security = "Public";
+
+        for (CheckBox checkBox : splGroupCheckBoxes) {
+            if (checkBox.isSelected()) {
+                isEncrypted = true;
+                security = "Protected";
+                selectedGrpBuilder.append(",").append(checkBox.getText());
+            }
+        }
+
         for (CheckBox checkBox : groupCheckBoxes) {
             if (checkBox.isSelected()) {
-                if(GROUP_LIST.isSpecialGroup(checkBox.getText()))
+                if(isEncrypted)
                 {
-                    isEncrypted = true;
+                    errorLabel.setText("Article cannot be in both Special and General groups");
+                    errorLabel.setVisible(true);
+                    return;
                 }
-                selectedGrpBuilder.append(",").append(checkBox.getText());
+                else{
+                    selectedGrpBuilder.append(",").append(checkBox.getText());
+                }
+
             }
         }
 
@@ -296,7 +330,14 @@ public class CreateArticle extends Application {
 
         System.out.println("Selected group: " + selectedGrp);
 
-        String security = "Public";
+        // Print diagnostic info
+        System.out.println("Creating article with fields:");
+        System.out.println("Title: " + titleField.getText());
+        System.out.println("Description: " + descriptionField.getText());
+        System.out.println("Keywords: " + keywordsField.getText());
+        System.out.println("Body: " + bodyField.getText());
+        System.out.println("Reference Links: " + referenceLinksField.getText());
+        System.out.println("Level: " + levelBox.getValue());
 
         if(selectedArticle == null)
         {
@@ -310,14 +351,14 @@ public class CreateArticle extends Application {
 
             ARTICLE_LIST.addArticle(newArticle);
             System.out.println("Article created: " + newArticle); // Placeholder for actual save operation
-            clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox,errorLabel,message);
+            clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,splGroupCheckBoxes, levelBox,errorLabel,message);
             message.setText("Article Created!");
             message.setVisible(true);
         }
         else {
             Article newArticle = new Article(selectedArticle.getUID(), title, selectedArticle.getAuthor(), level, security, description, keywords, body, referenceLinks, selectedGrp);
             ARTICLE_LIST.getArticleByUID(selectedArticle.getUID()).replaceArticle(newArticle);
-            clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes, levelBox,errorLabel,message);
+            clearFields(titleField, descriptionField, keywordsField, bodyField, referenceLinksField, groupCheckBoxes,splGroupCheckBoxes, levelBox,errorLabel,message);
             selectedArticle = null;
             message.setText("Article Updated!");
             message.setVisible(true);
