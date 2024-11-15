@@ -528,7 +528,7 @@ public class InstructorsArticlePage extends Application {
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
 
-    private void showCreateGroup(VBox sidebar,Stage primaryStage) {
+    private void showCreateGroup(VBox sidebar, Stage primaryStage) {
         // Create a new Stage (window) for the pop-up
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
@@ -544,6 +544,23 @@ public class InstructorsArticlePage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
+        // Create checkboxes for General Group and Special Group
+        CheckBox generalGroupCheckBox = new CheckBox("General Group");
+        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
+        // Ensure only one checkbox can be selected at a time
+        generalGroupCheckBox.setOnAction(e -> {
+            if (generalGroupCheckBox.isSelected()) {
+                specialGroupCheckBox.setSelected(false);
+            }
+        });
+
+        specialGroupCheckBox.setOnAction(e -> {
+            if (specialGroupCheckBox.isSelected()) {
+                generalGroupCheckBox.setSelected(false);
+            }
+        });
+
         // Create the "Create" button
         Button createButton = new Button("Create");
         createButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
@@ -556,29 +573,40 @@ public class InstructorsArticlePage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
-                // Handle group creation logic here
-                if(!GROUP_LIST.contains(groupName)) {
-                    GROUP_LIST.addGroup(groupName);
-                    System.out.println("Group Created: " + groupName);
-                    sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
-                    // Close the pop-up after creation
-                    popupStage.close();
+                // Check if a group type is selected
+                if (!generalGroupCheckBox.isSelected() && !specialGroupCheckBox.isSelected()) {
+                    errorLabel.setText("Please select a group type.");
+                    return;
                 }
 
-                errorLabel.setText("Group " + groupName + " already exists");
+                if (!GROUP_LIST.contains(groupName)) {
+                    String groupType = generalGroupCheckBox.isSelected() ? "General" : "Special";
 
+                    // Handle group creation logic here
+                    GROUP_LIST.addGroup(groupName);
+                    GROUP_LIST.addGroup(groupName);
+                    System.out.println("Group Created: " + groupName + " (" + groupType + ")");
 
+                    sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
+
+                    // Close the pop-up after creation
+                    popupStage.close();
+                } else {
+                    errorLabel.setText("Group " + groupName + " already exists");
+                }
             } else {
-                // You can show an alert or error message if the field is empty
+                // Show error message if the field is empty
                 errorLabel.setText("Group name cannot be empty.");
             }
         });
 
-        // Add the TextField and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,errorLabel, createButton);
+        // Add the TextField, checkboxes, and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,
+                generalGroupCheckBox, specialGroupCheckBox,
+                errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
-        Scene popupScene = new Scene(popupLayout, 300, 150);
+        Scene popupScene = new Scene(popupLayout, 300, 200);
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
