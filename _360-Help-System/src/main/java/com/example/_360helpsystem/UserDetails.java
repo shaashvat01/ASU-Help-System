@@ -29,18 +29,6 @@ import javafx.stage.Stage;
 
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
-/*******
- * <p> UserDetails Class </p>
- *
- * <p> Description: This class stores and manages details for users within the help system.
- * It provides fields and methods to handle user information such as username, role, and
- * other relevant attributes, supporting user authentication and authorization processes. </p>
- *
- * @version 1.00, 2024-10-30
- * author Team - Th15
- *
- *******/
-
 public class UserDetails extends Application {
 
     private String username;

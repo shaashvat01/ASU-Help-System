@@ -1,7 +1,6 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
-import Backend.Group;
 import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -21,18 +20,6 @@ import java.util.List;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
-
-/*******
- * <p> BackupArticles Class </p>
- *
- * <p> Description: This class manages the backup functionality for articles within the help system.
- * It provides methods to save and restore article data, ensuring data preservation and
- * easy recovery of important information. </p>
- *
- * @version 1.00, 2024-10-30
- * author Team - Th15
- *
- *******/
 
 public class BackupArticles extends Application {
 
@@ -69,8 +56,8 @@ public class BackupArticles extends Application {
         HBox currentHBox = new HBox(15);  // Create the first HBox with 15px spacing
         currentHBox.setAlignment(Pos.CENTER);  // Center-align the elements
 
-        for (Group grp : GROUP_LIST) {
-            CheckBox checkBox = new CheckBox(grp.getName());
+        for (String grpName : GROUP_LIST) {
+            CheckBox checkBox = new CheckBox(grpName);
             checkBox.setFont(Font.font("Arial", 14));
             groupCheckBoxes.add(checkBox);
             currentHBox.getChildren().add(checkBox);  // Add checkboxes to the current HBox
@@ -163,7 +150,6 @@ public class BackupArticles extends Application {
 
     public void createBackup(TextField textField, List<CheckBox> CheckBoxList,Label error,Label message) throws IOException {
         message.setVisible(false);
-        error.setVisible(false);
         String fileName = textField.getText();
         boolean isGroupSelected = false;
         for(CheckBox checkBox : CheckBoxList)
@@ -182,13 +168,10 @@ public class BackupArticles extends Application {
 
         if(!fileName.isEmpty() && isGroupSelected)
         {
-            Update_DB UDB = new Update_DB();
-
-            if(UDB.isFileUnique(fileName))
+            if(fileName.equals("Backups"))
             {
                 error.setText("File name in use. Enter another name");
                 error.setVisible(true);
-                return;
             }
             List<String> selectedGroups = new ArrayList<>();
 
@@ -200,8 +183,8 @@ public class BackupArticles extends Application {
                 }
             }
 
-
-
+            fileName = fileName + ".txt";
+            Update_DB UDB = new Update_DB();
             if(!UDB.checkDupBackup(fileName))
             {
                 UDB.writeBackup(fileName,selectedGroups);

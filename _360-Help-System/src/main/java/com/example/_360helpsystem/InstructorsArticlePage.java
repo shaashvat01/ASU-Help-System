@@ -1,7 +1,6 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
-import Backend.Group;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -62,8 +61,8 @@ public class InstructorsArticlePage extends Application {
         grpTitle.setAlignment(Pos.CENTER);
         sidebar.getChildren().add(grpTitle);
 
-        for (Group grp : GROUP_LIST) {
-            HBox groupButton = createGroupButton(grp.getName(), primaryStage);
+        for (String grpName : GROUP_LIST) {
+            HBox groupButton = createGroupButton(grpName, primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -82,7 +81,23 @@ public class InstructorsArticlePage extends Application {
         Button backupBtn = createStyledButton("Backup", e -> showBackupScreen(primaryStage));
         Button restoreBtn = createStyledButton("Restore", e -> showRestoreArticles(primaryStage));
 
-        HBox articleButtons = new HBox(20, createArticleBtn, backupBtn, restoreBtn);
+        // Create Group button
+        Button createGrpBtn = new Button("Create Group");
+        createGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        createGrpBtn.setPrefWidth(125);
+        createGrpBtn.setPrefHeight(35);
+        createGrpBtn.setFont(Font.font("Arial", 15));
+        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar, primaryStage));
+
+        // Delete Group button
+        Button deleteGrpBtn = new Button("Delete Group");
+        deleteGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        deleteGrpBtn.setPrefWidth(125);
+        deleteGrpBtn.setPrefHeight(35);
+        deleteGrpBtn.setFont(Font.font("Arial", 15));
+        deleteGrpBtn.setOnAction(e -> showDeleteGroup(sidebar));
+
+        HBox articleButtons = new HBox(20, createArticleBtn, createGrpBtn, deleteGrpBtn, backupBtn, restoreBtn);
         articleButtons.setAlignment(Pos.CENTER);
         articleButtons.setPadding(new Insets(0, 0, 0, 0));
 
@@ -165,6 +180,7 @@ public class InstructorsArticlePage extends Application {
 
         displayArticlesForGroup("General", primaryStage);
     }
+
 
     private VBox createFilterPanel() {
         // Filter options panel with Content Level and Group checkboxes
@@ -286,7 +302,7 @@ public class InstructorsArticlePage extends Application {
 
 
     private void showManageDialog(Stage primaryStage, String groupName) {
-        ManageGeneralGroup generalGroup = new ManageGeneralGroup();
+        ManageGeneralGroup generalGroup = new ManageGeneralGroup("Instructor");
         try {
             generalGroup.start(primaryStage);  // Start with only the primaryStage
             generalGroup.initialize(primaryStage, groupName);  // Pass groupName via initialize
@@ -512,7 +528,7 @@ public class InstructorsArticlePage extends Application {
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
 
-    private void showCreateGroup(VBox sidebar,Stage primaryStage) {
+    private void showCreateGroup(VBox sidebar, Stage primaryStage) {
         // Create a new Stage (window) for the pop-up
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
@@ -528,6 +544,23 @@ public class InstructorsArticlePage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
+        // Create checkboxes for General Group and Special Group
+        CheckBox generalGroupCheckBox = new CheckBox("General Group");
+        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
+        // Ensure only one checkbox can be selected at a time
+        generalGroupCheckBox.setOnAction(e -> {
+            if (generalGroupCheckBox.isSelected()) {
+                specialGroupCheckBox.setSelected(false);
+            }
+        });
+
+        specialGroupCheckBox.setOnAction(e -> {
+            if (specialGroupCheckBox.isSelected()) {
+                generalGroupCheckBox.setSelected(false);
+            }
+        });
+
         // Create the "Create" button
         Button createButton = new Button("Create");
         createButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
@@ -540,29 +573,40 @@ public class InstructorsArticlePage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
-                // Handle group creation logic here
-                if(!GROUP_LIST.contains(groupName)) {
-                    GROUP_LIST.addGroup(new Group(groupName,false));// NEED TO CHECK
-                    System.out.println("Group Created: " + groupName);
-                    sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
-                    // Close the pop-up after creation
-                    popupStage.close();
+                // Check if a group type is selected
+                if (!generalGroupCheckBox.isSelected() && !specialGroupCheckBox.isSelected()) {
+                    errorLabel.setText("Please select a group type.");
+                    return;
                 }
 
-                errorLabel.setText("Group " + groupName + " already exists");
+                if (!GROUP_LIST.contains(groupName)) {
+                    String groupType = generalGroupCheckBox.isSelected() ? "General" : "Special";
 
+                    // Handle group creation logic here
+                    GROUP_LIST.addGroup(groupName);
+                    GROUP_LIST.addGroup(groupName);
+                    System.out.println("Group Created: " + groupName + " (" + groupType + ")");
 
+                    sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
+
+                    // Close the pop-up after creation
+                    popupStage.close();
+                } else {
+                    errorLabel.setText("Group " + groupName + " already exists");
+                }
             } else {
-                // You can show an alert or error message if the field is empty
+                // Show error message if the field is empty
                 errorLabel.setText("Group name cannot be empty.");
             }
         });
 
-        // Add the TextField and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,errorLabel, createButton);
+        // Add the TextField, checkboxes, and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,
+                generalGroupCheckBox, specialGroupCheckBox,
+                errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
-        Scene popupScene = new Scene(popupLayout, 300, 150);
+        Scene popupScene = new Scene(popupLayout, 300, 200);
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
@@ -644,7 +688,7 @@ public class InstructorsArticlePage extends Application {
     }
 
     private void showCreateArticleScreen(Stage primaryStage) {
-        CreateArticle createArticle = new CreateArticle();
+        CreateArticle createArticle = new CreateArticle("Instructor");
         try{
             createArticle.start(primaryStage);
         }

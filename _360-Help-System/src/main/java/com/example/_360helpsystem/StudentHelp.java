@@ -1,6 +1,5 @@
 package com.example._360helpsystem;
 
-import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -53,7 +52,7 @@ public class StudentHelp extends Application {
         genericMessageField.setPromptText("Write a message"); // Placeholder
         Button genericMessageButton = new Button("Enter");
         genericMessageButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
-        genericMessageButton.setOnAction(e -> showMessageSentAlert(genericMessageField,true));
+        genericMessageButton.setOnAction(e -> showMessageSentAlert());
 
         HBox genericMessageBox = new HBox(10, genericMessageField, genericMessageButton);
         genericMessageBox.setAlignment(Pos.CENTER);
@@ -68,7 +67,7 @@ public class StudentHelp extends Application {
         teamMessageField.setPromptText("Write a message"); // Placeholder
         Button teamMessageButton = new Button("Enter");
         teamMessageButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
-        teamMessageButton.setOnAction(e -> showMessageSentAlert(teamMessageField,false));
+        teamMessageButton.setOnAction(e -> showMessageSentAlert());
 
         HBox teamMessageBox = new HBox(10, teamMessageField, teamMessageButton);
         teamMessageBox.setAlignment(Pos.CENTER);
@@ -107,28 +106,12 @@ public class StudentHelp extends Application {
     }
 
     // Method to show the "Message has been sent" alert
-    private void showMessageSentAlert(TextField textField, boolean isGenericMessage) {
+    private void showMessageSentAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-
-        if(textField.getText().isEmpty()) {
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("Please enter a valid message");
-            alert.showAndWait(); // Displays the alert and waits for user to click "OK"
-        }
-        else {
-            Update_DB UDB = new Update_DB();
-            alert.setTitle("Confirmation");
-            alert.setHeaderText(null);
-            alert.setContentText("Message has been sent.");
-            alert.showAndWait(); // Displays the alert and waits for user to click "OK"
-            textField.setText("");
-            if (!isGenericMessage) {
-                UDB.saveSearchHistory(textField.getText());
-                UDB.clearSearchHistory();
-            }
-        }
-
+        alert.setTitle("Confirmation");
+        alert.setHeaderText(null);
+        alert.setContentText("Message has been sent.");
+        alert.showAndWait(); // Displays the alert and waits for user to click "OK"
     }
 
     public static void main(String[] args) {

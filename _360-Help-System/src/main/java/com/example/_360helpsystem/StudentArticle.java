@@ -1,7 +1,6 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
-import Backend.Group;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -18,7 +17,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
-import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 
 public class StudentArticle extends Application {
 
@@ -285,7 +283,6 @@ public class StudentArticle extends Application {
         articleContainerVBox.getChildren().clear();
 
         for (Article article : ARTICLE_LIST) {
-            for(Group group : GROUP_LIST)
             if (article.hasGroup("General")) {
                 VBox articleBox = new VBox(5);
                 articleBox.setPadding(new Insets(10));

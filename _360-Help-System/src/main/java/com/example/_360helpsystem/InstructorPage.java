@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -27,66 +28,68 @@ public class InstructorPage extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Top bar with "Home" label on the left and "Logout" button on the right
+        // Top bar with back button on the left and "Logout" button on the right
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10, 10, 10, 10));
 
-        // "Home" text on the left
-        Label homeText = WindowUtil.createStyledLabel("Home", 24);
-        topBar.getChildren().add(homeText);
-        HBox.setMargin(homeText, new Insets(0, 0, 0, 10));  // Extra padding for spacing
+        // Create circular back button using ButtonStyleUtil
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
 
-        // Add spacer to push the "Logout" button to the right
+        // Spacer to push the "Logout" button to the right
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);  // Make the spacer grow to push the Logout button to the right
-        topBar.getChildren().add(spacer);
 
         // "Logout" button on the right
         Button logoutButton = WindowUtil.createStyledButton("Logout");
-        logoutButton.setFont(WindowUtil.createStyledLabel("Logout", 18).getFont());  // Consistent font
-        topBar.getChildren().add(logoutButton);
+        logoutButton.setFont(WindowUtil.createStyledLabel("Logout", 18).getFont());
 
-        // Align the top bar
+        // Add the back button, spacer, and logout button to the top bar
+        topBar.getChildren().addAll(backButton, spacer, logoutButton);
         topBar.setAlignment(Pos.CENTER);
 
-        // Create the circular back button using ButtonStyleUtil
-        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        // Sidebar buttons for "Articles" and "Help"
+        Button articlesButton = createSidebarButtonWithIcon("Articles", "📄");
+        articlesButton.setOnAction(e -> showArticleScreen(primaryStage));
 
-        // Handle back button action
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+        // Sidebar VBox with buttons
+        VBox sidebar = new VBox(10);
+        sidebar.setPadding(new Insets(20, 5, 10, 5));
+        sidebar.setStyle("-fx-background-color: #333;");
+        sidebar.setPrefWidth(160);
+        sidebar.getChildren().addAll(articlesButton);
 
-        // Create the main layout with the top bar and back button
+        // Main content area (centered button as per previous code)
+        VBox mainContentArea = new VBox();
+        mainContentArea.setAlignment(Pos.CENTER);
+        mainContentArea.setPadding(new Insets(20));
+
+        // Main layout with sidebar and main content area
+        HBox mainLayout = new HBox(sidebar, mainContentArea);
+
+        // BorderPane root to include top bar and layout
         BorderPane root = new BorderPane();
         root.setTop(topBar);
+        root.setCenter(mainLayout);
+        root.setStyle("-fx-background-color: #f8f5f3;");
 
-        // Create a BorderPane to position the back button at the top left
-        BorderPane backButtonPane = new BorderPane();
-        backButtonPane.setTop(backButton);
-
-        // Align the back button to the top-left and set padding (gap of 5)
-        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
-        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
-
-        root.setLeft(backButtonPane);
-
-        // Create and style the "Articles" button
-        Button article = new Button("Articles");
-        article.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        article.setFont(Font.font("Arial", 18));
-        article.setPrefWidth(250);
-        article.setOnAction(e -> showArticleScreen(primaryStage));
-
-        // Add the article button to the center of the layout
-        root.setCenter(article);  // Set the button in the center of the layout
-
-        // Set the scene with the required window size
-        Scene scene = new Scene(root, 900, 700);  // Set to 600x600
+        // Scene settings
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setTitle("Home Page");
         primaryStage.setScene(scene);
         primaryStage.show();
 
         // Set action for the logout button to show the SignIn screen
         logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
+    }
+
+    private Button createSidebarButtonWithIcon(String text, String icon) {
+        Button button = new Button(icon + " " + text);
+        button.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT;");
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setPadding(new Insets(10, 10, 10, 10));
+        button.setAlignment(Pos.CENTER_LEFT);
+        return button;
     }
 
     private void showArticleScreen(Stage primaryStage) {

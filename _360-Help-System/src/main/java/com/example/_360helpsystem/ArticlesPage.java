@@ -1,7 +1,6 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
-import Backend.Group;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -61,9 +60,9 @@ public class ArticlesPage extends Application {
 
         sidebar.getChildren().add(grpTitle);
 
-        for(Group grp : GROUP_LIST)
+        for(String grpName : GROUP_LIST)
         {
-            HBox groupButton = createGroupButton(grp.getName(),primaryStage);
+            HBox groupButton = createGroupButton(grpName,primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -192,6 +191,7 @@ public class ArticlesPage extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
+        displayArticlesForGroup("General",primaryStage);
     }
 
     private void showPreviousScreen(Stage primaryStage) {
@@ -238,7 +238,7 @@ public class ArticlesPage extends Application {
         // Create a ContextMenu with a single "Manage" option
         ContextMenu contextMenu = new ContextMenu();
         MenuItem manageItem = new MenuItem("Manage");
-        manageItem.setOnAction(e -> showManageDialog(primaryStage,text)); // Opens the manage dialog
+        manageItem.setOnAction(e -> showManageDialog(primaryStage, text)); // Opens the manage dialog
         contextMenu.getItems().add(manageItem);
 
         // Show the context menu when the three-dots button is clicked
@@ -329,30 +329,27 @@ public class ArticlesPage extends Application {
     }
 
 
-    private void showManageDialog(Stage primaryStage,String name) {
-        ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup();
+    private void showManageDialog(Stage primaryStage, String groupName) {
+        ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup("Admin");
         try{
-            manageGeneralGroup.setGroupName(name);
             manageGeneralGroup.start(primaryStage);
+            manageGeneralGroup.initialize(primaryStage, groupName);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     // Method to dynamically display articles for a specific group
-    private void displayArticlesForGroup(String groupName,Stage primaryStage) {
-        // Clear previous articles
+    private void displayArticlesForGroup(String groupName, Stage primaryStage) {
         articleContainerVBox.getChildren().clear();
 
         for (Article article : ARTICLE_LIST) {
-            if(article.hasGroup(groupName) || groupName.equals("General")) {
-                // Create VBox for each article with padding and border
+            if (article.hasGroup(groupName)) {
                 VBox articleBox = new VBox(5);
                 articleBox.setPadding(new Insets(10));
                 articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
                 articleBox.setAlignment(Pos.TOP_LEFT);
 
-                // Create HBox for title and level
                 HBox titleLevelBox = new HBox(10);
                 Label titleLabel = new Label(article.getTitle());
                 titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
@@ -365,24 +362,17 @@ public class ArticlesPage extends Application {
                 titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
                 titleLevelBox.setAlignment(Pos.TOP_LEFT);
 
-                // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
 
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
+                HBox titleOptionsBox = new HBox(titleLevelBox, optionsButton);
+                HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
+                titleOptionsBox.setAlignment(Pos.TOP_RIGHT);
 
-                // Add titleOptionsBox and abstract to articleBox (VBox)
                 articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
                 articleContainerVBox.getChildren().add(articleBox);
             }
-
         }
     }
 
@@ -472,8 +462,22 @@ public class ArticlesPage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
-        // Create checkboxes for Special Group
+        // Create checkboxes for General Group and Special Group
+        CheckBox generalGroupCheckBox = new CheckBox("General Group");
         CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
+        // Ensure only one checkbox can be selected at a time
+        generalGroupCheckBox.setOnAction(e -> {
+            if (generalGroupCheckBox.isSelected()) {
+                specialGroupCheckBox.setSelected(false);
+            }
+        });
+
+        specialGroupCheckBox.setOnAction(e -> {
+            if (specialGroupCheckBox.isSelected()) {
+                generalGroupCheckBox.setSelected(false);
+            }
+        });
 
         // Create the "Create" button
         Button createButton = new Button("Create");
@@ -487,10 +491,20 @@ public class ArticlesPage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
+                // Check if a group type is selected
+                if (!generalGroupCheckBox.isSelected() && !specialGroupCheckBox.isSelected()) {
+                    errorLabel.setText("Please select a group type.");
+                    return;
+                }
 
                 if (!GROUP_LIST.contains(groupName)) {
-                    GROUP_LIST.addGroup(new Group(groupName,specialGroupCheckBox.isSelected()));
-                    System.out.println("Group created - "+groupName+"-"+specialGroupCheckBox.isSelected());
+                    String groupType = generalGroupCheckBox.isSelected() ? "General" : "Special";
+
+                    // Handle group creation logic here
+                    GROUP_LIST.addGroup(groupName);
+                    GROUP_LIST.addGroup(groupName);
+                    System.out.println("Group Created: " + groupName + " (" + groupType + ")");
+
                     sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
 
                     // Close the pop-up after creation
@@ -505,7 +519,8 @@ public class ArticlesPage extends Application {
         });
 
         // Add the TextField, checkboxes, and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, specialGroupCheckBox,
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,
+                generalGroupCheckBox, specialGroupCheckBox,
                 errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
@@ -526,7 +541,7 @@ public class ArticlesPage extends Application {
     }
 
     private void showCreateArticleScreen(Stage primaryStage) {
-        CreateArticle createArticle = new CreateArticle();
+        CreateArticle createArticle = new CreateArticle("Admin");
         try{
             createArticle.start(primaryStage);
         }
