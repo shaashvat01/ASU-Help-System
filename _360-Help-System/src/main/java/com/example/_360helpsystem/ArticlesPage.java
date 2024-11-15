@@ -238,7 +238,7 @@ public class ArticlesPage extends Application {
         // Create a ContextMenu with a single "Manage" option
         ContextMenu contextMenu = new ContextMenu();
         MenuItem manageItem = new MenuItem("Manage");
-        manageItem.setOnAction(e -> showManageDialog(primaryStage)); // Opens the manage dialog
+        manageItem.setOnAction(e -> showManageDialog(primaryStage, text)); // Opens the manage dialog
         contextMenu.getItems().add(manageItem);
 
         // Show the context menu when the three-dots button is clicked
@@ -329,29 +329,27 @@ public class ArticlesPage extends Application {
     }
 
 
-    private void showManageDialog(Stage primaryStage) {
+    private void showManageDialog(Stage primaryStage, String groupName) {
         ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup("Admin");
         try{
             manageGeneralGroup.start(primaryStage);
+            manageGeneralGroup.initialize(primaryStage, groupName);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     // Method to dynamically display articles for a specific group
-    private void displayArticlesForGroup(String groupName,Stage primaryStage) {
-        // Clear previous articles
+    private void displayArticlesForGroup(String groupName, Stage primaryStage) {
         articleContainerVBox.getChildren().clear();
 
         for (Article article : ARTICLE_LIST) {
-            if(article.hasGroup(groupName) || groupName.equals("General")) {
-                // Create VBox for each article with padding and border
+            if (article.hasGroup(groupName)) {
                 VBox articleBox = new VBox(5);
                 articleBox.setPadding(new Insets(10));
                 articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
                 articleBox.setAlignment(Pos.TOP_LEFT);
 
-                // Create HBox for title and level
                 HBox titleLevelBox = new HBox(10);
                 Label titleLabel = new Label(article.getTitle());
                 titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
@@ -364,24 +362,17 @@ public class ArticlesPage extends Application {
                 titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
                 titleLevelBox.setAlignment(Pos.TOP_LEFT);
 
-                // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
 
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
+                HBox titleOptionsBox = new HBox(titleLevelBox, optionsButton);
+                HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
+                titleOptionsBox.setAlignment(Pos.TOP_RIGHT);
 
-                // Add titleOptionsBox and abstract to articleBox (VBox)
                 articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
                 articleContainerVBox.getChildren().add(articleBox);
             }
-
         }
     }
 
