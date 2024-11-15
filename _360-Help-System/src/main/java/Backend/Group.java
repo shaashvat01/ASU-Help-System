@@ -29,7 +29,7 @@ public class Group {
         this.users.add(user.username);
     }
     public void removeUser(User user) {
-        this.users.remove(user);
+        this.users.remove(user.username);
     }
     public String getName() {
         return this.name;
