@@ -238,7 +238,7 @@ public class ArticlesPage extends Application {
         // Create a ContextMenu with a single "Manage" option
         ContextMenu contextMenu = new ContextMenu();
         MenuItem manageItem = new MenuItem("Manage");
-        manageItem.setOnAction(e -> showManageDialog(primaryStage)); // Opens the manage dialog
+        manageItem.setOnAction(e -> showManageDialog(primaryStage,text)); // Opens the manage dialog
         contextMenu.getItems().add(manageItem);
 
         // Show the context menu when the three-dots button is clicked
@@ -329,9 +329,10 @@ public class ArticlesPage extends Application {
     }
 
 
-    private void showManageDialog(Stage primaryStage) {
+    private void showManageDialog(Stage primaryStage,String name) {
         ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup();
         try{
+            manageGeneralGroup.setGroupName(name);
             manageGeneralGroup.start(primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();

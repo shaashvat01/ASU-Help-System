@@ -40,8 +40,14 @@ public class Group {
     public ArrayList<String> getAdmins() {
         return admins;
     }
+    public void addAdmin(String username) {
+        this.admins.add(username);
+    }
     public void removeAdmin(String username) {
         this.admins.remove(username);
+    }
+    public boolean isAdmin(String username) {
+        return this.admins.contains(username);
     }
     public boolean isSpecial() {
         return isSpecial;

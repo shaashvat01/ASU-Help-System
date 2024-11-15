@@ -31,6 +31,15 @@ public class GroupList implements Iterable<Group> {
         this.groups.add(group);
     }
 
+    public Group getGroup(String name) {
+        for (Group group : groups) {
+            if (group.getName().equals(name)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
     // Removes a group from the list.
     public void removeGroup(String group) {
         for(Group g : GROUP_LIST) {
