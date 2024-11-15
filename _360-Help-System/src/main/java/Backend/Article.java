@@ -2,21 +2,6 @@ package Backend;
 
 import java.util.ArrayList;
 
-/*******
- * <p> Article Class </p>
- *
- * <p> Description: This class defines the structure and properties of an article in the help system.
- * Articles contain information such as title, author, level, security, abstract, keywords,
- * body, and other metadata relevant to managing help content within the system. </p>
- *
- * <p> Articles serve as the main content managed by users with specific roles, allowing them
- * to categorize, update, and secure information as needed. </p>
- *
- * @version 1.00, 2024-10-30
- * @author Team - Th15
- *
- *******/
-
 public class Article {
     private long UID;
     private String title;
@@ -28,14 +13,11 @@ public class Article {
     private String body;
     private String links;
     private ArrayList<String> groups;
-    private String iv;
-    private ArrayList<String> Users;
 
-    //Unique identifier for the article.
     public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
         this.keywords = new ArrayList<>();
         this.groups = new ArrayList<>();
-        this.Users = new ArrayList<>();
+
         this.UID = UID;
         this.title = title;
         this.author = author;
@@ -59,8 +41,6 @@ public class Article {
             this.groups.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
         }
     }
-
-
     public long getUID() {
         return UID;
     }
@@ -126,7 +106,6 @@ public class Article {
         return false;
     }
 
-    // method to replace article
     public void replaceArticle(Article article) {
         this.UID = article.UID;
         this.title = article.title;
@@ -146,26 +125,6 @@ public class Article {
             return true;
         }
         return false;
-    }
-
-    public String getIv() {
-        return iv;
-    }
-
-    public void setIv(String iv) {
-        this.iv = iv;
-    }
-
-    public void addUser(String user) {
-        Users.add(user);
-    }
-
-    public void removeUser(String user) {
-        Users.remove(user);
-    }
-
-    public boolean hasUser(String user) {
-        return Users.contains(user);
     }
 
 }

@@ -1,19 +1,14 @@
 package Backend;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
-import static com.example._360helpsystem.CreateAdminAccount.*;
+import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 
 /*******
  * <p> Update_DB Class </p>
@@ -28,16 +23,11 @@ import static com.example._360helpsystem.CreateAdminAccount.*;
  */
 
 public class Update_DB {
-    private final String path_to_UserDB = "Users-DB.txt";
-    private final String path_to_OTPDB = "OTPs-DB.txt";
-    private final String path_to_ArticleDB = "Articles-DB.txt";
-    private final String path_to_GroupDB = "Groups-DB.txt";
-    private final String path_to_BackupDB = "Backups-DB.txt";
-    private final String path_to_genericMsgDB = "GenericMsgs-DB.txt";
-    private final String path_to_searchHistory = "History-DB.txt";
-    private final String path_to_requestsDB = "Requests-DB.txt";
-    private final String path_to_futureArticleDB = "FutureArticles-DB.txt";
-    private final String path_to_key = "Key-DB.txt";
+    private final String path_to_UserDB = "Users.txt";
+    private final String path_to_OTPDB = "OTPs.txt";
+    private final String path_to_ArticleDB = "Articles.txt";
+    private final String path_to_GroupDB = "Groups.txt";
+    private final String path_to_BackupDB = "Backups.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -103,13 +93,15 @@ public class Update_DB {
 
     public void loadArticleDB(ArticleList articleL) {
         File articleDBFile = new File(path_to_ArticleDB);
-        if (articleDBFile.exists()) {
+        if (articleDBFile.exists()) { // Check if the file exists
             try (BufferedReader reader = new BufferedReader(new FileReader(articleDBFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.trim().isEmpty()) continue; // Skip empty lines
+                    if (line.trim().isEmpty()) {
+                        break; // Stop reading if a blank line is encountered
+                    }
                     String[] data = line.split("-");
-                    if (data.length == 11) {
+                    if (data.length == 10) {
                         long UID = Long.parseLong(data[0]);
                         String level = data[1];
                         String security = data[2];
@@ -120,20 +112,21 @@ public class Update_DB {
                         String body = data[7];
                         String links = data[8];
                         String group = data[9];
-                        String iv = data[10];
 
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
-                        article.setIv(iv);
                         articleL.addArticle(article);
+                        System.out.println("Article added to article database: " + article.getTitle() + " - " + article.getKeywords());
+
                     } else {
-                        System.out.println("Data length mismatch. Expected 11 fields.");
+                        System.out.println("Data length mismatch. Expected 10, found: " + data.length);
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Error loading articles: " + e.getMessage());
+                System.out.println("Error loading article database: " + e.getMessage());
             }
         } else {
-            System.out.println("Article database file does not exist.");
+            // File doesn't exist; leave articleL empty
+            System.out.println("Article database file does not exist. Starting with an empty ArticleList.");
         }
     }
 
@@ -159,44 +152,19 @@ public class Update_DB {
 
     public void loadGrpDB(GroupList grpList) {
         File grpDBFile = new File(path_to_GroupDB);
-
-        if (!grpDBFile.exists()) {
-            System.out.println("Group database file does not exist.");
-            return;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue; // Skip empty lines
-
-                String[] parts = line.split("-");
-                if (parts.length != 4) {
-                    System.out.println("Invalid group format: " + line);
-                    continue;
+        if (grpDBFile.exists()) { // Check if the file exists
+            try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    grpList.addGroup(line);
                 }
-
-                String groupID = parts[0].trim();
-                String usersPart = parts[1].replaceAll("[\\[\\]]", "").trim();
-                String adminsPart = parts[2].replaceAll("[\\[\\]]", "").trim();
-                boolean isSpecial;
-
-                try {
-                    isSpecial = Boolean.parseBoolean(parts[3].trim());
-                } catch (Exception e) {
-                    System.out.println("Invalid boolean value for special flag in line: " + line);
-                    continue;
-                }
-
-                List<String> users = usersPart.isEmpty() ? new ArrayList<>() : Arrays.asList(usersPart.split(", "));
-                List<String> admins = adminsPart.isEmpty() ? new ArrayList<>() : Arrays.asList(adminsPart.split(", "));
-
-                Group group = new Group(groupID, isSpecial, new ArrayList<>(users), new ArrayList<>(admins));
-                grpList.addGroup(group);
+            } catch (IOException e) {
+                System.out.println("Error loading Group database: " + e.getMessage());
             }
-        } catch (IOException e) {
-            System.out.println("Error loading groups: " + e.getMessage());
+        } else {
+            // File doesn't exist; leave OTP_LIST empty
+            System.out.println("Group database file does not exist. Starting with an empty OTPList.");
+            grpList.addGroup("General");
         }
     }
 
@@ -251,8 +219,7 @@ public class Update_DB {
                         article.getKeywords() + "-" +
                         article.getBody() + "-" +
                         article.getLinks() + "-" +
-                        article.getGroup() + "-" +
-                        article.getIv());
+                        article.getGroup());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -274,11 +241,8 @@ public class Update_DB {
 
     public void saveGrpDB(GroupList grpList) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_GroupDB, false))) { // Set append to false
-            for (Group grp : grpList) { // Accessing OTP_LIST directly from OTPList class
-                writer.write(grp.getName());
-                writer.write("-"+String.join(", ", grp.getUsers().toString()));
-                writer.write("-"+String.join(", ", grp.getAdmins().toString()));
-                writer.write("-" + grp.isSpecial());
+            for (String grpName : grpList) { // Accessing OTP_LIST directly from OTPList class
+                writer.write(grpName);
                 writer.newLine(); // Add a new line after each OTP
             }
         } catch (IOException e) {
@@ -403,140 +367,7 @@ public class Update_DB {
         }
         return null;
     }
-
-    public void writeToMsgDB(String message) {
-        try (FileWriter writer = new FileWriter(path_to_genericMsgDB, true)) {  // true enables append mode
-            writer.write(message + System.lineSeparator());  // Write message with a newline at the end
-        } catch (IOException e) {
-            e.printStackTrace();  // Print stack trace if an error occurs
-        }
-    }
-
-    public void storeSearch(String search)
-    {
-        try (FileWriter writer = new FileWriter(path_to_searchHistory, true)) {  // true enables append mode
-            writer.write(search + System.lineSeparator());  // Write message with a newline at the end
-        } catch (IOException e) {
-            e.printStackTrace();  // Print stack trace if an error occurs
-        }
-    }
-
-    public void clearSearchHistory() {
-        try (FileWriter writer = new FileWriter(path_to_searchHistory)) {
-        } catch (IOException e) {
-            e.printStackTrace();  // Print stack trace if an error occurs
-        }
-    }
-
-    public void saveSearchHistory(String message)
-    {
-        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_searchHistory));
-             FileWriter writer = new FileWriter(path_to_futureArticleDB, true)) {  // true enables append mode
-            writer.write("Help Message : "+message + System.lineSeparator());
-            writer.write("User's search history - "+ System.lineSeparator());
-            String line;
-            while ((line = reader.readLine()) != null) {
-                writer.write(line + System.lineSeparator());  // Append each line with a newline
-            }
-            writer.write("--------------------------------------------------------" + System.lineSeparator());
-        } catch (IOException e) {
-            e.printStackTrace();  // Print stack trace if an error occurs
-        }
-    }
-
-    public void storeAccessRequest(User user,Article article) {
-        try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
-            writer.write(user.username+"-"+article.getUID()+System.lineSeparator());  // Write message with a newline at the end
-        } catch (IOException e) {
-            e.printStackTrace();  // Print stack trace if an error occurs
-        }
-    }
-
-    public void loadKey()
-    {
-        File keyFile = new File(path_to_key);
-
-        if (keyFile.exists()) { // Check if the key file exists
-            try (BufferedReader reader = new BufferedReader(new FileReader(keyFile))) {
-                String encodedKey = reader.readLine(); // Read the Base64 encoded key from the first line
-
-                // Decode the Base64 encoded key string
-                byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-
-                // Rebuild the SecretKey from the decoded key bytes
-                SECRET_KEY = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-
-                System.out.println("Secret key loaded successfully from " + path_to_key);
-
-            } catch (IOException e) {
-                System.out.println("Error loading secret key: " + e.getMessage());
-            }
-        } else {
-            // If the key file doesn't exist, handle the case accordingly
-            System.out.println("Secret key file does not exist. Generating new key file!");
-
-
-            try (FileWriter writer = new FileWriter(path_to_key, true)) {  // true enables append mode
-                SECRET_KEY = new Encryption().generateKey();
-                writer.write(Base64.getEncoder().encodeToString(SECRET_KEY.getEncoded())+System.lineSeparator());  // Write message with a newline at the end
-            } catch (IOException e) {
-                e.printStackTrace();  // Print stack trace if an error occurs
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-    }
-
-    public SecretKey generateKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(256); // Key size in bits
-        return keyGenerator.generateKey();
-    }
-
-    public boolean isFileUnique(String name) {
-        name = name + ".txt";
-        System.out.println("Checking file name - " + name);
-
-        if (name.equalsIgnoreCase(path_to_ArticleDB)) {
-            System.out.println("File name matches path_to_ArticleDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_futureArticleDB)) {
-            System.out.println("File name matches path_to_futureArticleDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_BackupDB)) {
-            System.out.println("File name matches path_to_BackupDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_UserDB)) {
-            System.out.println("File name matches path_to_UserDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_OTPDB)) {
-            System.out.println("File name matches path_to_OTPDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_GroupDB)) {
-            System.out.println("File name matches path_to_GroupDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_genericMsgDB)) {
-            System.out.println("File name matches path_to_genericMsgDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_searchHistory)) {
-            System.out.println("File name matches path_to_searchHistory.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_requestsDB)) {
-            System.out.println("File name matches path_to_requestsDB.");
-            return false;
-        } else if (name.equalsIgnoreCase(path_to_key)) {
-            System.out.println("File name matches path_to_key.");
-            return false;
-        } else {
-            System.out.println("File name is unique.");
-            return true;
-        }
-    }
-
-
 }
-
 
 
 
