@@ -1,9 +1,6 @@
 package com.example._360helpsystem;
 
-import Backend.Article;
-import Backend.Group;
-import Backend.User;
-import Backend.UserList;
+import Backend.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -58,17 +56,19 @@ public class ManageGeneralGroup extends Application {
         Button addUserButton = createSidebarButtonWithIcon("Add User", "➕");
         Button removeUserButton = createSidebarButtonWithIcon("Remove User", "➖");
         Button permissionsButton = createSidebarButtonWithIcon("Permissions", "🔑");
+        Button AccessRequestsButton = createSidebarButtonWithIcon("Access Requests", "🔑");
 
         articlesButton.setOnAction(e -> showArticlesForGroup());
         addUserButton.setOnAction(e -> showAddUserScreen());
         removeUserButton.setOnAction(e -> showRemoveUserScreen());
         permissionsButton.setOnAction(e -> showPermissionsScreen());
+        AccessRequestsButton.setOnAction(e -> showRequestScreen());
 
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
         sidebar.setPrefWidth(160);  // Fixed width for sidebar
-        sidebar.getChildren().addAll(articlesButton, addUserButton, removeUserButton, permissionsButton);
+        sidebar.getChildren().addAll(articlesButton, addUserButton, removeUserButton, permissionsButton, AccessRequestsButton);
 
         // Set up a ScrollPane for the main content area with fixed dimensions
         ScrollPane scrollPane = new ScrollPane();
@@ -315,6 +315,73 @@ public class ManageGeneralGroup extends Application {
         wrapper.setAlignment(Pos.CENTER);
 
         mainContentArea.getChildren().add(wrapper);
+    }
+
+    private void showRequestScreen() {
+        mainContentArea.getChildren().clear();
+
+        // Header Labels
+        Label usernameHeader = new Label("Username");
+        usernameHeader.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
+        Label actionsHeader = new Label("Actions");
+        actionsHeader.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
+        // VBox for usernames
+        VBox usernameColumn = new VBox(10);
+        usernameColumn.setAlignment(Pos.TOP_LEFT);
+        usernameColumn.getChildren().add(usernameHeader);
+
+        // VBox for action buttons
+        VBox actionsColumn = new VBox(10);
+        actionsColumn.setAlignment(Pos.TOP_RIGHT);
+        actionsColumn.getChildren().add(actionsHeader);
+
+        // Populate the columns with data from ACCESS_LIST
+        for (Access access : ACCESS_LIST) {
+            // Username
+            Text usernameText = new Text(access.getUsername());
+            usernameText.setFont(Font.font("Arial", 16));
+
+            // Buttons
+            Button acceptButton = new Button("Accept");
+            Button rejectButton = new Button("Reject");
+
+            // Set button actions
+            acceptButton.setOnAction(event -> handleAccept(access));
+            rejectButton.setOnAction(event -> handleReject(access));
+
+            // HBox for individual request buttons
+            HBox buttonBox = new HBox(10, acceptButton, rejectButton);
+            buttonBox.setAlignment(Pos.CENTER_LEFT);
+
+            // Add elements to respective VBoxes
+            usernameColumn.getChildren().add(usernameText);
+            actionsColumn.getChildren().add(buttonBox);
+        }
+
+        // Create the HBox to hold the two columns
+        HBox requestsBox = new HBox(50, usernameColumn, actionsColumn); // Adjust spacing between columns
+        requestsBox.setAlignment(Pos.TOP_CENTER);
+
+        // Add the requestsBox to the mainContentArea
+        mainContentArea.getChildren().add(requestsBox);
+    }
+
+    // Helper methods for handling accept/reject actions
+    private void handleAccept(Access access) {
+        // Logic to accept the request
+        addUser(access.getUsername());
+        System.out.println("Accepted: " + access.getUsername());
+        ACCESS_LIST.removeAccess(access); // Example: Remove the access from list after accepting
+        showRequestScreen(); // Refresh the screen
+    }
+
+    private void handleReject(Access access) {
+        // Logic to reject the request
+        System.out.println("Rejected: " + access.getUsername());
+        ACCESS_LIST.removeAccess(access); // Example: Remove the access from list after rejecting
+        showRequestScreen(); // Refresh the screen
     }
 
     private void showPreviousScreen(Stage primaryStage) {

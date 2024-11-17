@@ -201,6 +201,44 @@ public class Update_DB {
         }
     }
 
+    public void loadRequestsDB() {
+        if (ACCESS_LIST == null) {
+            ACCESS_LIST = new AccessList(); // Initialize ACCESS_LIST if not already done
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_requestsDB))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Expected format: username-[group1, group2, ...]
+                String[] parts = line.split("-");
+                if (parts.length != 2) {
+                    System.out.println("Invalid line format in Requests database: " + line);
+                    continue;
+                }
+
+                String username = parts[0].trim();
+                String groupsString = parts[1].trim();
+
+                // Remove square brackets and split by commas
+                String cleanGroupsString = groupsString.replace("[", "").replace("]", "");
+                String[] groupsArray = cleanGroupsString.isEmpty() ? new String[0] : cleanGroupsString.split(",");
+
+                // Create a list of groups
+                ArrayList<String> groups = new ArrayList<>();
+                for (String group : groupsArray) {
+                    if (!group.trim().isEmpty()) {
+                        groups.add(group.trim());
+                    }
+                }
+
+                // Add the Access object to ACCESS_LIST (assuming status is true by default)
+                ACCESS_LIST.addAccess(new Access(username, groups));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading Requests database: " + e.getMessage());
+        }
+    }
+
     // Save the user database to the file (overwrite if exists)
     public void saveUserDB(UserList userL) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_UserDB, false))) { // Set append to false
@@ -287,9 +325,22 @@ public class Update_DB {
         }
     }
 
+    public void saveRequestsDB() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_requestsDB, false))) { // Set append to false
+            for (Access access  : ACCESS_LIST) { // Accessing OTP_LIST directly from OTPList class
+                writer.write(access.getUsername());
+                writer.write("-"+access.getGroups().toString());
+                writer.newLine(); // Add a new line after each OTP
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving Requests database: " + e.getMessage());
+        }
+    }
+
     public void writeBackup(String fileName, List<String> selectedGroups) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false))) {// Set append to false
             writer.write(String.join("-", selectedGroups));
+            writer.newLine();
             for (Article article : ARTICLE_LIST) {
                 for (String selectedGroup : selectedGroups) {
                     if(article.hasGroup(selectedGroup))
@@ -462,7 +513,7 @@ public class Update_DB {
 
     public void storeAccessRequest(User user,Article article) {
         try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
-            writer.write(user.username+"-"+article.getUID()+System.lineSeparator());  // Write message with a newline at the end
+            writer.write(user.username+"-"+article.getGroups().toString()+System.lineSeparator());  // Write message with a newline at the end
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }

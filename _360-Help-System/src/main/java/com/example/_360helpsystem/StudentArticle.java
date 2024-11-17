@@ -1,9 +1,6 @@
 package com.example._360helpsystem;
 
-import Backend.Article;
-import Backend.ArticleSearcher;
-import Backend.Encryption;
-import Backend.Group;
+import Backend.*;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -16,12 +13,12 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
-import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.*;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 public class StudentArticle extends Application {
@@ -266,6 +263,7 @@ public class StudentArticle extends Application {
             articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
             articleBox.setAlignment(Pos.TOP_LEFT);
 
+            Label sequenceLabel = new Label(String.valueOf(sequenceNumber));
 
             Label titleLabel = new Label(sequenceNumber + ". Title: " + article.getTitle());
             titleLabel.setFont(Font.font("Arial", 14));
@@ -281,7 +279,13 @@ public class StudentArticle extends Application {
             Button requestAccessButton = new Button("Request Access");
             requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
             requestAccessButton.setFont(Font.font("Arial", 14));
-            requestAccessButton.setOnAction(e -> requestAccess());
+            requestAccessButton.setOnAction(e -> {
+                try {
+                    requestAccess(article,sequenceLabel);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
 
             Button viewArticle = new Button("View Article");
             viewArticle.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
@@ -376,7 +380,8 @@ public class StudentArticle extends Application {
                 levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
                 levelLabel.setFont(Font.font("Arial", 14));
 
-                Label grpLabel = new Label(article.getGroups().toString());
+
+                Label grpLabel = new Label(Arrays.toString(article.getGroups().toArray()));
                 grpLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
                 grpLabel.setFont(Font.font("Arial", 14));
 
@@ -389,7 +394,13 @@ public class StudentArticle extends Application {
                 Button requestAccessButton = new Button("Request Access");
                 requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
                 requestAccessButton.setFont(Font.font("Arial", 14));
-                requestAccessButton.setOnAction(e -> requestAccess());
+                requestAccessButton.setOnAction(e -> {
+                    try {
+                        requestAccess(article,sequenceNumberLabel);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
 
                 Button viewArticle = new Button("View Article");
                 viewArticle.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
@@ -525,7 +536,7 @@ public class StudentArticle extends Application {
         detailStage.show();
     }
 
-    public void requestAccess()
+    public void requestAccess(Article article,Label sequence) throws Exception
     {
         Stage detailStage = new Stage();
 
@@ -533,15 +544,24 @@ public class StudentArticle extends Application {
         accessLayout.setPadding(new Insets(20));
         accessLayout.setAlignment(Pos.CENTER);
 
-        Label messageLabel = new Label("Access Request has been sent to group admin");
+        Label messageLabel = new Label("Do you want to request access to article no - "+sequence.getText()+"?");
         messageLabel.setFont(Font.font("Arial", 14));
         messageLabel.setStyle("-fx-text-fill: #2c3e50;");
 
-        accessLayout.getChildren().addAll(messageLabel);
+        Button confirmButton = new Button("Yes");
+        confirmButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        confirmButton.setFont(Font.font("Arial", 14));
+        confirmButton.setOnAction(e -> {
+            // Add new access to the list
+            ACCESS_LIST.addAccess(new Access(CURRENT_USER.getUserName(), article.getGroups()));
+            detailStage.close();
+        });
+
+        accessLayout.getChildren().addAll(messageLabel,confirmButton);
 
 
         // Create and set the scene
-        Scene detailScene = new Scene(accessLayout, 300, 200);
+        Scene detailScene = new Scene(accessLayout, 400, 200);
         detailStage.setScene(detailScene);
         detailStage.show();
 
