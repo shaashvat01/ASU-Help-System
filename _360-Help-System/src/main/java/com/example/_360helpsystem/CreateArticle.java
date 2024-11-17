@@ -228,18 +228,24 @@ public class CreateArticle extends Application {
         HBox.setHgrow(rightBox, Priority.ALWAYS);  // Make the right box grow to push the Logout button to the right
 
 
-        if(selectedArticle != null)
-        {
+        if(selectedArticle != null) {
+            System.out.println("Updating article");
             titleField.setText(selectedArticle.getTitle());
             levelComboBox.setValue(selectedArticle.getLevel());
-            descriptionField.setText(selectedArticle.getBody());
+            descriptionField.setText(selectedArticle.getAbs());
             keywordsField.setText(selectedArticle.getKeywords());
             bodyField.setText(selectedArticle.getBody());
+            if (selectedArticle.getSecurity().equals("Protected")) {
+                bodyField.setText(new Encryption().decryptBody(selectedArticle));
+            }
             referenceLinksField.setText(selectedArticle.getLinks());
-            for(CheckBox checkBox : groupCheckBoxes)
-            {
-                if(selectedArticle.hasGroup(checkBox.getText()))
-                {
+            for (CheckBox checkBox : groupCheckBoxes) {
+                if (selectedArticle.hasGroup(checkBox.getText())) {
+                    checkBox.setSelected(true);
+                }
+            }
+            for (CheckBox checkBox : splGroupCheckBoxes) {
+                if (selectedArticle.hasGroup(checkBox.getText())) {
                     checkBox.setSelected(true);
                 }
             }
@@ -291,11 +297,20 @@ public class CreateArticle extends Application {
         String referenceLinks = referenceLinksField.getText().trim();
         String level = (levelBox.getValue() != null) ? levelBox.getValue().trim() : "";
 
+        if(GROUP_LIST.getSize() == 0)
+        {
+            errorLabel.setText("Please create a group first!");
+            errorLabel.setVisible(true);
+            return;
+        }
+
         if (title.isEmpty() || description.isEmpty() || keywords.isEmpty() || body.isEmpty() || referenceLinks.isEmpty() || level.isEmpty()) {
             errorLabel.setText("All fields must be filled.");
             errorLabel.setVisible(true);
             return;
         }
+
+
 
         boolean isEncrypted = false;
 

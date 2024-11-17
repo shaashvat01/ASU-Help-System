@@ -351,9 +351,14 @@ public class InstructorsArticlePage extends Application {
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
                 optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
 
-                HBox titleOptionsBox = new HBox(titleLevelBox, optionsButton);
+                HBox titleOptionsBox = new HBox(titleLevelBox);
                 HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
                 titleOptionsBox.setAlignment(Pos.TOP_RIGHT);
+
+                if(GROUP_LIST.getGroup(groupName).isAdmin(CURRENT_USER.getUserName()))
+                {
+                    titleOptionsBox.getChildren().addAll(optionsButton);
+                }
 
                 articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
                 articleContainerVBox.getChildren().add(articleBox);
