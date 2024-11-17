@@ -3,6 +3,7 @@ package Backend;
 import java.util.ArrayList;
 
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 public class Group {
     private String name;
@@ -14,8 +15,27 @@ public class Group {
         this.name = name;
         this.users = new ArrayList<>();
         this.admins = new ArrayList<>();
-        admins.add(USER_LIST.getUserList().getFirst().username);
+
         this.isSpecial = special;
+        if(isSpecial && CURRENT_USER.isInstructor()) {
+            admins.add(CURRENT_USER.username);
+            users.add(CURRENT_USER.username);
+        }
+
+        if(!isSpecial) {
+            for(User user : USER_LIST.getUserList())
+            {
+                if(!user.isAdmin())
+                {
+                    users.add(user.username);
+                    if(user.isInstructor())
+                    {
+                        admins.add(user.username);
+                    }
+                }
+
+            }
+        }
     }
 
     public Group(String name, boolean special, ArrayList<String> users, ArrayList<String> admins) {

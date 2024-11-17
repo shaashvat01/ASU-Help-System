@@ -113,7 +113,17 @@ public class Article {
         this.links = links;
     }
     public String getGroup() {
-        return String.join(",", groups);
+        StringBuilder result = new StringBuilder();
+        for (String group : this.groups) {
+            if (result.length() > 0) {
+                result.append(","); // Append a comma only after the first group
+            }
+            result.append(group);
+        }
+        return result.toString();
+    }
+    public ArrayList<String> getGroups() {
+        return groups;
     }
     public boolean hasGroup(String group) {
         for(String grpName : groups)

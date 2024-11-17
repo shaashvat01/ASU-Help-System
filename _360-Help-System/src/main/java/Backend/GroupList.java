@@ -42,9 +42,12 @@ public class GroupList implements Iterable<Group> {
 
     // Removes a group from the list.
     public void removeGroup(String group) {
-        for(Group g : GROUP_LIST) {
-            if(g.getName().equals(group)) {
-                this.groups.remove(g);
+        Iterator<Group> iterator = GROUP_LIST.iterator();
+        while (iterator.hasNext()) {
+            Group g = iterator.next();
+            if (g.getName().equals(group)) {
+                iterator.remove(); // Safely removes the element from GROUP_LIST
+                this.groups.remove(g); // Removes from the internal groups list
             }
         }
     }
@@ -70,12 +73,4 @@ public class GroupList implements Iterable<Group> {
         return false;
     }
 
-    public boolean isSpecialGroup(String group) {
-        for(Group g : GROUP_LIST) {
-            if(g.getName().equals(group) && g.isSpecial()) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

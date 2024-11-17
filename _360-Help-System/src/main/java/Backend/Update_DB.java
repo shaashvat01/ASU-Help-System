@@ -14,6 +14,7 @@ import java.util.Base64;
 import java.util.List;
 
 import static com.example._360helpsystem.CreateAdminAccount.*;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 /*******
  * <p> Update_DB Class </p>
@@ -288,6 +289,7 @@ public class Update_DB {
 
     public void writeBackup(String fileName, List<String> selectedGroups) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false))) {// Set append to false
+            writer.write(String.join("-", selectedGroups));
             for (Article article : ARTICLE_LIST) {
                 for (String selectedGroup : selectedGroups) {
                     if(article.hasGroup(selectedGroup))
@@ -370,6 +372,20 @@ public class Update_DB {
             ArticleList articleList = new ArticleList();
             try (BufferedReader reader = new BufferedReader(new FileReader(backupDBFile))) {
                 String line;
+                line = reader.readLine();
+                String[] grpData = line.split("-");
+                for(String grp : grpData)
+                {
+                    if(GROUP_LIST.contains(grp))
+                    {
+                        if(GROUP_LIST.getGroup(grp).isAdmin(CURRENT_USER.getUserName()))
+                        {
+                        }
+                        else{
+                            return null;
+                        }
+                    }
+                }
                 while ((line = reader.readLine()) != null) {
                     if (line.trim().isEmpty()) {
                         break; // Stop reading if a blank line is encountered

@@ -288,7 +288,7 @@ public class ArticlesPage extends Application {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
                 // Handle group deletion logic here
-                if(GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
+                if(GROUP_LIST.contains(groupName)) {
                     GROUP_LIST.removeGroup(groupName); // Ensure GROUP_LIST has remove() method
 
                     // Remove the corresponding button from the sidebar
@@ -332,8 +332,7 @@ public class ArticlesPage extends Application {
     private void showManageDialog(Stage primaryStage,String name) {
         ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup();
         try{
-            manageGeneralGroup.setGroupName(name);
-            manageGeneralGroup.start(primaryStage);
+            manageGeneralGroup.setGroup(name,primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

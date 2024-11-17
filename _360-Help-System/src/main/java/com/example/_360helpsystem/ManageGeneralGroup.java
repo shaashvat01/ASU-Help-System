@@ -3,6 +3,7 @@ package com.example._360helpsystem;
 import Backend.Article;
 import Backend.Group;
 import Backend.User;
+import Backend.UserList;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import static com.example._360helpsystem.CreateAdminAccount.*;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 public class ManageGeneralGroup extends Application {
 
@@ -36,6 +38,7 @@ public class ManageGeneralGroup extends Application {
         backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
         Button createArticleBtn = new Button("Create Article");
+        createArticleBtn.setVisible(false);
         createArticleBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         createArticleBtn.setFont(Font.font("Arial", 15));
         createArticleBtn.setPrefWidth(150);
@@ -237,63 +240,69 @@ public class ManageGeneralGroup extends Application {
         int rowIndex = 2;
 
 
-
         for (String username : GROUP_LIST.getGroup(this.groupName).getUsers()) {
-            Label usernameLabel = new Label(username);
+            if(!username.equals(CURRENT_USER.getUserName())) {
+                Label usernameLabel = new Label(username);
 
-            CheckBox studentCheckbox = new CheckBox();
-            studentCheckbox.setDisable(true);
+                CheckBox studentCheckbox = new CheckBox();
+                studentCheckbox.setDisable(true);
 
-            CheckBox instructorCheckbox = new CheckBox();
-            instructorCheckbox.setDisable(true);
+                CheckBox instructorCheckbox = new CheckBox();
+                instructorCheckbox.setDisable(true);
 
-            CheckBox viewCheckbox = new CheckBox();
-            viewCheckbox.setDisable(true);
+                CheckBox viewCheckbox = new CheckBox();
+                viewCheckbox.setDisable(true);
 
-            CheckBox adminRightsCheckbox = new CheckBox();
-            adminRightsCheckbox.setDisable(true);
-
-
-            if(USER_LIST.findUser(username).isInstructor())
-            {
-                instructorCheckbox.setSelected(true);
-            }
-            if(USER_LIST.findUser(username).isStudent())
-            {
-                studentCheckbox.setSelected(true);
-            }
-
-            Button grantAdminButton = new Button();
-            if(GROUP_LIST.getGroup(this.groupName).isAdmin(username))
-            {
-                adminRightsCheckbox.setSelected(true);
-                grantAdminButton.setText("Remove Admin");
-            }
-            else{
-                viewCheckbox.setSelected(true);
-                grantAdminButton.setText("Grant Admin");
-            }
+                CheckBox adminRightsCheckbox = new CheckBox();
+                adminRightsCheckbox.setDisable(true);
 
 
-
-            grantAdminButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-            grantAdminButton.setOnAction(e -> {
-                if (adminRightsCheckbox.isSelected()) {
-                    removeAdmin(username, adminRightsCheckbox, viewCheckbox, grantAdminButton);
-                } else {
-                    makeAdmin(username, adminRightsCheckbox, viewCheckbox, grantAdminButton);
+                if(USER_LIST.findUser(username).isInstructor())
+                {
+                    instructorCheckbox.setSelected(true);
                 }
-            });
+                if(USER_LIST.findUser(username).isStudent())
+                {
+                    studentCheckbox.setSelected(true);
+                }
+
+                Button grantAdminButton = new Button();
+                if(GROUP_LIST.getGroup(this.groupName).isAdmin(username))
+                {
+                    adminRightsCheckbox.setSelected(true);
+                    grantAdminButton.setText("Remove Admin");
+                }
+                else{
+                    viewCheckbox.setSelected(true);
+                    grantAdminButton.setText("Grant Admin");
+                }
 
 
-            permissionsLayout.add(usernameLabel, 0, rowIndex);
-            permissionsLayout.add(studentCheckbox, 1, rowIndex);
-            permissionsLayout.add(instructorCheckbox, 2, rowIndex);
-            permissionsLayout.add(viewCheckbox, 4, rowIndex);
-            permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
-            permissionsLayout.add(new HBox(10, grantAdminButton), 6, rowIndex);
 
-            rowIndex++;
+                grantAdminButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+                grantAdminButton.setOnAction(e -> {
+                    if (adminRightsCheckbox.isSelected()) {
+                        removeAdmin(username, adminRightsCheckbox, viewCheckbox, grantAdminButton);
+                    } else {
+                        makeAdmin(username, adminRightsCheckbox, viewCheckbox, grantAdminButton);
+                    }
+                });
+
+
+                permissionsLayout.add(usernameLabel, 0, rowIndex);
+                permissionsLayout.add(studentCheckbox, 1, rowIndex);
+                permissionsLayout.add(instructorCheckbox, 2, rowIndex);
+                permissionsLayout.add(viewCheckbox, 4, rowIndex);
+                permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
+                permissionsLayout.add(new HBox(10, grantAdminButton), 6, rowIndex);
+
+                if(USER_LIST.findUser(username).isStudent() && !USER_LIST.findUser(username).isInstructor())
+                {
+                    grantAdminButton.setVisible(false);
+                }
+
+                rowIndex++;
+            }
         }
 
         Region topSpacer = new Region();
@@ -310,16 +319,21 @@ public class ManageGeneralGroup extends Application {
 
     private void showPreviousScreen(Stage primaryStage) {
         ArticlesPage articlesPage = new ArticlesPage();
+        InstructorsArticlePage instructorsArticlePage = new InstructorsArticlePage();
         try {
-            articlesPage.start(primaryStage);
+            if(CURRENT_USER.isAdmin())
+            {
+                articlesPage.start(primaryStage);
+            }
+            else{
+                instructorsArticlePage.start(primaryStage);
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
 
     public void addUser(String username) {
         Group group = GROUP_LIST.getGroup(groupName);
@@ -366,6 +380,12 @@ public class ManageGeneralGroup extends Application {
         adminCheckBox.setSelected(false);
         viewCheckBox.setSelected(true);
         grantAdminButton.setText("Grant Admin");
+    }
+
+    public void setGroup(String group,Stage primaryStage) {
+        this.groupName = group;
+        start(primaryStage);
+
     }
 
     public static void main(String[] args) {

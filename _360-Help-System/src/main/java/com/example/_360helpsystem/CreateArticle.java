@@ -371,9 +371,16 @@ public class CreateArticle extends Application {
 
     private void showPreviousScreen(Stage primaryStage) {
         ArticlesPage articles = new ArticlesPage();
+        InstructorsArticlePage instructorsArticlePage = new InstructorsArticlePage();
         try{
             selectedArticle = null;
-            articles.start(primaryStage);
+            if(CURRENT_USER.isAdmin())
+            {
+                articles.start(primaryStage);
+            }
+            else {
+                instructorsArticlePage.start(primaryStage);
+            }
         }
         catch(Exception ex){
             ex.printStackTrace();

@@ -19,6 +19,7 @@ import java.util.List;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 /*******
  * <p> RestoreArticles Class </p>
@@ -134,8 +135,16 @@ public class RestoreArticles extends Application {
 
     private void showPreviousScreen(Stage primaryStage) {
         ArticlesPage articles = new ArticlesPage();
+        InstructorsArticlePage instructorsArticlePage = new InstructorsArticlePage();
         try {
-            articles.start(primaryStage);
+            if(CURRENT_USER.isAdmin())
+            {
+                articles.start(primaryStage);
+            }
+            else{
+                instructorsArticlePage.start(primaryStage);
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -153,18 +162,25 @@ public class RestoreArticles extends Application {
             }
             else{
                 ArticleList articles = new Update_DB().readBackup(fileToRestore);
-
-                for(Article article : articles)
+                if(articles != null)
                 {
-                    if(!ARTICLE_LIST.contains(article))
+                    for(Article article : articles)
                     {
-                        ARTICLE_LIST.addArticle(article);
-                        createdLabel.setVisible(true);
-                        createdLabel.setText("Restore Successful");
-                        errorLabel.setVisible(false);
-                        backupListBox.setValue("");
+                        if(!ARTICLE_LIST.contains(article))
+                        {
+                            ARTICLE_LIST.addArticle(article);
+                            createdLabel.setVisible(true);
+                            createdLabel.setText("Restore Successful");
+                            errorLabel.setVisible(false);
+                            backupListBox.setValue("");
+                        }
                     }
                 }
+                else{
+                    errorLabel.setVisible(true);
+                    errorLabel.setText("Access Denied!");
+                }
+
             }
 
 
@@ -182,11 +198,20 @@ public class RestoreArticles extends Application {
             }
             else{
 
-                ARTICLE_LIST = new Update_DB().readBackup(fileToRestore);
-                createdLabel.setVisible(true);
-                createdLabel.setText("Restore Successful");
-                errorLabel.setVisible(false);
-                backupListBox.setValue("");
+                ArticleList articles = new Update_DB().readBackup(fileToRestore);
+                if(articles != null)
+                {
+                    ARTICLE_LIST = articles;
+                    createdLabel.setVisible(true);
+                    createdLabel.setText("Restore Successful");
+                    errorLabel.setVisible(false);
+                    backupListBox.setValue("");
+                }
+                else{
+                    errorLabel.setVisible(true);
+                    errorLabel.setText("Access Denied!");
+                }
+
             }
 
 

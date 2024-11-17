@@ -63,6 +63,7 @@ public class InstructorsArticlePage extends Application {
         sidebar.getChildren().add(grpTitle);
 
         for (Group grp : GROUP_LIST) {
+            if(grp.getUsers().contains(CURRENT_USER.getUserName())) {}
             HBox groupButton = createGroupButton(grp.getName(), primaryStage);
             sidebar.getChildren().add(groupButton);
         }
@@ -82,7 +83,21 @@ public class InstructorsArticlePage extends Application {
         Button backupBtn = createStyledButton("Backup", e -> showBackupScreen(primaryStage));
         Button restoreBtn = createStyledButton("Restore", e -> showRestoreArticles(primaryStage));
 
-        HBox articleButtons = new HBox(20, createArticleBtn, backupBtn, restoreBtn);
+        Button createGrpBtn = new Button("Create Group");
+        createGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        createGrpBtn.setPrefWidth(125);
+        createGrpBtn.setPrefHeight(35);
+        createGrpBtn.setFont(Font.font("Arial", 15));
+        createGrpBtn.setOnAction(e -> showCreateGroup(sidebar,primaryStage));
+
+        Button deleteGrpBtn = new Button("Delete Group");
+        deleteGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        deleteGrpBtn.setPrefWidth(125);
+        deleteGrpBtn.setPrefHeight(35);
+        deleteGrpBtn.setFont(Font.font("Arial", 15));
+        deleteGrpBtn.setOnAction(e -> showDeleteGroup(sidebar));
+
+        HBox articleButtons = new HBox(20,createGrpBtn,deleteGrpBtn ,createArticleBtn, backupBtn, restoreBtn);
         articleButtons.setAlignment(Pos.CENTER);
         articleButtons.setPadding(new Insets(0, 0, 0, 0));
 
@@ -246,8 +261,6 @@ public class InstructorsArticlePage extends Application {
         return filterPanel;
     }
 
-
-
     private HBox createGroupButton(String text, Stage primaryStage) {
         Button groupNameButton = new Button(text);
         String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
@@ -281,6 +294,12 @@ public class InstructorsArticlePage extends Application {
         groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
         groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
 
+        if(GROUP_LIST.getGroup(text).isSpecial() && !GROUP_LIST.getGroup(text).isAdmin(CURRENT_USER.getUserName()))
+        {
+            System.out.println(text + "options removed for current user");
+            groupButtonContainer.getChildren().remove(optionsButton);
+        }
+
         return groupButtonContainer;
     }
 
@@ -288,8 +307,7 @@ public class InstructorsArticlePage extends Application {
     private void showManageDialog(Stage primaryStage, String groupName) {
         ManageGeneralGroup generalGroup = new ManageGeneralGroup();
         try {
-            generalGroup.start(primaryStage);  // Start with only the primaryStage
-            generalGroup.initialize(primaryStage, groupName);  // Pass groupName via initialize
+            generalGroup.setGroup(groupName,primaryStage);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -528,6 +546,9 @@ public class InstructorsArticlePage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
+        // Create checkboxes for Special Group
+        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
         // Create the "Create" button
         Button createButton = new Button("Create");
         createButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
@@ -540,29 +561,29 @@ public class InstructorsArticlePage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
-                // Handle group creation logic here
-                if(!GROUP_LIST.contains(groupName)) {
-                    GROUP_LIST.addGroup(new Group(groupName,false));// NEED TO CHECK
-                    System.out.println("Group Created: " + groupName);
-                    sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
+
+                if (!GROUP_LIST.contains(groupName)) {
+                    GROUP_LIST.addGroup(new Group(groupName,specialGroupCheckBox.isSelected()));
+                    System.out.println("Group created - "+groupName+"-"+specialGroupCheckBox.isSelected());
+                    sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
+
                     // Close the pop-up after creation
                     popupStage.close();
+                } else {
+                    errorLabel.setText("Group " + groupName + " already exists");
                 }
-
-                errorLabel.setText("Group " + groupName + " already exists");
-
-
             } else {
-                // You can show an alert or error message if the field is empty
+                // Show error message if the field is empty
                 errorLabel.setText("Group name cannot be empty.");
             }
         });
 
-        // Add the TextField and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,errorLabel, createButton);
+        // Add the TextField, checkboxes, and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, specialGroupCheckBox,
+                errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
-        Scene popupScene = new Scene(popupLayout, 300, 150);
+        Scene popupScene = new Scene(popupLayout, 300, 200);
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
@@ -596,21 +617,31 @@ public class InstructorsArticlePage extends Application {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
                 // Handle group deletion logic here
-                if(GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
-                    GROUP_LIST.removeGroup(groupName); // Assuming removeGroup is a method in GROUP_LIST
-                    System.out.println("Group Deleted: " + groupName);
-                    // Remove the corresponding button from the sidebar
-                    sidebar.getChildren().removeIf(node -> {
-                        if (node instanceof Button) {
-                            Button button = (Button) node;
-                            return button.getText().equals(groupName); // Check if the button text matches
+                if(GROUP_LIST.contains(groupName)) {
+                    if(GROUP_LIST.getGroup(groupName).isSpecial())
+                    {
+                        if(GROUP_LIST.getGroup(groupName).isAdmin(CURRENT_USER.getUserName()))
+                        {
+                            GROUP_LIST.removeGroup(groupName); // Assuming removeGroup is a method in GROUP_LIST
+                            System.out.println("Group Deleted: " + groupName);
+                            // Remove the corresponding button from the sidebar
+                            sidebar.getChildren().removeIf(node -> {
+                                if (node instanceof HBox) {
+                                    HBox hBox = (HBox) node;
+                                    if (hBox.getChildren().get(0) instanceof Button) {
+                                        Button groupButton = (Button) hBox.getChildren().get(0);
+                                        return groupButton.getText().equals(groupName); // Check if the button text matches
+                                    }
+                                }
+                                return false;
+                            });
+                            // Close the pop-up after deletion
+                            popupStage.close();
                         }
-                        return false;
-                    });
-                    // Close the pop-up after deletion
-                    popupStage.close();
+                    }
+
                 } else {
-                    if(groupName.equalsIgnoreCase("General")) {
+                    if(GROUP_LIST.getGroup(groupName).isSpecial()) {
                         errorLabel.setText("Cannot delete " + groupName);
                     }
                     else{
