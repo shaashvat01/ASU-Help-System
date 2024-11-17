@@ -28,14 +28,12 @@ public class Article {
     private String body;
     private String links;
     private ArrayList<String> groups;
-    private String iv;
-    private ArrayList<String> Users;
+
 
     //Unique identifier for the article.
     public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
         this.keywords = new ArrayList<>();
         this.groups = new ArrayList<>();
-        this.Users = new ArrayList<>();
         this.UID = UID;
         this.title = title;
         this.author = author;
@@ -151,31 +149,7 @@ public class Article {
     }
 
     public boolean hasKeyword(String keyword) {
-        if(this.keywords.contains(keyword))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public String getIv() {
-        return iv;
-    }
-
-    public void setIv(String iv) {
-        this.iv = iv;
-    }
-
-    public void addUser(String user) {
-        Users.add(user);
-    }
-
-    public void removeUser(String user) {
-        Users.remove(user);
-    }
-
-    public boolean hasUser(String user) {
-        return Users.contains(user);
+        return this.keywords.contains(keyword);
     }
 
 }

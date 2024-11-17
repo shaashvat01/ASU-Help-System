@@ -512,7 +512,7 @@ public class StudentArticle extends Application {
         Label bodyLabel = new Label();
         if(article.getSecurity().equals("Protected"))
         {
-            bodyLabel.setText(new Encryption().decryptArticle(article));
+            bodyLabel.setText(new Encryption().decryptBody(article));
         }
         else{
             bodyLabel.setText(article.getBody());

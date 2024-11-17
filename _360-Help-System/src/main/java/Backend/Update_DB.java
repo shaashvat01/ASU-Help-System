@@ -110,7 +110,7 @@ public class Update_DB {
                 while ((line = reader.readLine()) != null) {
                     if (line.trim().isEmpty()) continue; // Skip empty lines
                     String[] data = line.split("-");
-                    if (data.length == 11) {
+                    if (data.length == 10) {
                         long UID = Long.parseLong(data[0]);
                         String level = data[1];
                         String security = data[2];
@@ -121,10 +121,9 @@ public class Update_DB {
                         String body = data[7];
                         String links = data[8];
                         String group = data[9];
-                        String iv = data[10];
+
 
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
-                        article.setIv(iv);
                         articleL.addArticle(article);
                     } else {
                         System.out.println("Data length mismatch. Expected 11 fields.");
@@ -290,8 +289,7 @@ public class Update_DB {
                         article.getKeywords() + "-" +
                         article.getBody() + "-" +
                         article.getLinks() + "-" +
-                        article.getGroup() + "-" +
-                        article.getIv());
+                        article.getGroup());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -519,41 +517,6 @@ public class Update_DB {
         }
     }
 
-    public void loadKey()
-    {
-        File keyFile = new File(path_to_key);
-
-        if (keyFile.exists()) { // Check if the key file exists
-            try (BufferedReader reader = new BufferedReader(new FileReader(keyFile))) {
-                String encodedKey = reader.readLine(); // Read the Base64 encoded key from the first line
-
-                // Decode the Base64 encoded key string
-                byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-
-                // Rebuild the SecretKey from the decoded key bytes
-                SECRET_KEY = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-
-                System.out.println("Secret key loaded successfully from " + path_to_key);
-
-            } catch (IOException e) {
-                System.out.println("Error loading secret key: " + e.getMessage());
-            }
-        } else {
-            // If the key file doesn't exist, handle the case accordingly
-            System.out.println("Secret key file does not exist. Generating new key file!");
-
-
-            try (FileWriter writer = new FileWriter(path_to_key, true)) {  // true enables append mode
-                SECRET_KEY = new Encryption().generateKey();
-                writer.write(Base64.getEncoder().encodeToString(SECRET_KEY.getEncoded())+System.lineSeparator());  // Write message with a newline at the end
-            } catch (IOException e) {
-                e.printStackTrace();  // Print stack trace if an error occurs
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-    }
 
     public SecretKey generateKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");

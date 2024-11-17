@@ -35,7 +35,6 @@ public class CreateAdminAccount extends Application {
     public static OTPList OTP_LIST = new OTPList();
     public static ArticleList ARTICLE_LIST = new ArticleList();
     public static GroupList GROUP_LIST = new GroupList();
-    public static SecretKey SECRET_KEY;
     public static AccessList ACCESS_LIST = new AccessList();
     Update_DB UDB = new Update_DB();
     //DEBUG
@@ -165,7 +164,6 @@ public class CreateAdminAccount extends Application {
         UDB.loadOTPDB(OTP_LIST);
         UDB.loadArticleDB(ARTICLE_LIST);
         UDB.loadGrpDB(GROUP_LIST);
-        UDB.loadKey();
         UDB.loadRequestsDB();
         UDB.clearSearchHistory();
     }
