@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Encryption;
 import Backend.Group;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -523,12 +524,27 @@ public class InstructorsArticlePage extends Application {
             contextMenu.hide(); // Hide the context menu after action
         });
 
+        // Create the Update Article menu item
+        MenuItem viewItem = new MenuItem("View Article");
+        viewItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        viewItem.setOnAction(e -> {
+            try {
+                showArticleDetails(article);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            contextMenu.hide(); // Hide the context menu after action
+        });
+
+
         // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem, updateItem);
+        contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
 
         // Show the context menu relative to the clicked 3-dots button
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
+
+
 
     private void showCreateGroup(VBox sidebar,Stage primaryStage) {
         // Create a new Stage (window) for the pop-up

@@ -1,6 +1,7 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Encryption;
 import Backend.Group;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -446,13 +447,106 @@ public class ArticlesPage extends Application {
             contextMenu.hide(); // Hide the context menu after action
         });
 
+        // Create the Update Article menu item
+        MenuItem updateItem = new MenuItem("Update Article");
+        updateItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        updateItem.setOnAction(e -> {
+            System.out.println("Updating article: " + article.getUID());
+            selectedArticle = article;
+            showCreateArticleScreen(primaryStage); //go to article screen
+            contextMenu.hide(); // Hide the context menu after action
+        });
+
+        // Create the Update Article menu item
+        MenuItem viewItem = new MenuItem("View Article");
+        viewItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        viewItem.setOnAction(e -> {
+            try {
+                showArticleDetails(article);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            contextMenu.hide(); // Hide the context menu after action
+        });
 
 
         // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem);
+        contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
 
         // Show the context menu relative to the clicked 3-dots button
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
+    }
+
+    private void showArticleDetails(Article article) throws Exception {
+        // Create a new stage for the details window
+        Stage detailStage = new Stage();
+        detailStage.setTitle("Article Details - " + article.getTitle());
+
+        // Article details layout
+        VBox detailsLayout = new VBox(10);
+        detailsLayout.setPadding(new Insets(20));
+        detailsLayout.setAlignment(Pos.TOP_LEFT);
+
+        // Title
+        Label titleLabel = new Label("Title: " + article.getTitle());
+        titleLabel.setFont(Font.font("Arial", 18));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Level
+        Label levelLabel = new Label("Level: " + article.getLevel());
+        levelLabel.setFont(Font.font("Arial", 14));
+        levelLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #7f8c8d;");
+
+        // Abstract
+        Label abstractHeading = new Label("Abstract:");
+        abstractHeading.setFont(Font.font("Arial", 14));
+        abstractHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label abstractLabel = new Label(article.getAbs());
+        abstractLabel.setWrapText(true);
+
+        // Keywords
+        Label keywordsHeading = new Label("Keywords:");
+        keywordsHeading.setFont(Font.font("Arial", 14));
+        keywordsHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label keywordsLabel = new Label(article.getKeywords());
+        keywordsLabel.setWrapText(true);
+
+        // Reference Links
+        Label referenceLinksHeading = new Label("Reference Links:");
+        referenceLinksHeading.setFont(Font.font("Arial", 14));
+        referenceLinksHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label referenceLinksLabel = new Label(article.getLinks());
+        referenceLinksLabel.setWrapText(true);
+
+        // Body or Content
+        Label bodyHeading = new Label("Body:");
+        bodyHeading.setFont(Font.font("Arial", 14));
+        bodyHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label bodyLabel = new Label();
+        if(article.getSecurity().equals("Protected"))
+        {
+            bodyLabel.setText(new Encryption().decryptBody(article));
+        }
+        else{
+            bodyLabel.setText(article.getBody());
+        }
+
+        bodyLabel.setWrapText(true);
+
+        // Add all details to the layout
+        detailsLayout.getChildren().addAll(
+                titleLabel,
+                levelLabel,
+                abstractHeading, abstractLabel,
+                keywordsHeading, keywordsLabel,
+                referenceLinksHeading, referenceLinksLabel,
+                bodyHeading, bodyLabel
+        );
+
+        // Create and set the scene
+        Scene detailScene = new Scene(detailsLayout, 600, 500);
+        detailStage.setScene(detailScene);
+        detailStage.show();
     }
 
     private void showCreateGroup(VBox sidebar, Stage primaryStage) {
