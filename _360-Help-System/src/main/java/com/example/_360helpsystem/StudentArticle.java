@@ -553,7 +553,12 @@ public class StudentArticle extends Application {
         confirmButton.setFont(Font.font("Arial", 14));
         confirmButton.setOnAction(e -> {
             // Add new access to the list
-            ACCESS_LIST.addAccess(new Access(CURRENT_USER.getUserName(), article.getGroups()));
+            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            if(!ACCESS_LIST.getAccessList().contains(access))
+            {
+                ACCESS_LIST.addAccess(access);
+            }
+
             detailStage.close();
         });
 
