@@ -381,7 +381,7 @@ public class StudentArticle extends Application {
                 levelLabel.setFont(Font.font("Arial", 14));
 
 
-                Label grpLabel = new Label(Arrays.toString(article.getGroups().toArray()));
+                Label grpLabel = new Label("["+article.getGroup()+"]");
                 grpLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
                 grpLabel.setFont(Font.font("Arial", 14));
 
