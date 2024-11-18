@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -67,7 +68,7 @@ public class ManageGeneralGroup extends Application {
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
-        sidebar.setPrefWidth(160);  // Fixed width for sidebar
+        sidebar.setPrefWidth(170);  // Fixed width for sidebar
         sidebar.getChildren().addAll(articlesButton, addUserButton, removeUserButton, permissionsButton, AccessRequestsButton);
 
         // Set up a ScrollPane for the main content area with fixed dimensions
@@ -223,8 +224,8 @@ public class ManageGeneralGroup extends Application {
         Label actionsHeader = new Label("Actions");
 
         permissionsLayout.add(usernameHeader, 0, 0);
-        permissionsLayout.add(roleHeader, 2, 0);
-        permissionsLayout.add(actionsHeader, 3, 0);
+        permissionsLayout.add(roleHeader, 1, 0, 2, 1); // Span 2 columns for roleHeader
+        permissionsLayout.add(actionsHeader, 3, 0, 2, 1); // Span 2 columns for actionsHeader
 
         // Role and Action labels
         Label studentLabel = new Label("S");
@@ -234,14 +235,13 @@ public class ManageGeneralGroup extends Application {
 
         permissionsLayout.add(studentLabel, 1, 1);
         permissionsLayout.add(instructorLabel, 2, 1);
-        permissionsLayout.add(viewLabel, 4, 1);
-        permissionsLayout.add(adminRightsLabel, 5, 1);
+        permissionsLayout.add(viewLabel, 3, 1);
+        permissionsLayout.add(adminRightsLabel, 4, 1);
 
         int rowIndex = 2;
 
-
         for (String username : GROUP_LIST.getGroup(this.groupName).getUsers()) {
-            if(!username.equals(CURRENT_USER.getUserName())) {
+            if (!username.equals(CURRENT_USER.getUserName())) {
                 Label usernameLabel = new Label(username);
 
                 CheckBox studentCheckbox = new CheckBox();
@@ -256,28 +256,21 @@ public class ManageGeneralGroup extends Application {
                 CheckBox adminRightsCheckbox = new CheckBox();
                 adminRightsCheckbox.setDisable(true);
 
-
-                if(USER_LIST.findUser(username).isInstructor())
-                {
+                if (USER_LIST.findUser(username).isInstructor()) {
                     instructorCheckbox.setSelected(true);
                 }
-                if(USER_LIST.findUser(username).isStudent())
-                {
+                if (USER_LIST.findUser(username).isStudent()) {
                     studentCheckbox.setSelected(true);
                 }
 
                 Button grantAdminButton = new Button();
-                if(GROUP_LIST.getGroup(this.groupName).isAdmin(username))
-                {
+                if (GROUP_LIST.getGroup(this.groupName).isAdmin(username)) {
                     adminRightsCheckbox.setSelected(true);
                     grantAdminButton.setText("Remove Admin");
-                }
-                else{
+                } else {
                     viewCheckbox.setSelected(true);
                     grantAdminButton.setText("Grant Admin");
                 }
-
-
 
                 grantAdminButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
                 grantAdminButton.setOnAction(e -> {
@@ -288,16 +281,14 @@ public class ManageGeneralGroup extends Application {
                     }
                 });
 
-
                 permissionsLayout.add(usernameLabel, 0, rowIndex);
                 permissionsLayout.add(studentCheckbox, 1, rowIndex);
                 permissionsLayout.add(instructorCheckbox, 2, rowIndex);
-                permissionsLayout.add(viewCheckbox, 4, rowIndex);
-                permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
-                permissionsLayout.add(new HBox(10, grantAdminButton), 6, rowIndex);
+                permissionsLayout.add(viewCheckbox, 3, rowIndex);
+                permissionsLayout.add(adminRightsCheckbox, 4, rowIndex);
+                permissionsLayout.add(new HBox(10, grantAdminButton), 5, rowIndex);
 
-                if(USER_LIST.findUser(username).isStudent() && !USER_LIST.findUser(username).isInstructor())
-                {
+                if (USER_LIST.findUser(username).isStudent() && !USER_LIST.findUser(username).isInstructor()) {
                     grantAdminButton.setVisible(false);
                 }
 
@@ -324,6 +315,9 @@ public class ManageGeneralGroup extends Application {
         Label usernameHeader = new Label("Username");
         usernameHeader.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
+        Label articleHeader = new Label("Article");
+        articleHeader.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
         Label actionsHeader = new Label("Actions");
         actionsHeader.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
@@ -332,6 +326,11 @@ public class ManageGeneralGroup extends Application {
         usernameColumn.setAlignment(Pos.TOP_LEFT);
         usernameColumn.getChildren().add(usernameHeader);
 
+        // VBox for articles
+        VBox articleColumn = new VBox(10);
+        articleColumn.setAlignment(Pos.TOP_CENTER);
+        articleColumn.getChildren().add(articleHeader);
+
         // VBox for action buttons
         VBox actionsColumn = new VBox(10);
         actionsColumn.setAlignment(Pos.TOP_RIGHT);
@@ -339,11 +338,19 @@ public class ManageGeneralGroup extends Application {
 
         // Populate the columns with data from ACCESS_LIST
         for (Access access : ACCESS_LIST) {
-            if(access.getGroups().contains(this.groupName))
-            {
+            if (access.getGroups().contains(this.groupName)) {
                 // Username
                 Text usernameText = new Text(access.getUsername());
                 usernameText.setFont(Font.font("Arial", 16));
+
+                // Article name and level
+                Text articleNameText = new Text("Random Article");
+                articleNameText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+                articleNameText.setFill(Color.web("#8b0000"));
+                Text articleLevelText = new Text(" - Beginner");
+                articleLevelText.setFont(Font.font("Arial", 16));
+                articleLevelText.setFill(Color.web("#7f8c8d"));
+                HBox articleBox = new HBox(articleNameText, articleLevelText);
 
                 // Buttons
                 Button acceptButton = new Button("Accept");
@@ -359,18 +366,20 @@ public class ManageGeneralGroup extends Application {
 
                 // Add elements to respective VBoxes
                 usernameColumn.getChildren().add(usernameText);
+                articleColumn.getChildren().add(articleBox);
                 actionsColumn.getChildren().add(buttonBox);
             }
-
         }
 
-        // Create the HBox to hold the two columns
-        HBox requestsBox = new HBox(50, usernameColumn, actionsColumn); // Adjust spacing between columns
+        // Create the HBox to hold the three columns
+        HBox requestsBox = new HBox(50, usernameColumn, articleColumn, actionsColumn); // Adjust spacing between columns
         requestsBox.setAlignment(Pos.TOP_CENTER);
 
         // Add the requestsBox to the mainContentArea
         mainContentArea.getChildren().add(requestsBox);
     }
+
+
 
     // Helper methods for handling accept/reject actions
     private void handleAccept(Access access) {

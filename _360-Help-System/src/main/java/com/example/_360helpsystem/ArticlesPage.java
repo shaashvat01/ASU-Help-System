@@ -209,28 +209,13 @@ public class ArticlesPage extends Application {
         // Main button with group name
         Button groupNameButton = new Button(text);
 
-        // Default, hover, and active styles without an inner border
+        // Default and active styles for the group name button
         String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-background-radius: 15; "
-                + "-fx-padding: 10 0 10 0;";  // Padding for uniformity
-
-        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-background-radius: 15; "
-                + "-fx-padding: 10 0 10 0;";
-
-        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15;";  // Active style for clicked button
+                + "-fx-background-radius: 15; -fx-padding: 10 0 10 0; -fx-border-color: transparent;"; // Border removed
 
         groupNameButton.setStyle(defaultStyle);
         groupNameButton.setMaxWidth(Double.MAX_VALUE);
         groupNameButton.setAlignment(Pos.CENTER);
-
-        // Set action for when the button is clicked
-        groupNameButton.setOnAction(e -> {
-            if (activeButton != null) activeButton.setStyle(defaultStyle);  // Reset previous active button
-            groupNameButton.setStyle(activeStyle);  // Apply active style to the clicked button
-            activeButton = groupNameButton;
-            displayArticlesForGroup(text, primaryStage);
-        });
 
         // Three-dots button for options
         Button optionsButton = new Button("...");
@@ -239,7 +224,7 @@ public class ArticlesPage extends Application {
         // Create a ContextMenu with a single "Manage" option
         ContextMenu contextMenu = new ContextMenu();
         MenuItem manageItem = new MenuItem("Manage");
-        manageItem.setOnAction(e -> showManageDialog(primaryStage,text)); // Opens the manage dialog
+        manageItem.setOnAction(e -> showManageDialog(primaryStage, text)); // Opens the manage dialog
         contextMenu.getItems().add(manageItem);
 
         // Show the context menu when the three-dots button is clicked
@@ -251,9 +236,38 @@ public class ArticlesPage extends Application {
         groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; "
                 + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"); // Outer border only
 
-        // Apply hover effect to the entire HBox container
+        // Add hover effect
+        String hoverStyle = "-fx-background-color: #444; -fx-border-color: white; -fx-border-radius: 15; "
+                + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"; // Hover style
+
         groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
-        groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
+        groupButtonContainer.setOnMouseExited(e -> {
+            if (groupNameButton.equals(activeButton)) {
+                // Keep active style if this is the active button
+                groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: transparent; "
+                        + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+            } else {
+                // Reset to default style otherwise
+                groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; "
+                        + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+            }
+        });
+
+        // Set action for when the container (HBox) is clicked
+        groupButtonContainer.setOnMouseClicked(e -> {
+            // Reset the border for the previously active button's container
+            if (activeButton != null) {
+                ((HBox) activeButton.getParent()).setStyle("-fx-background-color: #333; -fx-border-color: white; "
+                        + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+            }
+
+            // Update styles for the clicked button's container
+            groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: transparent; "
+                    + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+
+            activeButton = groupNameButton; // Update active button reference
+            displayArticlesForGroup(text, primaryStage); // Display articles for the selected group
+        });
 
         return groupButtonContainer;
     }
