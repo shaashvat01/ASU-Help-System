@@ -265,40 +265,78 @@ public class InstructorsArticlePage extends Application {
 
 
     private HBox createGroupButton(String text, Stage primaryStage) {
+        // Main button with group name
         Button groupNameButton = new Button(text);
-        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
-        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
-        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15;";
+
+        // Default and active styles for the group name button
+        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
+                + "-fx-background-radius: 15; -fx-padding: 10 0 10 0; -fx-border-color: transparent;"; // Border removed
 
         groupNameButton.setStyle(defaultStyle);
         groupNameButton.setMaxWidth(Double.MAX_VALUE);
         groupNameButton.setAlignment(Pos.CENTER);
 
+        // Action for the groupNameButton
         groupNameButton.setOnAction(e -> {
-            if (activeButton != null) activeButton.setStyle(defaultStyle);
-            groupNameButton.setStyle(activeStyle);
-            activeButton = groupNameButton;
-            displayArticlesForGroup(text, primaryStage);
+            System.out.println("Group name button clicked: " + text);
+            displayArticlesForGroup(text, primaryStage); // Display articles for the selected group
         });
 
+        // Three-dots button for options
         Button optionsButton = new Button("...");
         optionsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 19px;");
 
+        // Create a ContextMenu with a single "Manage" option
         ContextMenu contextMenu = new ContextMenu();
         MenuItem manageItem = new MenuItem("Manage");
-        manageItem.setOnAction(e -> showManageDialog(primaryStage, text));
+        manageItem.setOnAction(e -> showManageDialog(primaryStage, text)); // Opens the manage dialog
         contextMenu.getItems().add(manageItem);
 
+        // Show the context menu when the three-dots button is clicked
         optionsButton.setOnAction(e -> contextMenu.show(optionsButton, Side.BOTTOM, 0, 0));
 
+        // Container for the group name button and options button
         HBox groupButtonContainer = new HBox(groupNameButton, optionsButton);
         groupButtonContainer.setAlignment(Pos.CENTER);
-        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; "
+                + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"); // Outer border only
+
+        // Add hover effect
+        String hoverStyle = "-fx-background-color: #444; -fx-border-color: white; -fx-border-radius: 15; "
+                + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"; // Hover style
+
         groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
-        groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
+        groupButtonContainer.setOnMouseExited(e -> {
+            if (groupNameButton.equals(activeButton)) {
+                // Keep active style if this is the active button
+                groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: transparent; "
+                        + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+            } else {
+                // Reset to default style otherwise
+                groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; "
+                        + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+            }
+        });
+
+        // Set action for when the container (HBox) is clicked
+        groupButtonContainer.setOnMouseClicked(e -> {
+            // Reset the border for the previously active button's container
+            if (activeButton != null) {
+                ((HBox) activeButton.getParent()).setStyle("-fx-background-color: #333; -fx-border-color: white; "
+                        + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+            }
+
+            // Update styles for the clicked button's container
+            groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: transparent; "
+                    + "-fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+
+            activeButton = groupNameButton; // Update active button reference
+            displayArticlesForGroup(text, primaryStage); // Display articles for the selected group
+        });
 
         return groupButtonContainer;
     }
+
 
 
     private void showManageDialog(Stage primaryStage, String groupName) {

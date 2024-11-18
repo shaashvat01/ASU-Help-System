@@ -120,40 +120,23 @@ public class ManageGeneralGroup extends Application {
         // Headers with centered alignment and bold style
         Label usernameHeader = new Label("Username");
         usernameHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
-        Label nameHeader = new Label("Name");
-        nameHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
-        Label roleHeader = new Label("Roles");
-        roleHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
         Label articleHeader = new Label("Article"); // New Article column header
         articleHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
         Label actionsHeader = new Label("Actions");
         actionsHeader.setStyle("-fx-font-weight: bold; -fx-alignment: center;");
 
-        // Add headers to the grid with no padding
+        // Add headers to the grid
         permissionsLayout.add(usernameHeader, 0, 0);
-        permissionsLayout.add(nameHeader, 1, 0);
-        permissionsLayout.add(roleHeader, 2, 0, 3, 1); // Spanning the Roles header across columns 2, 3, and 4
-        permissionsLayout.add(articleHeader, 5, 0); // Positioned Article column
-        permissionsLayout.add(actionsHeader, 6, 0); // Positioned Actions above buttons
+        permissionsLayout.add(articleHeader, 1, 0); // Positioned Article column
+        permissionsLayout.add(actionsHeader, 2, 0); // Positioned Actions above buttons
 
-        // Role labels for the role columns under "Roles" header with no padding
-        Label studentLabel = new Label("S");
-        Label instructorLabel = new Label("I");
-        Label adminLabel = new Label("A");
-
-        // Add role labels in appropriate columns under the Roles header
-        permissionsLayout.add(studentLabel, 2, 1);
-        permissionsLayout.add(instructorLabel, 3, 1);
-        permissionsLayout.add(adminLabel, 4, 1);
-
-        int rowIndex = 2;
+        int rowIndex = 1;
         String[] mockUsers = {"User1", "User2"};
         String[] mockArticles = {"Article A", "Article B"}; // Mock article data
         String[] mockArticleLevels = {" - Intermediate", " - Advanced"};
 
         for (int i = 0; i < mockUsers.length; i++) {
             Label usernameLabel = new Label(mockUsers[i]);
-            Label nameLabel = new Label("User");
 
             // Combine article name and level into two separate labels
             Label articleNameLabel = new Label(mockArticles[i]);
@@ -163,32 +146,16 @@ public class ManageGeneralGroup extends Application {
 
             HBox articleBox = new HBox(articleNameLabel, articleLevelLabel);
 
-            CheckBox studentCheckbox = new CheckBox();
-            studentCheckbox.setDisable(true);
-
-            CheckBox instructorCheckbox = new CheckBox();
-            instructorCheckbox.setDisable(true);
-
-            CheckBox adminCheckbox = new CheckBox();
-            adminCheckbox.setSelected(true);
-            adminCheckbox.setDisable(true);
-
             Button declineButton = new Button("Decline");
             declineButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-            declineButton.setOnAction(e -> studentCheckbox.setSelected(false));
 
             Button acceptButton = new Button("Accept");
             acceptButton.setStyle("-fx-background-color: #64B45F; -fx-text-fill: white;");
-            acceptButton.setOnAction(e -> adminCheckbox.setSelected(true));
 
-            // Add user details, article label, and checkboxes in the appropriate columns
+            // Add user details, article label, and buttons in the appropriate columns
             permissionsLayout.add(usernameLabel, 0, rowIndex);
-            permissionsLayout.add(nameLabel, 1, rowIndex);
-            permissionsLayout.add(studentCheckbox, 2, rowIndex);
-            permissionsLayout.add(instructorCheckbox, 3, rowIndex);
-            permissionsLayout.add(adminCheckbox, 4, rowIndex);
-            permissionsLayout.add(articleBox, 5, rowIndex); // Added article label
-            permissionsLayout.add(new HBox(10, declineButton, acceptButton), 6, rowIndex); // Added buttons in Actions column
+            permissionsLayout.add(articleBox, 1, rowIndex); // Added article label
+            permissionsLayout.add(new HBox(10, declineButton, acceptButton), 2, rowIndex); // Added buttons in Actions column
 
             rowIndex++;
         }
@@ -204,6 +171,7 @@ public class ManageGeneralGroup extends Application {
 
         mainContentArea.getChildren().add(wrapper);
     }
+
 
 
 
@@ -324,17 +292,14 @@ public class ManageGeneralGroup extends Application {
         // Headers
         Label usernameHeader = new Label("Username");
         usernameHeader.setStyle("-fx-font-weight: bold;");
-        Label nameHeader = new Label("Name");
-        nameHeader.setStyle("-fx-font-weight: bold;");
         Label roleHeader = new Label("Roles");
         roleHeader.setStyle("-fx-font-weight: bold;");
         Label actionsHeader = new Label("Actions");
         actionsHeader.setStyle("-fx-font-weight: bold;");
 
         permissionsLayout.add(usernameHeader, 0, 0);
-        permissionsLayout.add(nameHeader, 1, 0);
-        permissionsLayout.add(roleHeader, 2, 0, 3, 1); // Span 3 columns for SIA
-        permissionsLayout.add(actionsHeader, 5, 0, 2, 1); // Span 2 columns for RA
+        permissionsLayout.add(roleHeader, 1, 0, 3, 1); // Span 3 columns for SIA
+        permissionsLayout.add(actionsHeader, 4, 0, 2, 1); // Span 2 columns for RA
 
         // Role and Action labels
         Label studentLabel = new Label("S");
@@ -343,19 +308,17 @@ public class ManageGeneralGroup extends Application {
         Label viewLabel = new Label("Read");
         Label adminRightsLabel = new Label("Admin");
 
-        permissionsLayout.add(studentLabel, 2, 1);
-        permissionsLayout.add(instructorLabel, 3, 1);
-        permissionsLayout.add(adminLabel, 4, 1);
-        permissionsLayout.add(viewLabel, 5, 1);
-        permissionsLayout.add(adminRightsLabel, 6, 1);
+        permissionsLayout.add(studentLabel, 1, 1);
+        permissionsLayout.add(instructorLabel, 2, 1);
+        permissionsLayout.add(adminLabel, 3, 1);
+        permissionsLayout.add(viewLabel, 4, 1);
+        permissionsLayout.add(adminRightsLabel, 5, 1);
 
         int rowIndex = 2;
         String[] mockUsers = {"User1", "User2"};
-        String[] mockNames = {"John Doe", "Jane Smith"};
 
         for (int i = 0; i < mockUsers.length; i++) {
             Label usernameLabel = new Label(mockUsers[i]);
-            Label nameLabel = new Label(mockNames[i]);
 
             CheckBox studentCheckbox = new CheckBox();
             studentCheckbox.setDisable(true);
@@ -382,13 +345,12 @@ public class ManageGeneralGroup extends Application {
             grantAdminButton.setOnAction(e -> adminRightsCheckbox.setSelected(true));
 
             permissionsLayout.add(usernameLabel, 0, rowIndex);
-            permissionsLayout.add(nameLabel, 1, rowIndex);
-            permissionsLayout.add(studentCheckbox, 2, rowIndex);
-            permissionsLayout.add(instructorCheckbox, 3, rowIndex);
-            permissionsLayout.add(adminCheckbox, 4, rowIndex);
-            permissionsLayout.add(viewCheckbox, 5, rowIndex);
-            permissionsLayout.add(adminRightsCheckbox, 6, rowIndex);
-            permissionsLayout.add(new HBox(10, grantViewButton, grantAdminButton), 7, rowIndex);
+            permissionsLayout.add(studentCheckbox, 1, rowIndex);
+            permissionsLayout.add(instructorCheckbox, 2, rowIndex);
+            permissionsLayout.add(adminCheckbox, 3, rowIndex);
+            permissionsLayout.add(viewCheckbox, 4, rowIndex);
+            permissionsLayout.add(adminRightsCheckbox, 5, rowIndex);
+            permissionsLayout.add(new HBox(10, grantViewButton, grantAdminButton), 6, rowIndex);
 
             rowIndex++;
         }
@@ -404,6 +366,7 @@ public class ManageGeneralGroup extends Application {
 
         mainContentArea.getChildren().add(wrapper);
     }
+
 
 
     private void showPreviousScreen(Stage primaryStage) {
