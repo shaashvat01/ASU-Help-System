@@ -357,7 +357,7 @@ public class InstructorsArticlePage extends Application {
                 HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
                 titleOptionsBox.setAlignment(Pos.TOP_RIGHT);
 
-                if(GROUP_LIST.getGroup(groupName).isAdmin(CURRENT_USER.getUserName()))
+                if(GROUP_LIST.getGroup(groupName).getUsers().contains(CURRENT_USER.getUserName()))
                 {
                     titleOptionsBox.getChildren().addAll(optionsButton);
                 }
@@ -544,8 +544,33 @@ public class InstructorsArticlePage extends Application {
         });
 
 
-        // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
+
+        boolean hasAdminAccess = false;
+        boolean hasReadAccess = false;
+        for(String grp : article.getGroups())
+        {
+            if(GROUP_LIST.contains(grp) && GROUP_LIST.getGroup(grp).isAdmin(CURRENT_USER.getUserName()))
+            {
+                hasAdminAccess = true;
+            }
+            if(GROUP_LIST.contains(grp) && GROUP_LIST.getGroup(grp).getUsers().contains(CURRENT_USER.getUserName()))
+            {
+                hasReadAccess = true;
+            }
+        }
+
+        if(hasAdminAccess)
+        {
+            // Add the menu items to the context menu
+            contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
+        }
+        else {
+            if(hasReadAccess)
+            {
+                contextMenu.getItems().addAll(viewItem);
+            }
+
+        }
 
         // Show the context menu relative to the clicked 3-dots button
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);

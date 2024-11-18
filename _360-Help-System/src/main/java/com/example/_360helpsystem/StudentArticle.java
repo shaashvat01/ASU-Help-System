@@ -381,7 +381,7 @@ public class StudentArticle extends Application {
                 levelLabel.setFont(Font.font("Arial", 14));
 
 
-                Label grpLabel = new Label(Arrays.toString(article.getGroups().toArray()));
+                Label grpLabel = new Label("["+article.getGroup()+"]");
                 grpLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
                 grpLabel.setFont(Font.font("Arial", 14));
 
@@ -553,7 +553,12 @@ public class StudentArticle extends Application {
         confirmButton.setFont(Font.font("Arial", 14));
         confirmButton.setOnAction(e -> {
             // Add new access to the list
-            ACCESS_LIST.addAccess(new Access(CURRENT_USER.getUserName(), article.getGroups()));
+            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            if(!ACCESS_LIST.getAccessList().contains(access))
+            {
+                ACCESS_LIST.addAccess(access);
+            }
+
             detailStage.close();
         });
 

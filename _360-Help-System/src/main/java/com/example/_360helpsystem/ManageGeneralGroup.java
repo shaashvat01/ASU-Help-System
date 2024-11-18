@@ -339,25 +339,29 @@ public class ManageGeneralGroup extends Application {
 
         // Populate the columns with data from ACCESS_LIST
         for (Access access : ACCESS_LIST) {
-            // Username
-            Text usernameText = new Text(access.getUsername());
-            usernameText.setFont(Font.font("Arial", 16));
+            if(access.getGroups().contains(this.groupName))
+            {
+                // Username
+                Text usernameText = new Text(access.getUsername());
+                usernameText.setFont(Font.font("Arial", 16));
 
-            // Buttons
-            Button acceptButton = new Button("Accept");
-            Button rejectButton = new Button("Reject");
+                // Buttons
+                Button acceptButton = new Button("Accept");
+                Button rejectButton = new Button("Reject");
 
-            // Set button actions
-            acceptButton.setOnAction(event -> handleAccept(access));
-            rejectButton.setOnAction(event -> handleReject(access));
+                // Set button actions
+                acceptButton.setOnAction(event -> handleAccept(access));
+                rejectButton.setOnAction(event -> handleReject(access));
 
-            // HBox for individual request buttons
-            HBox buttonBox = new HBox(10, acceptButton, rejectButton);
-            buttonBox.setAlignment(Pos.CENTER_LEFT);
+                // HBox for individual request buttons
+                HBox buttonBox = new HBox(10, acceptButton, rejectButton);
+                buttonBox.setAlignment(Pos.CENTER_LEFT);
 
-            // Add elements to respective VBoxes
-            usernameColumn.getChildren().add(usernameText);
-            actionsColumn.getChildren().add(buttonBox);
+                // Add elements to respective VBoxes
+                usernameColumn.getChildren().add(usernameText);
+                actionsColumn.getChildren().add(buttonBox);
+            }
+
         }
 
         // Create the HBox to hold the two columns
