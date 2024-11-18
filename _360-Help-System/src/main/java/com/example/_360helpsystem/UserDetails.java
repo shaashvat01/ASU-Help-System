@@ -27,6 +27,7 @@ import javafx.stage.Stage;
  *
  */
 
+import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
 /*******
@@ -163,6 +164,14 @@ public class UserDetails extends Application {
                 Student newStudent = new Student(username, password, email, firstName, middleName, lastName, preferredName);
                 newStudent.finishAccountSetup();
                 newStudent.setInstructor(true);
+                for(Group g : GROUP_LIST)
+                {
+                    if(!g.isSpecial())
+                    {
+                        g.addUser(newStudent);
+                        g.addAdmin(newStudent.getUserName());
+                    }
+                }
                 USER_LIST.getUserList().add(newStudent);  // getUserList() returns the LinkedList of User objects
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
@@ -170,6 +179,13 @@ public class UserDetails extends Application {
             {
                 Student newStudent = new Student(username, password, email, firstName, middleName, lastName, preferredName);
                 newStudent.finishAccountSetup();
+                for(Group g : GROUP_LIST)
+                {
+                    if(!g.isSpecial())
+                    {
+                        g.addUser(newStudent);
+                    }
+                }
                 USER_LIST.getUserList().add(newStudent);
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
@@ -177,6 +193,14 @@ public class UserDetails extends Application {
             {
                 Instructor newInstructor = new Instructor(username, password, email, firstName, middleName, lastName, preferredName);
                 newInstructor.finishAccountSetup();
+                for(Group g : GROUP_LIST)
+                {
+                    if(!g.isSpecial())
+                    {
+                        g.addUser(newInstructor);
+                        g.addAdmin(newInstructor.getUserName());
+                    }
+                }
                 USER_LIST.getUserList().add(newInstructor);
                 USER_LIST.removeUser(USER_LIST.findUserByOTP(otp));
             }
