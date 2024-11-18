@@ -169,8 +169,6 @@ public class InstructorPage extends Application {
         mainContentArea.getChildren().add(borderedBox);
     }
 
-
-
     private void showArticleScreen(Stage primaryStage) {
         InstructorsArticlePage articlePage = new InstructorsArticlePage();
         try{

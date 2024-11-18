@@ -44,19 +44,22 @@ public class AdminPage extends Application {
     public void start(Stage primaryStage) {
         Admin admin = new Admin();
 
-        // Sidebar buttons for "User Accounts" and "Articles" with icons
+        // Sidebar buttons for "User Accounts", "Articles", and "Messages" with icons
         Button userModificationsButton = createSidebarButtonWithIcon("User Accounts", "👤");
         userModificationsButton.setOnAction(e -> showUserSettingsScreen(primaryStage));
 
         Button articleButton = createSidebarButtonWithIcon("Articles", "📘");
         articleButton.setOnAction(e -> showArticleScreen(primaryStage));
 
+        Button messagesButton = createSidebarButtonWithIcon("Messages", "✉️");
+        messagesButton.setOnAction(e -> showMessagesScreen(primaryStage)); // Link to Messages screen
+
         // Sidebar VBox with buttons
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
         sidebar.setPrefWidth(160);
-        sidebar.getChildren().addAll(userModificationsButton, articleButton);
+        sidebar.getChildren().addAll(userModificationsButton, articleButton, messagesButton); // Add Messages button
 
         // Logout Button
         Button logoutButton = new Button("Logout");
@@ -99,6 +102,69 @@ public class AdminPage extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
     }
+
+    private void showMessageDetailsScreen(Stage primaryStage, String messageType) {
+        // Predefined student name and message
+        String studentName = "Alice Johnson";
+        String message = (messageType.equalsIgnoreCase("Generic"))
+                ? "Please check your latest assignment!"
+                : "Your project submission has been reviewed.";
+
+        Text studentNameText = new Text("Student: " + studentName);
+        studentNameText.setFont(Font.font("Arial", 20));
+
+        Text messageText = new Text(messageType + " Message: " + message);
+        messageText.setFont(Font.font("Arial", 16));
+
+        VBox messageDetails = new VBox(10, studentNameText, messageText);
+        messageDetails.setAlignment(Pos.CENTER);
+
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> start(primaryStage));
+
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(messageDetails);
+
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
+        Scene scene = new Scene(root, 900, 700);
+        primaryStage.setScene(scene);
+    }
+
+    private void showMessagesScreen(Stage primaryStage) {
+        // Create buttons for Generic Messages and Specific Messages
+        Button genericMessagesButton = new Button("Generic Messages");
+        genericMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
+        genericMessagesButton.setPadding(new Insets(10, 20, 10, 20));
+
+        Button specificMessagesButton = new Button("Specific Messages");
+        specificMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
+        specificMessagesButton.setPadding(new Insets(10, 20, 10, 20));
+
+        // Set actions for buttons
+        genericMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Generic"));
+        specificMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Specific"));
+
+        // VBox to hold the buttons
+        VBox messagesBox = new VBox(20, genericMessagesButton, specificMessagesButton); // Spacing between buttons
+        messagesBox.setAlignment(Pos.CENTER); // Center align buttons
+        messagesBox.setPadding(new Insets(20));
+
+        // Wrap the messagesBox in a VBox with a black border
+        VBox borderedBox = new VBox(messagesBox);
+        borderedBox.setStyle(" -fx-border-width: 2; -fx-padding: 20; -fx-background-color: white;");
+        borderedBox.setAlignment(Pos.CENTER); // Ensure the bordered box is centered
+        borderedBox.setPrefWidth(800);
+        borderedBox.setPrefHeight(600);
+
+
+        // Clear existing content in the main content area and add the bordered box
+        mainContentArea.getChildren().clear();
+        mainContentArea.getChildren().add(borderedBox);
+    }
+
 
     // Function to update the content when "User Account" is clicked
     private void showUserSettingsScreen(Stage primaryStage) {
