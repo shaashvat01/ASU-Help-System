@@ -29,12 +29,14 @@ import java.util.stream.Collectors;
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
+import static com.example._360helpsystem.ArticlesPage.selectedArticle;
+
 
 public class InstructorsArticlePage extends Application {
 
     private VBox articleContainerVBox; // The container to display the articles
     private Button activeButton = null;
-    public static Article selectedArticle = null;
+//    public static Article selectedArticle = null;
 
     @Override
     public void start(Stage primaryStage) {
