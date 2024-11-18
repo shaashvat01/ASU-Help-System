@@ -1,3 +1,4 @@
+
 package com.example._360helpsystem;
 
 import Backend.*;
@@ -15,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import javax.crypto.SecretKey;
 import java.util.ArrayList;
 
 /*******
@@ -33,7 +35,9 @@ public class CreateAdminAccount extends Application {
     public static OTPList OTP_LIST = new OTPList();
     public static ArticleList ARTICLE_LIST = new ArticleList();
     public static GroupList GROUP_LIST = new GroupList();
+    public static AccessList ACCESS_LIST = new AccessList();
     Update_DB UDB = new Update_DB();
+    //DEBUG
 
     public static void main(String[] args) {
         launch(args);
@@ -41,7 +45,7 @@ public class CreateAdminAccount extends Application {
 
     // This method checks if users exist and either shows the admin creation screen or opens the main screen based on that condition.
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         // Check if users exist (if none exist, show the first-time setup screen)
         initializeDB();
         boolean usersExist = checkIfUsersExist();
@@ -155,12 +159,12 @@ public class CreateAdminAccount extends Application {
         }
     }
     // Loads the user and OTP databases from files.
-    private void initializeDB()
-    {
+    private void initializeDB() throws Exception {
         UDB.loadUserDB(USER_LIST);
         UDB.loadOTPDB(OTP_LIST);
         UDB.loadArticleDB(ARTICLE_LIST);
         UDB.loadGrpDB(GROUP_LIST);
+        UDB.loadRequestsDB();
         UDB.clearSearchHistory();
     }
     // This method saves the databases when the application is closing.
@@ -170,7 +174,8 @@ public class CreateAdminAccount extends Application {
         UDB.saveOTPDB(OTP_LIST);
         UDB.saveArticleDB(ARTICLE_LIST);
         UDB.saveGrpDB(GROUP_LIST);
-
+        UDB.saveRequestsDB();
+        UDB.clearSearchHistory();
         System.out.println("Databases saved successfully.");
     }
 }

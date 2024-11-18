@@ -29,11 +29,11 @@ public class Article {
     private String links;
     private ArrayList<String> groups;
 
+
     //Unique identifier for the article.
     public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
         this.keywords = new ArrayList<>();
         this.groups = new ArrayList<>();
-
         this.UID = UID;
         this.title = title;
         this.author = author;
@@ -57,6 +57,8 @@ public class Article {
             this.groups.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
         }
     }
+
+
     public long getUID() {
         return UID;
     }
@@ -109,7 +111,17 @@ public class Article {
         this.links = links;
     }
     public String getGroup() {
-        return String.join(",", groups);
+        StringBuilder result = new StringBuilder();
+        for (String group : this.groups) {
+            if (result.length() > 0) {
+                result.append(","); // Append a comma only after the first group
+            }
+            result.append(group);
+        }
+        return result.toString();
+    }
+    public ArrayList<String> getGroups() {
+        return groups;
     }
     public boolean hasGroup(String group) {
         for(String grpName : groups)
@@ -137,11 +149,7 @@ public class Article {
     }
 
     public boolean hasKeyword(String keyword) {
-        if(this.keywords.contains(keyword))
-        {
-            return true;
-        }
-        return false;
+        return this.keywords.contains(keyword);
     }
 
 }

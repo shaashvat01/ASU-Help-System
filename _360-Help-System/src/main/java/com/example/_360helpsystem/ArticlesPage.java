@@ -1,6 +1,8 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Encryption;
+import Backend.Group;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,18 +21,6 @@ import javafx.stage.Stage;
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
-
-/*******
- * <p> ArticlesPage Class </p>
- *
- * <p> Description: This class manages the user interface for displaying articles in the help system.
- * It provides functionalities to view, search, and interact with article content.
- * The class is designed to facilitate a user-friendly experience for browsing help articles. </p>
- *
- * @version 1.00, 2024-10-30
- * author Team - Th15
- *
- *******/
 
 public class ArticlesPage extends Application {
 
@@ -72,9 +62,9 @@ public class ArticlesPage extends Application {
 
         sidebar.getChildren().add(grpTitle);
 
-        for(String grpName : GROUP_LIST)
+        for(Group grp : GROUP_LIST)
         {
-            Button groupButton = createGroupButton(grpName,primaryStage);
+            HBox groupButton = createGroupButton(grp.getName(),primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
@@ -203,7 +193,6 @@ public class ArticlesPage extends Application {
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        displayArticlesForGroup("General",primaryStage);
     }
 
     private void showPreviousScreen(Stage primaryStage) {
@@ -216,62 +205,139 @@ public class ArticlesPage extends Application {
         }
     }
 
-    // Helper method to create a sidebar group button
-    private Button createGroupButton(String text,Stage primaryStage) {
-        Button button = new Button(text);
+    private HBox createGroupButton(String text, Stage primaryStage) {
+        // Main button with group name
+        Button groupNameButton = new Button(text);
 
-        // Consistent button styling for default, hover, and active states
+        // Default, hover, and active styles without an inner border
         String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Updated padding to be equal on left and right
+                + "-fx-background-radius: 15; "
+                + "-fx-padding: 10 0 10 0;";  // Padding for uniformity
 
         String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Same padding as default
+                + "-fx-background-radius: 15; "
+                + "-fx-padding: 10 0 10 0;";
 
-        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: black; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Style for active button
+        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15;";  // Active style for clicked button
 
-        button.setStyle(defaultStyle);
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.setAlignment(Pos.CENTER);  // Align text to the center
+        groupNameButton.setStyle(defaultStyle);
+        groupNameButton.setMaxWidth(Double.MAX_VALUE);
+        groupNameButton.setAlignment(Pos.CENTER);
 
-        // Hover effect while maintaining font size and padding
-        button.setOnMouseEntered(e -> {
-            if (button != activeButton) {
-                button.setStyle(hoverStyle);
-            }
-        });
-        button.setOnMouseExited(e -> {
-            if (button != activeButton) {
-                button.setStyle(defaultStyle);
-            }
+        // Set action for when the button is clicked
+        groupNameButton.setOnAction(e -> {
+            if (activeButton != null) activeButton.setStyle(defaultStyle);  // Reset previous active button
+            groupNameButton.setStyle(activeStyle);  // Apply active style to the clicked button
+            activeButton = groupNameButton;
+            displayArticlesForGroup(text, primaryStage);
         });
 
-        // Set action when the group button is clicked
-        button.setOnAction(e -> {
-            // Reset the currently active button's style to default
-            if (activeButton != null) {
-                activeButton.setStyle(defaultStyle);
-            }
+        // Three-dots button for options
+        Button optionsButton = new Button("...");
+        optionsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 19px;");
 
-            // Set this button's style to active
-            button.setStyle(activeStyle);
-            activeButton = button; // Update the active button reference
+        // Create a ContextMenu with a single "Manage" option
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem manageItem = new MenuItem("Manage");
+        manageItem.setOnAction(e -> showManageDialog(primaryStage,text)); // Opens the manage dialog
+        contextMenu.getItems().add(manageItem);
 
-            // Handle the action for displaying articles
-            displayArticlesForGroup(text,primaryStage);
-        });
+        // Show the context menu when the three-dots button is clicked
+        optionsButton.setOnAction(e -> contextMenu.show(optionsButton, Side.BOTTOM, 0, 0));
 
-        return button;
+        // Container for the group name button and options button
+        HBox groupButtonContainer = new HBox(groupNameButton, optionsButton);
+        groupButtonContainer.setAlignment(Pos.CENTER);
+        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; "
+                + "-fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;"); // Outer border only
+
+        // Apply hover effect to the entire HBox container
+        groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
+        groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
+
+        return groupButtonContainer;
     }
 
 
 
+    private void showDeleteGroup(VBox sidebar) {
+        // Create a new Stage (window) for the pop-up
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
+        popupStage.setTitle("Delete Group");
+
+        // Create a VBox layout for the pop-up content
+        VBox popupLayout = new VBox(10);
+        popupLayout.setPadding(new Insets(15));
+        popupLayout.setAlignment(Pos.CENTER);
+
+        // Create the TextField for entering the group name to delete
+        TextField groupNameField = new TextField();
+        groupNameField.setPromptText("Enter Group Name to Delete");  // Set placeholder text
+        groupNameField.setPrefWidth(200);
+
+        // Create the "Delete" button
+        Button deleteButton = new Button("Delete");
+        deleteButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
+        deleteButton.setPrefWidth(100);
+
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
+
+        // Handle "Delete" button action
+        deleteButton.setOnAction(event -> {
+            String groupName = groupNameField.getText();
+            if (!groupName.isEmpty()) {
+                // Handle group deletion logic here
+                if(GROUP_LIST.contains(groupName)) {
+                    GROUP_LIST.removeGroup(groupName); // Ensure GROUP_LIST has remove() method
+
+                    // Remove the corresponding button from the sidebar
+                    sidebar.getChildren().removeIf(node -> {
+                        if (node instanceof HBox) {
+                            HBox hBox = (HBox) node;
+                            if (hBox.getChildren().get(0) instanceof Button) {
+                                Button groupButton = (Button) hBox.getChildren().get(0);
+                                return groupButton.getText().equals(groupName); // Check if the button text matches
+                            }
+                        }
+                        return false;
+                    });
+
+                    // Close the pop-up after deletion
+                    popupStage.close();
+                } else {
+                    if(groupName.equalsIgnoreCase("General")) {
+                        errorLabel.setText("Cannot delete " + groupName);
+                    }
+                    else {
+                        errorLabel.setText("Group " + groupName + " does not exist.");
+                    }
+                }
+            } else {
+                // Show an alert or error message if the field is empty
+                errorLabel.setText("Group name cannot be empty.");
+            }
+        });
+
+        // Add the TextField and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, errorLabel, deleteButton);
+
+        // Create a Scene for the pop-up window and set it to the stage
+        Scene popupScene = new Scene(popupLayout, 300, 150);
+        popupStage.setScene(popupScene);
+        popupStage.showAndWait();  // Show the pop-up and wait until it is closed
+    }
+
+
+    private void showManageDialog(Stage primaryStage,String name) {
+        ManageGeneralGroup manageGeneralGroup = new ManageGeneralGroup();
+        try{
+            manageGeneralGroup.setGroup(name,primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     // Method to dynamically display articles for a specific group
     private void displayArticlesForGroup(String groupName,Stage primaryStage) {
@@ -391,14 +457,99 @@ public class ArticlesPage extends Application {
             contextMenu.hide(); // Hide the context menu after action
         });
 
+        // Create the Update Article menu item
+        MenuItem viewItem = new MenuItem("View Article");
+        viewItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        viewItem.setOnAction(e -> {
+            try {
+                showArticleDetails(article);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            contextMenu.hide(); // Hide the context menu after action
+        });
+
+
         // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem, updateItem);
+        contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
 
         // Show the context menu relative to the clicked 3-dots button
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
 
-    private void showCreateGroup(VBox sidebar,Stage primaryStage) {
+    private void showArticleDetails(Article article) throws Exception {
+        // Create a new stage for the details window
+        Stage detailStage = new Stage();
+        detailStage.setTitle("Article Details - " + article.getTitle());
+
+        // Article details layout
+        VBox detailsLayout = new VBox(10);
+        detailsLayout.setPadding(new Insets(20));
+        detailsLayout.setAlignment(Pos.TOP_LEFT);
+
+        // Title
+        Label titleLabel = new Label("Title: " + article.getTitle());
+        titleLabel.setFont(Font.font("Arial", 18));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Level
+        Label levelLabel = new Label("Level: " + article.getLevel());
+        levelLabel.setFont(Font.font("Arial", 14));
+        levelLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #7f8c8d;");
+
+        // Abstract
+        Label abstractHeading = new Label("Abstract:");
+        abstractHeading.setFont(Font.font("Arial", 14));
+        abstractHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label abstractLabel = new Label(article.getAbs());
+        abstractLabel.setWrapText(true);
+
+        // Keywords
+        Label keywordsHeading = new Label("Keywords:");
+        keywordsHeading.setFont(Font.font("Arial", 14));
+        keywordsHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label keywordsLabel = new Label(article.getKeywords());
+        keywordsLabel.setWrapText(true);
+
+        // Reference Links
+        Label referenceLinksHeading = new Label("Reference Links:");
+        referenceLinksHeading.setFont(Font.font("Arial", 14));
+        referenceLinksHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label referenceLinksLabel = new Label(article.getLinks());
+        referenceLinksLabel.setWrapText(true);
+
+        // Body or Content
+        Label bodyHeading = new Label("Body:");
+        bodyHeading.setFont(Font.font("Arial", 14));
+        bodyHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label bodyLabel = new Label();
+        if(article.getSecurity().equals("Protected"))
+        {
+            bodyLabel.setText(new Encryption().decryptBody(article));
+        }
+        else{
+            bodyLabel.setText(article.getBody());
+        }
+
+        bodyLabel.setWrapText(true);
+
+        // Add all details to the layout
+        detailsLayout.getChildren().addAll(
+                titleLabel,
+                levelLabel,
+                abstractHeading, abstractLabel,
+                keywordsHeading, keywordsLabel,
+                referenceLinksHeading, referenceLinksLabel,
+                bodyHeading, bodyLabel
+        );
+
+        // Create and set the scene
+        Scene detailScene = new Scene(detailsLayout, 600, 500);
+        detailStage.setScene(detailScene);
+        detailStage.show();
+    }
+
+    private void showCreateGroup(VBox sidebar, Stage primaryStage) {
         // Create a new Stage (window) for the pop-up
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
@@ -414,6 +565,9 @@ public class ArticlesPage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
+        // Create checkboxes for Special Group
+        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
         // Create the "Create" button
         Button createButton = new Button("Create");
         createButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
@@ -426,101 +580,32 @@ public class ArticlesPage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
-                // Handle group creation logic here
-                if(!GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
-                    GROUP_LIST.addGroup(groupName);
-                    System.out.println("Group Created: " + groupName);
-                    sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
+
+                if (!GROUP_LIST.contains(groupName)) {
+                    GROUP_LIST.addGroup(new Group(groupName,specialGroupCheckBox.isSelected()));
+                    System.out.println("Group created - "+groupName+"-"+specialGroupCheckBox.isSelected());
+                    sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
+
                     // Close the pop-up after creation
                     popupStage.close();
-                }
-
-                errorLabel.setText("Group " + groupName + " already exists");
-
-
-            } else {
-                // You can show an alert or error message if the field is empty
-                errorLabel.setText("Group name cannot be empty.");
-            }
-        });
-
-        // Add the TextField and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,errorLabel, createButton);
-
-        // Create a Scene for the pop-up window and set it to the stage
-        Scene popupScene = new Scene(popupLayout, 300, 150);
-        popupStage.setScene(popupScene);
-        popupStage.showAndWait();  // Show the pop-up and wait until it is closed
-    }
-
-    private void showDeleteGroup(VBox sidebar) {
-        // Create a new Stage (window) for the pop-up
-        Stage popupStage = new Stage();
-        popupStage.initModality(Modality.APPLICATION_MODAL);  // Make the pop-up modal
-        popupStage.setTitle("Delete Group");
-
-        // Create a VBox layout for the pop-up content
-        VBox popupLayout = new VBox(10);
-        popupLayout.setPadding(new Insets(15));
-        popupLayout.setAlignment(Pos.CENTER);
-
-        // Create the TextField for entering the group name to delete
-        TextField groupNameField = new TextField();
-        groupNameField.setPromptText("Enter Group Name to Delete");  // Set placeholder text
-        groupNameField.setPrefWidth(200);
-
-        // Create the "Delete" button
-        Button deleteButton = new Button("Delete");
-        deleteButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
-        deleteButton.setPrefWidth(100);
-
-        Label errorLabel = new Label();
-        errorLabel.setTextFill(Color.RED);  // Set text color to red for visibility
-
-        // Handle "Delete" button action
-        deleteButton.setOnAction(event -> {
-            String groupName = groupNameField.getText();
-            if (!groupName.isEmpty()) {
-                // Handle group deletion logic here
-                if(GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
-                    GROUP_LIST.removeGroup(groupName); // Assuming removeGroup is a method in GROUP_LIST
-                    System.out.println("Group Deleted: " + groupName);
-                    // Remove the corresponding button from the sidebar
-                    sidebar.getChildren().removeIf(node -> {
-                        if (node instanceof Button) {
-                            Button button = (Button) node;
-                            return button.getText().equals(groupName); // Check if the button text matches
-                        }
-                        return false;
-                    });
-                    // Close the pop-up after deletion
-                    popupStage.close();
                 } else {
-                    if(groupName.equalsIgnoreCase("General")) {
-                        errorLabel.setText("Cannot delete " + groupName);
-                    }
-                    else{
-                        errorLabel.setText("Group " + groupName + " does not exist.");
-                    }
-
+                    errorLabel.setText("Group " + groupName + " already exists");
                 }
             } else {
-                // Show an alert or error message if the field is empty
+                // Show error message if the field is empty
                 errorLabel.setText("Group name cannot be empty.");
             }
         });
 
-        // Add the TextField and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, errorLabel, deleteButton);
+        // Add the TextField, checkboxes, and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, specialGroupCheckBox,
+                errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
-        Scene popupScene = new Scene(popupLayout, 300, 150);
+        Scene popupScene = new Scene(popupLayout, 300, 200);
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
-
-
-
 
 
     private void showRestoreArticles(Stage primaryStage) {

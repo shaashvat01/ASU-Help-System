@@ -1,14 +1,20 @@
 package Backend;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
-import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
-import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+import static com.example._360helpsystem.CreateAdminAccount.*;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 /*******
  * <p> Update_DB Class </p>
@@ -23,14 +29,16 @@ import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
  */
 
 public class Update_DB {
-    private final String path_to_UserDB = "Users.txt";
-    private final String path_to_OTPDB = "OTPs.txt";
-    private final String path_to_ArticleDB = "Articles.txt";
-    private final String path_to_GroupDB = "Groups.txt";
-    private final String path_to_BackupDB = "Backups.txt";
-    private final String path_to_genericMsgDB = "GenericMsgs.txt";
-    private final String path_to_searchHistory = "History.txt";
-    private final String path_to_requestsDB = "Requests.txt";
+    private final String path_to_UserDB = "Users-DB.txt";
+    private final String path_to_OTPDB = "OTPs-DB.txt";
+    private final String path_to_ArticleDB = "Articles-DB.txt";
+    private final String path_to_GroupDB = "Groups-DB.txt";
+    private final String path_to_BackupDB = "Backups-DB.txt";
+    private final String path_to_genericMsgDB = "GenericMsgs-DB.txt";
+    private final String path_to_searchHistory = "History-DB.txt";
+    private final String path_to_requestsDB = "Requests-DB.txt";
+    private final String path_to_futureArticleDB = "FutureArticles-DB.txt";
+    private final String path_to_key = "Key-DB.txt";
 
     // Load the user database from the file into UserList
     public void loadUserDB(UserList userL) {
@@ -96,13 +104,11 @@ public class Update_DB {
 
     public void loadArticleDB(ArticleList articleL) {
         File articleDBFile = new File(path_to_ArticleDB);
-        if (articleDBFile.exists()) { // Check if the file exists
+        if (articleDBFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(articleDBFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.trim().isEmpty()) {
-                        break; // Stop reading if a blank line is encountered
-                    }
+                    if (line.trim().isEmpty()) continue; // Skip empty lines
                     String[] data = line.split("-");
                     if (data.length == 10) {
                         long UID = Long.parseLong(data[0]);
@@ -116,20 +122,18 @@ public class Update_DB {
                         String links = data[8];
                         String group = data[9];
 
+
                         Article article = new Article(UID, title, author, level, security, abstractText, keywords, body, links, group);
                         articleL.addArticle(article);
-                        System.out.println("Article added to article database: " + article.getTitle() + " - " + article.getKeywords());
-
                     } else {
-                        System.out.println("Data length mismatch. Expected 10, found: " + data.length);
+                        System.out.println("Data length mismatch. Expected 11 fields.");
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Error loading article database: " + e.getMessage());
+                System.out.println("Error loading articles: " + e.getMessage());
             }
         } else {
-            // File doesn't exist; leave articleL empty
-            System.out.println("Article database file does not exist. Starting with an empty ArticleList.");
+            System.out.println("Article database file does not exist.");
         }
     }
 
@@ -155,19 +159,82 @@ public class Update_DB {
 
     public void loadGrpDB(GroupList grpList) {
         File grpDBFile = new File(path_to_GroupDB);
-        if (grpDBFile.exists()) { // Check if the file exists
-            try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    grpList.addGroup(line);
+
+        if (!grpDBFile.exists()) {
+            System.out.println("Group database file does not exist.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(grpDBFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue; // Skip empty lines
+
+                String[] parts = line.split("-");
+                if (parts.length != 4) {
+                    System.out.println("Invalid group format: " + line);
+                    continue;
                 }
-            } catch (IOException e) {
-                System.out.println("Error loading Group database: " + e.getMessage());
+
+                String groupID = parts[0].trim();
+                String usersPart = parts[1].replaceAll("[\\[\\]]", "").trim();
+                String adminsPart = parts[2].replaceAll("[\\[\\]]", "").trim();
+                boolean isSpecial;
+
+                try {
+                    isSpecial = Boolean.parseBoolean(parts[3].trim());
+                } catch (Exception e) {
+                    System.out.println("Invalid boolean value for special flag in line: " + line);
+                    continue;
+                }
+
+                List<String> users = usersPart.isEmpty() ? new ArrayList<>() : Arrays.asList(usersPart.split(", "));
+                List<String> admins = adminsPart.isEmpty() ? new ArrayList<>() : Arrays.asList(adminsPart.split(", "));
+
+                Group group = new Group(groupID, isSpecial, new ArrayList<>(users), new ArrayList<>(admins));
+                grpList.addGroup(group);
             }
-        } else {
-            // File doesn't exist; leave OTP_LIST empty
-            System.out.println("Group database file does not exist. Starting with an empty OTPList.");
-            grpList.addGroup("General");
+        } catch (IOException e) {
+            System.out.println("Error loading groups: " + e.getMessage());
+        }
+    }
+
+    public void loadRequestsDB() {
+        if (ACCESS_LIST == null) {
+            ACCESS_LIST = new AccessList(); // Initialize ACCESS_LIST if not already done
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_requestsDB))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Expected format: username-[group1, group2, ...]
+                String[] parts = line.split("-");
+                if (parts.length != 2) {
+                    System.out.println("Invalid line format in Requests database: " + line);
+                    continue;
+                }
+
+                String username = parts[0].trim();
+                String groupsString = parts[1].trim();
+
+                // Remove square brackets and split by commas
+                String cleanGroupsString = groupsString.replace("[", "").replace("]", "");
+                String[] groupsArray = cleanGroupsString.isEmpty() ? new String[0] : cleanGroupsString.split(",");
+
+                // Create a list of groups
+                ArrayList<String> groups = new ArrayList<>();
+                for (String group : groupsArray) {
+                    if (!group.trim().isEmpty()) {
+                        groups.add(group.trim());
+                    }
+                }
+
+                // Add the Access object to ACCESS_LIST (assuming status is true by default)
+                ACCESS_LIST.addAccess(new Access(username, groups));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading Requests database: " + e.getMessage());
         }
     }
 
@@ -244,8 +311,11 @@ public class Update_DB {
 
     public void saveGrpDB(GroupList grpList) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_GroupDB, false))) { // Set append to false
-            for (String grpName : grpList) { // Accessing OTP_LIST directly from OTPList class
-                writer.write(grpName);
+            for (Group grp : grpList) { // Accessing OTP_LIST directly from OTPList class
+                writer.write(grp.getName());
+                writer.write("-"+String.join(", ", grp.getUsers().toString()));
+                writer.write("-"+String.join(", ", grp.getAdmins().toString()));
+                writer.write("-" + grp.isSpecial());
                 writer.newLine(); // Add a new line after each OTP
             }
         } catch (IOException e) {
@@ -253,8 +323,22 @@ public class Update_DB {
         }
     }
 
+    public void saveRequestsDB() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_requestsDB, false))) { // Set append to false
+            for (Access access  : ACCESS_LIST) { // Accessing OTP_LIST directly from OTPList class
+                writer.write(access.getUsername());
+                writer.write("-"+access.getGroups().toString());
+                writer.newLine(); // Add a new line after each OTP
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving Requests database: " + e.getMessage());
+        }
+    }
+
     public void writeBackup(String fileName, List<String> selectedGroups) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false))) {// Set append to false
+            writer.write(String.join("-", selectedGroups));
+            writer.newLine();
             for (Article article : ARTICLE_LIST) {
                 for (String selectedGroup : selectedGroups) {
                     if(article.hasGroup(selectedGroup))
@@ -337,6 +421,20 @@ public class Update_DB {
             ArticleList articleList = new ArticleList();
             try (BufferedReader reader = new BufferedReader(new FileReader(backupDBFile))) {
                 String line;
+                line = reader.readLine();
+                String[] grpData = line.split("-");
+                for(String grp : grpData)
+                {
+                    if(GROUP_LIST.contains(grp))
+                    {
+                        if(GROUP_LIST.getGroup(grp).isAdmin(CURRENT_USER.getUserName()))
+                        {
+                        }
+                        else{
+                            return null;
+                        }
+                    }
+                }
                 while ((line = reader.readLine()) != null) {
                     if (line.trim().isEmpty()) {
                         break; // Stop reading if a blank line is encountered
@@ -395,18 +493,78 @@ public class Update_DB {
         }
     }
 
-    public void storeAccessRequest(User user,Article article) {
-        try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
-            writer.write(user.username+"-"+article.getUID()+System.lineSeparator());  // Write message with a newline at the end
+    public void saveSearchHistory(String message)
+    {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_searchHistory));
+             FileWriter writer = new FileWriter(path_to_futureArticleDB, true)) {  // true enables append mode
+            writer.write("Help Message : "+message + System.lineSeparator());
+            writer.write("User's search history - "+ System.lineSeparator());
+            String line;
+            while ((line = reader.readLine()) != null) {
+                writer.write(line + System.lineSeparator());  // Append each line with a newline
+            }
+            writer.write("--------------------------------------------------------" + System.lineSeparator());
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
     }
 
-    public void saveRequest()
-    {
-
+    public void storeAccessRequest(User user,Article article) {
+        try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
+            writer.write(user.username+"-"+article.getGroups().toString()+System.lineSeparator());  // Write message with a newline at the end
+        } catch (IOException e) {
+            e.printStackTrace();  // Print stack trace if an error occurs
+        }
     }
+
+
+    public SecretKey generateKey() throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(256); // Key size in bits
+        return keyGenerator.generateKey();
+    }
+
+    public boolean isFileUnique(String name) {
+        name = name + ".txt";
+        System.out.println("Checking file name - " + name);
+
+        if (name.equalsIgnoreCase(path_to_ArticleDB)) {
+            System.out.println("File name matches path_to_ArticleDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_futureArticleDB)) {
+            System.out.println("File name matches path_to_futureArticleDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_BackupDB)) {
+            System.out.println("File name matches path_to_BackupDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_UserDB)) {
+            System.out.println("File name matches path_to_UserDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_OTPDB)) {
+            System.out.println("File name matches path_to_OTPDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_GroupDB)) {
+            System.out.println("File name matches path_to_GroupDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_genericMsgDB)) {
+            System.out.println("File name matches path_to_genericMsgDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_searchHistory)) {
+            System.out.println("File name matches path_to_searchHistory.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_requestsDB)) {
+            System.out.println("File name matches path_to_requestsDB.");
+            return false;
+        } else if (name.equalsIgnoreCase(path_to_key)) {
+            System.out.println("File name matches path_to_key.");
+            return false;
+        } else {
+            System.out.println("File name is unique.");
+            return true;
+        }
+    }
+
+
 }
 
 

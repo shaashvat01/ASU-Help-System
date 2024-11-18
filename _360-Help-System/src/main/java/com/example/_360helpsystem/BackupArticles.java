@@ -1,6 +1,8 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Group;
+import Backend.Instructor;
 import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -20,6 +22,7 @@ import java.util.List;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
+import static com.example._360helpsystem.SignIn.CURRENT_USER;
 
 /*******
  * <p> BackupArticles Class </p>
@@ -68,18 +71,21 @@ public class BackupArticles extends Application {
         HBox currentHBox = new HBox(15);  // Create the first HBox with 15px spacing
         currentHBox.setAlignment(Pos.CENTER);  // Center-align the elements
 
-        for (String grpName : GROUP_LIST) {
-            CheckBox checkBox = new CheckBox(grpName);
-            checkBox.setFont(Font.font("Arial", 14));
-            groupCheckBoxes.add(checkBox);
-            currentHBox.getChildren().add(checkBox);  // Add checkboxes to the current HBox
-            iterations++;
+        for (Group grp : GROUP_LIST) {
+            if(grp.getAdmins().contains(CURRENT_USER.getUserName()) || CURRENT_USER.isAdmin())
+            {
+                CheckBox checkBox = new CheckBox(grp.getName());
+                checkBox.setFont(Font.font("Arial", 14));
+                groupCheckBoxes.add(checkBox);
+                currentHBox.getChildren().add(checkBox);  // Add checkboxes to the current HBox
+                iterations++;
 
-            // If 6 checkboxes have been added, create a new HBox
-            if (iterations % 6 == 0) {
-                checkboxesLayout.getChildren().add(currentHBox);  // Add the current HBox to the VBox
-                currentHBox = new HBox(15);  // Create a new HBox for the next set of 6 checkboxes
-                currentHBox.setAlignment(Pos.CENTER);  // Center-align the new HBox
+                // If 6 checkboxes have been added, create a new HBox
+                if (iterations % 6 == 0) {
+                    checkboxesLayout.getChildren().add(currentHBox);  // Add the current HBox to the VBox
+                    currentHBox = new HBox(15);  // Create a new HBox for the next set of 6 checkboxes
+                    currentHBox.setAlignment(Pos.CENTER);  // Center-align the new HBox
+                }
             }
         }
 
@@ -153,8 +159,16 @@ public class BackupArticles extends Application {
 
     private void showPreviousScreen(Stage primaryStage) {
         ArticlesPage articles = new ArticlesPage();
+        InstructorsArticlePage instructorsArticlePage = new InstructorsArticlePage();
         try {
-            articles.start(primaryStage);
+            if(CURRENT_USER.isAdmin())
+            {
+                articles.start(primaryStage);
+            }
+            else{
+                instructorsArticlePage.start(primaryStage);
+            }
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -181,10 +195,13 @@ public class BackupArticles extends Application {
 
         if(!fileName.isEmpty() && isGroupSelected)
         {
-            if(fileName.equals("Backups"))
+            Update_DB UDB = new Update_DB();
+
+            if(!UDB.isFileUnique(fileName))
             {
                 error.setText("File name in use. Enter another name");
                 error.setVisible(true);
+                return;
             }
             List<String> selectedGroups = new ArrayList<>();
 
@@ -196,8 +213,8 @@ public class BackupArticles extends Application {
                 }
             }
 
-            fileName = fileName + ".txt";
-            Update_DB UDB = new Update_DB();
+
+
             if(!UDB.checkDupBackup(fileName))
             {
                 UDB.writeBackup(fileName,selectedGroups);

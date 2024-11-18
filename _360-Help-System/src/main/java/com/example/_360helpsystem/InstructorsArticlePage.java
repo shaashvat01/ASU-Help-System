@@ -1,88 +1,81 @@
 package com.example._360helpsystem;
 
 import Backend.Article;
+import Backend.Encryption;
+import Backend.Group;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+
+import javafx.scene.control.Button;
+import javafx.util.Duration;
+
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.example._360helpsystem.CreateAdminAccount.ARTICLE_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.GROUP_LIST;
 import static com.example._360helpsystem.SignIn.CURRENT_USER;
+import static com.example._360helpsystem.ArticlesPage.selectedArticle;
 
-/*******
- * <p> InstructorsArticlePage Class </p>
- *
- * <p> Description: This class provides the user interface for instructors to view and manage
- * articles within the help system. It enables instructors to browse, edit, and organize content
- * specific to their needs. </p>
- *
- * @version 1.00, 2024-10-30
- * author Team - Th15
- *
- *******/
 
 public class InstructorsArticlePage extends Application {
 
     private VBox articleContainerVBox; // The container to display the articles
     private Button activeButton = null;
-    public static Article selectedArticle = null;
+//    public static Article selectedArticle = null;
 
     @Override
     public void start(Stage primaryStage) {
-
-        // Create a ScrollPane to hold the VBox containing articles
+        // ScrollPane for articles
         ScrollPane scrollPane_Article = new ScrollPane();
-        scrollPane_Article.setFitToWidth(true); // Ensure the ScrollPane fits the width of the content
-        scrollPane_Article.setFitToHeight(true); // Ensure the ScrollPane also fits the height of the window
-
-        // ScrollPane styling (optional)
+        scrollPane_Article.setFitToWidth(true);
+        scrollPane_Article.setFitToHeight(true);
         scrollPane_Article.setStyle("-fx-background-color: transparent;");
 
-        // Create a ScrollPane to hold the VBox containing groups
+        // ScrollPane for groups
         ScrollPane scrollPane_Groups = new ScrollPane();
-        scrollPane_Groups.setFitToWidth(true); // Ensure the ScrollPane fits the width of the content
-        scrollPane_Groups.setFitToHeight(true); // Ensure the ScrollPane also fits the height of the window
-
-        // ScrollPane styling (optional)
+        scrollPane_Groups.setFitToWidth(true);
+        scrollPane_Groups.setFitToHeight(true);
         scrollPane_Groups.setStyle("-fx-background-color: transparent;");
 
-        // Create the sidebar with groups
+        // Sidebar with groups
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(10, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
-        sidebar.setPrefWidth(160);  // Adjust the sidebar width
+        sidebar.setPrefWidth(160);
 
         Label grpTitle = new Label("Groups");
         grpTitle.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px;");
         grpTitle.setMaxWidth(Double.MAX_VALUE);
-        grpTitle.setPadding(new Insets(10, 0, 10, 0)); // Even padding for left and right
-        grpTitle.setAlignment(Pos.CENTER);  // Center the label text
-
-
+        grpTitle.setPadding(new Insets(10, 0, 10, 0));
+        grpTitle.setAlignment(Pos.CENTER);
         sidebar.getChildren().add(grpTitle);
 
-        for(String grpName : GROUP_LIST)
-        {
-            Button groupButton = createGroupButton(grpName,primaryStage);
+        for (Group grp : GROUP_LIST) {
+            if(grp.getUsers().contains(CURRENT_USER.getUserName())) {}
+            HBox groupButton = createGroupButton(grp.getName(), primaryStage);
             sidebar.getChildren().add(groupButton);
         }
 
-        scrollPane_Groups.setContent(sidebar); // Add VBox to ScrollPane
-        scrollPane_Groups.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
-        scrollPane_Groups.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);  // Disable horizontal scrollbar
+        scrollPane_Groups.setContent(sidebar);
+        scrollPane_Groups.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane_Groups.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        // Create article-related buttons (Create Article, Backup, Restore)
+        // Article-related buttons
         Button createArticleBtn = new Button("Create Article");
         createArticleBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         createArticleBtn.setPrefWidth(150);
@@ -90,19 +83,8 @@ public class InstructorsArticlePage extends Application {
         createArticleBtn.setFont(Font.font("Arial", 15));
         createArticleBtn.setOnAction(e -> showCreateArticleScreen(primaryStage));
 
-        Button backupBtn = new Button("Backup");
-        backupBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        backupBtn.setPrefWidth(100);
-        backupBtn.setPrefHeight(35);
-        backupBtn.setFont(Font.font("Arial", 15));
-        backupBtn.setOnAction(e -> showBackupScreen(primaryStage));
-
-        Button restoreBtn = new Button("Restore");
-        restoreBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        restoreBtn.setPrefWidth(100);
-        restoreBtn.setPrefHeight(35);
-        restoreBtn.setFont(Font.font("Arial", 15));
-        restoreBtn.setOnAction(e -> showRestoreArticles(primaryStage));
+        Button backupBtn = createStyledButton("Backup", e -> showBackupScreen(primaryStage));
+        Button restoreBtn = createStyledButton("Restore", e -> showRestoreArticles(primaryStage));
 
         Button createGrpBtn = new Button("Create Group");
         createGrpBtn.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
@@ -118,92 +100,400 @@ public class InstructorsArticlePage extends Application {
         deleteGrpBtn.setFont(Font.font("Arial", 15));
         deleteGrpBtn.setOnAction(e -> showDeleteGroup(sidebar));
 
-        HBox articleButtons = new HBox(20);
+        HBox articleButtons = new HBox(20,createGrpBtn,deleteGrpBtn ,createArticleBtn, backupBtn, restoreBtn);
         articleButtons.setAlignment(Pos.CENTER);
         articleButtons.setPadding(new Insets(0, 0, 0, 0));
 
-        if(CURRENT_USER != null)
-        {
-            if(CURRENT_USER.isAdmin() || CURRENT_USER.isInstructor())
-            {
-                // HBox to hold article-related buttons
-                articleButtons.getChildren().addAll(createGrpBtn,deleteGrpBtn);
-            }
-
-        }
-
-        // HBox to hold article-related buttons
-        articleButtons.getChildren().addAll(createArticleBtn, backupBtn, restoreBtn);
-
-
-        // VBox to hold the article container (which will display the articles dynamically)
-        articleContainerVBox = new VBox(10); // This will hold dynamically added articles
-        articleContainerVBox.setPrefSize(700, 565); // Set preferred size
+        articleContainerVBox = new VBox(10);
+        articleContainerVBox.setPrefSize(700, 565);
         articleContainerVBox.setStyle("-fx-background-color: white;");
+        scrollPane_Article.setContent(articleContainerVBox);
+        scrollPane_Article.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane_Article.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        scrollPane_Article.setContent(articleContainerVBox); // Add VBox to ScrollPane
-        scrollPane_Article.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
-        scrollPane_Article.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);  // Disable horizontal scrollbar
-        // VBox to hold the article buttons and container
         VBox articleSection = new VBox(20, articleButtons, scrollPane_Article);
         articleSection.setAlignment(Pos.TOP_CENTER);
         articleSection.setPadding(new Insets(20));
 
-        // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage)); // Call the showPreviousScreen method
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
-        // Search Bar
         TextField searchField = new TextField();
         searchField.setPromptText("Search articles...");
-        searchField.setPrefWidth(250);  // Adjust the width of the search field
-        searchField.setPrefHeight(30);
+        searchField.setPrefWidth(250);
 
-        // Search Button with "Search" text
         Button searchButton = new Button("Search");
         searchButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
-        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText(),primaryStage));
+        searchButton.setOnAction(e -> displayArticlesForSearch(searchField.getText(), primaryStage));
 
-        // Search bar layout
-        HBox searchBar = new HBox(5, searchField, searchButton);
+        Button filterButton = new Button("Filter");
+        filterButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        filterButton.setFont(Font.font("Arial", 15));
+        filterButton.setPrefHeight(29);
+
+        HBox searchBar = new HBox(5, searchField, searchButton, filterButton);
         searchBar.setAlignment(Pos.CENTER);
         searchBar.setPadding(new Insets(10, 0, 0, 240));
 
-
-        // Top bar layout with Back, Search, and Logout buttons
         HBox topBar = new HBox();
         topBar.setPadding(new Insets(10, 10, 0, 10));
         topBar.setSpacing(10);
-
         HBox leftBox = new HBox(backButton);
         leftBox.setAlignment(Pos.TOP_LEFT);
-
         HBox rightBox = new HBox(createArticleBtn);
         rightBox.setAlignment(Pos.TOP_RIGHT);
-
         topBar.getChildren().addAll(leftBox, searchBar, rightBox);
         topBar.setAlignment(Pos.CENTER);
-        HBox.setHgrow(rightBox, Priority.ALWAYS); // Make the right box grow to fit
+        HBox.setHgrow(rightBox, Priority.ALWAYS);
 
-        // Main layout with sidebar and main content area (article section)
         HBox mainLayout = new HBox(scrollPane_Groups, articleSection);
 
-        // Create the root layout and set the top bar and main layout
-        BorderPane root = new BorderPane();
-        root.setTop(topBar);
-        root.setCenter(mainLayout);
-        root.setStyle("-fx-background-color: #f8f5f3;");
+        BorderPane mainContent = new BorderPane();
+        mainContent.setTop(topBar);
+        mainContent.setCenter(mainLayout);
+        mainContent.setStyle("-fx-background-color: #f8f5f3;");
 
-        // Create the scene and set it on the stage
+        VBox filterPanel = createFilterPanel();
+
+        StackPane root = new StackPane(mainContent, filterPanel);
         Scene scene = new Scene(root, 900, 700);
-        primaryStage.setTitle("Article Dashboard");
+        primaryStage.setTitle("Instructor Article Dashboard");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        displayArticlesForGroup("General",primaryStage);
+        TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), filterPanel);
+        slideIn.setFromX(900);
+        slideIn.setToX(0);
+
+        TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), filterPanel);
+        slideOut.setFromX(0);
+        slideOut.setToX(900);
+
+        filterButton.setOnAction(e -> {
+            filterPanel.setVisible(true);
+            slideIn.play();
+        });
+
+        Button saveButton = (Button) filterPanel.lookup("#saveButton");
+        saveButton.setOnAction(e -> slideOut.play());
+        slideOut.setOnFinished(e -> filterPanel.setVisible(false));
+
+        displayArticlesForGroup("General", primaryStage);
+    }
+
+    private VBox createFilterPanel() {
+        // Filter options panel with Content Level and Group checkboxes
+        VBox filterPanel = new VBox(20);
+        filterPanel.setPadding(new Insets(20));
+        filterPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #ccc;");
+        filterPanel.setPrefWidth(300);
+        filterPanel.setTranslateX(900); // Initially hidden off-screen
+        filterPanel.setVisible(false); // Hidden initially
+
+        // Content Level heading and checkboxes
+        Label contentLevelLabel = new Label("Content Level:");
+        contentLevelLabel.setFont(Font.font("Arial", 14));
+        contentLevelLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox allContentCheckBox = new CheckBox("All");
+        CheckBox beginnerCheckBox = new CheckBox("Beginner");
+        CheckBox intermediateCheckBox = new CheckBox("Intermediate");
+        CheckBox advancedCheckBox = new CheckBox("Advanced");
+        CheckBox expertCheckBox = new CheckBox("Expert");
+
+        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+
+        // Groups heading and checkboxes
+        Label groupLabel = new Label("Groups:");
+        groupLabel.setFont(Font.font("Arial", 14));
+        groupLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox allGroupCheckBox = new CheckBox("All");
+        CheckBox javafxCheckBox = new CheckBox("JavaFX");
+        CheckBox eclipseCheckBox = new CheckBox("Eclipse");
+        CheckBox githubCheckBox = new CheckBox("GitHub");
+
+        VBox groupOptions = new VBox(10, allGroupCheckBox, javafxCheckBox, eclipseCheckBox, githubCheckBox);
+
+        // Search By heading and checkboxes
+        Label searchByLabel = new Label("Search By:");
+        searchByLabel.setFont(Font.font("Arial", 14));
+        searchByLabel.setStyle("-fx-font-weight: bold;");
+
+        CheckBox titleCheckBox = new CheckBox("Title");
+        CheckBox authorCheckBox = new CheckBox("Author");
+        CheckBox uidCheckBox = new CheckBox("UID");
+
+        VBox searchByOptions = new VBox(10, titleCheckBox, authorCheckBox, uidCheckBox);
+
+        // Buttons for clearing and saving filter selections
+        Button clearButton = new Button("Clear");
+        clearButton.setFont(Font.font("Arial", 16));
+        clearButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        clearButton.setPrefWidth(100);
+        clearButton.setOnAction(e -> {
+            // Clear all checkboxes
+            allContentCheckBox.setSelected(false);
+            beginnerCheckBox.setSelected(false);
+            intermediateCheckBox.setSelected(false);
+            advancedCheckBox.setSelected(false);
+            expertCheckBox.setSelected(false);
+            allGroupCheckBox.setSelected(false);
+            javafxCheckBox.setSelected(false);
+            eclipseCheckBox.setSelected(false);
+            githubCheckBox.setSelected(false);
+            titleCheckBox.setSelected(false);
+            authorCheckBox.setSelected(false);
+            uidCheckBox.setSelected(false);
+        });
+
+        Button saveButton = new Button("Save");
+        saveButton.setFont(Font.font("Arial", 16));
+        saveButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        saveButton.setPrefWidth(100);
+        saveButton.setId("saveButton");
+
+        HBox buttonLayout = new HBox(20, clearButton, saveButton);
+        buttonLayout.setAlignment(Pos.CENTER);
+
+        // Add all elements to the filter panel
+        filterPanel.getChildren().addAll(contentLevelLabel, contentLevelOptions, groupLabel, groupOptions, searchByLabel, searchByOptions, buttonLayout);
+        return filterPanel;
+    }
+
+    private HBox createGroupButton(String text, Stage primaryStage) {
+        Button groupNameButton = new Button(text);
+        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
+        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15; -fx-padding: 10 0 10 0;";
+        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; -fx-background-radius: 15;";
+
+        groupNameButton.setStyle(defaultStyle);
+        groupNameButton.setMaxWidth(Double.MAX_VALUE);
+        groupNameButton.setAlignment(Pos.CENTER);
+
+        groupNameButton.setOnAction(e -> {
+            if (activeButton != null) activeButton.setStyle(defaultStyle);
+            groupNameButton.setStyle(activeStyle);
+            activeButton = groupNameButton;
+            displayArticlesForGroup(text, primaryStage);
+        });
+
+        Button optionsButton = new Button("...");
+        optionsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 19px;");
+
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem manageItem = new MenuItem("Manage");
+        manageItem.setOnAction(e -> showManageDialog(primaryStage, text));
+        contextMenu.getItems().add(manageItem);
+
+        optionsButton.setOnAction(e -> contextMenu.show(optionsButton, Side.BOTTOM, 0, 0));
+
+        HBox groupButtonContainer = new HBox(groupNameButton, optionsButton);
+        groupButtonContainer.setAlignment(Pos.CENTER);
+        groupButtonContainer.setStyle("-fx-background-color: #333; -fx-border-color: white; -fx-border-radius: 15; -fx-background-radius: 15; -fx-padding: 10; -fx-spacing: 10;");
+        groupButtonContainer.setOnMouseEntered(e -> groupButtonContainer.setStyle(hoverStyle));
+        groupButtonContainer.setOnMouseExited(e -> groupButtonContainer.setStyle(defaultStyle));
+
+        if(GROUP_LIST.getGroup(text).isSpecial() && !GROUP_LIST.getGroup(text).isAdmin(CURRENT_USER.getUserName()))
+        {
+            System.out.println(text + "options removed for current user");
+            groupButtonContainer.getChildren().remove(optionsButton);
+        }
+
+        return groupButtonContainer;
+    }
+
+
+    private void showManageDialog(Stage primaryStage, String groupName) {
+        ManageGeneralGroup generalGroup = new ManageGeneralGroup();
+        try {
+            generalGroup.setGroup(groupName,primaryStage);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    private Button createStyledButton(String text, EventHandler<ActionEvent> action) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        button.setPrefWidth(100);
+        button.setPrefHeight(35);
+        button.setFont(Font.font("Arial", 15));
+        button.setOnAction(action);
+        return button;
+    }
+
+    private void displayArticlesForGroup(String groupName, Stage primaryStage) {
+        articleContainerVBox.getChildren().clear();
+
+        for (Article article : ARTICLE_LIST) {
+            if (article.hasGroup(groupName)) {
+                VBox articleBox = new VBox(5);
+                articleBox.setPadding(new Insets(10));
+                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                articleBox.setAlignment(Pos.TOP_LEFT);
+
+                HBox titleLevelBox = new HBox(10);
+                Label titleLabel = new Label(article.getTitle());
+                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
+                titleLabel.setFont(Font.font("Arial", 17));
+
+                Label levelLabel = new Label("(" + article.getLevel() + ")");
+                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
+                levelLabel.setFont(Font.font("Arial", 14));
+
+                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
+                titleLevelBox.setAlignment(Pos.TOP_LEFT);
+
+                Button optionsButton = new Button("...");
+                optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
+
+                HBox titleOptionsBox = new HBox(titleLevelBox);
+                HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
+                titleOptionsBox.setAlignment(Pos.TOP_RIGHT);
+
+                if(GROUP_LIST.getGroup(groupName).isAdmin(CURRENT_USER.getUserName()))
+                {
+                    titleOptionsBox.getChildren().addAll(optionsButton);
+                }
+
+                articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
+                articleContainerVBox.getChildren().add(articleBox);
+            }
+        }
+    }
+
+    private void displayArticlesForSearch(String searchText, Stage primaryStage) {
+        articleContainerVBox.getChildren().clear();
+
+        // Filter articles based on search text
+        List<Article> filteredArticles = ARTICLE_LIST.getArticles().stream()
+                .filter(article -> article.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
+                        article.getAuthor().toLowerCase().contains(searchText.toLowerCase()) ||
+                        article.getKeywords().toLowerCase().contains(searchText.toLowerCase()))
+                .collect(Collectors.toList());
+
+        // Display search results
+        Label groupLabel = new Label("Search Results");
+        groupLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        articleContainerVBox.getChildren().add(groupLabel);
+
+        // Display articles by level count
+        Map<String, Long> levelCounts = filteredArticles.stream()
+                .collect(Collectors.groupingBy(Article::getLevel, Collectors.counting()));
+
+        levelCounts.forEach((level, count) -> {
+            Label levelLabel = new Label(level + ": " + count + " articles");
+            levelLabel.setFont(Font.font("Arial", 14));
+            articleContainerVBox.getChildren().add(levelLabel);
+        });
+
+        // Display articles in short form
+        int sequenceNumber = 1;
+        for (Article article : filteredArticles) {
+            VBox articleBox = new VBox(5);
+            articleBox.setPadding(new Insets(10));
+            articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+            articleBox.setAlignment(Pos.TOP_LEFT);
+
+            HBox titleLevelBox = new HBox(10);
+            Label titleLabel = new Label(sequenceNumber + ". Title: " + article.getTitle());
+            titleLabel.setFont(Font.font("Arial", 14));
+            titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #8b0000;");
+
+            Label levelLabel = new Label("(" + article.getLevel() + ")");
+            levelLabel.setFont(Font.font("Arial", 14));
+            levelLabel.setStyle("-fx-text-fill: gray;");
+
+            titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
+            titleLevelBox.setAlignment(Pos.TOP_LEFT);
+
+            Label abstractLabel = new Label("Abstract: " + article.getAbs());
+            abstractLabel.setWrapText(true);
+            abstractLabel.setFont(Font.font("Arial", 14));
+
+            Button requestAccessButton = new Button("View Article");
+            requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+            requestAccessButton.setFont(Font.font("Arial", 14));
+            requestAccessButton.setOnAction(e -> showArticleDetails(article));
+
+            HBox optionsBox = new HBox(requestAccessButton);
+            optionsBox.setAlignment(Pos.TOP_RIGHT);
+
+            articleBox.getChildren().addAll(titleLevelBox, abstractLabel, optionsBox);
+            articleContainerVBox.getChildren().add(articleBox);
+
+            sequenceNumber++;
+        }
+    }
+
+    private void showArticleDetails(Article article) {
+        // Create a new stage for the details window
+        Stage detailStage = new Stage();
+        detailStage.setTitle("Article Details - " + article.getTitle());
+
+        // Article details layout
+        VBox detailsLayout = new VBox(10);
+        detailsLayout.setPadding(new Insets(20));
+        detailsLayout.setAlignment(Pos.TOP_LEFT);
+
+        // Title
+        Label titleLabel = new Label("Title: " + article.getTitle());
+        titleLabel.setFont(Font.font("Arial", 18));
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Level
+        Label levelLabel = new Label("Level: " + article.getLevel());
+        levelLabel.setFont(Font.font("Arial", 14));
+        levelLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #7f8c8d;");
+
+        // Abstract
+        Label abstractHeading = new Label("Abstract:");
+        abstractHeading.setFont(Font.font("Arial", 14));
+        abstractHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label abstractLabel = new Label(article.getAbs());
+        abstractLabel.setWrapText(true);
+
+        // Keywords
+        Label keywordsHeading = new Label("Keywords:");
+        keywordsHeading.setFont(Font.font("Arial", 14));
+        keywordsHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label keywordsLabel = new Label(article.getKeywords());
+        keywordsLabel.setWrapText(true);
+
+        // Reference Links
+        Label referenceLinksHeading = new Label("Reference Links:");
+        referenceLinksHeading.setFont(Font.font("Arial", 14));
+        referenceLinksHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label referenceLinksLabel = new Label(article.getLinks());
+        referenceLinksLabel.setWrapText(true);
+
+        // Body or Content
+        Label bodyHeading = new Label("Body:");
+        bodyHeading.setFont(Font.font("Arial", 14));
+        bodyHeading.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label bodyLabel = new Label(article.getBody());
+        bodyLabel.setWrapText(true);
+
+        // Add all details to the layout
+        detailsLayout.getChildren().addAll(
+                titleLabel,
+                levelLabel,
+                abstractHeading, abstractLabel,
+                keywordsHeading, keywordsLabel,
+                referenceLinksHeading, referenceLinksLabel,
+                bodyHeading, bodyLabel
+        );
+
+        // Create and set the scene
+        Scene detailScene = new Scene(detailsLayout, 600, 500);
+        detailStage.setScene(detailScene);
+        detailStage.show();
     }
 
     private void showPreviousScreen(Stage primaryStage) {
@@ -215,156 +505,6 @@ public class InstructorsArticlePage extends Application {
             ex.printStackTrace();
         }
     }
-
-    // Helper method to create a sidebar group button
-    private Button createGroupButton(String text,Stage primaryStage) {
-        Button button = new Button(text);
-
-        // Consistent button styling for default, hover, and active states
-        String defaultStyle = "-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Updated padding to be equal on left and right
-
-        String hoverStyle = "-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: white; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Same padding as default
-
-        String activeStyle = "-fx-background-color: #222; -fx-text-fill: white; -fx-font-size: 19px; "
-                + "-fx-border-radius: 15; -fx-background-radius: 15; "
-                + "-fx-border-color: black; -fx-border-width: 2px; "
-                + "-fx-padding: 10 0 10 0;";  // Style for active button
-
-        button.setStyle(defaultStyle);
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.setAlignment(Pos.CENTER);  // Align text to the center
-
-        // Hover effect while maintaining font size and padding
-        button.setOnMouseEntered(e -> {
-            if (button != activeButton) {
-                button.setStyle(hoverStyle);
-            }
-        });
-        button.setOnMouseExited(e -> {
-            if (button != activeButton) {
-                button.setStyle(defaultStyle);
-            }
-        });
-
-        // Set action when the group button is clicked
-        button.setOnAction(e -> {
-            // Reset the currently active button's style to default
-            if (activeButton != null) {
-                activeButton.setStyle(defaultStyle);
-            }
-
-            // Set this button's style to active
-            button.setStyle(activeStyle);
-            activeButton = button; // Update the active button reference
-
-            // Handle the action for displaying articles
-            displayArticlesForGroup(text,primaryStage);
-        });
-
-        return button;
-    }
-
-
-
-
-    // Method to dynamically display articles for a specific group
-    private void displayArticlesForGroup(String groupName,Stage primaryStage) {
-        // Clear previous articles
-        articleContainerVBox.getChildren().clear();
-
-        for (Article article : ARTICLE_LIST) {
-            if(article.hasGroup(groupName) || groupName.equals("General")) {
-                // Create VBox for each article with padding and border
-                VBox articleBox = new VBox(5);
-                articleBox.setPadding(new Insets(10));
-                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
-                articleBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create HBox for title and level
-                HBox titleLevelBox = new HBox(10);
-                Label titleLabel = new Label(article.getTitle());
-                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
-                titleLabel.setFont(Font.font("Arial", 17));
-
-                Label levelLabel = new Label("(" + article.getLevel() + ")");
-                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
-                levelLabel.setFont(Font.font("Arial", 14));
-
-                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
-                titleLevelBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create the 3-dots button for options
-                Button optionsButton = new Button("...");
-                optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
-
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
-
-                // Add titleOptionsBox and abstract to articleBox (VBox)
-                articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
-                articleContainerVBox.getChildren().add(articleBox);
-            }
-
-        }
-    }
-
-    public void displayArticlesForSearch(String searchText,Stage primaryStage)
-    {
-        articleContainerVBox.getChildren().clear();
-
-        for (Article article : ARTICLE_LIST) {
-            if(article.hasKeyword(searchText)) {
-                // Create VBox for each article with padding and border
-                VBox articleBox = new VBox(5);
-                articleBox.setPadding(new Insets(10));
-                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
-                articleBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create HBox for title and level
-                HBox titleLevelBox = new HBox(10);
-                Label titleLabel = new Label(article.getTitle());
-                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
-                titleLabel.setFont(Font.font("Arial", 17));
-
-                Label levelLabel = new Label("(" + article.getLevel() + ")");
-                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
-                levelLabel.setFont(Font.font("Arial", 14));
-
-                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
-                titleLevelBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create the 3-dots button for options
-                Button optionsButton = new Button("...");
-                optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
-
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
-
-                // Add titleOptionsBox and abstract to articleBox (VBox)
-                articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
-                articleContainerVBox.getChildren().add(articleBox);
-            }
-        }
-    }
-
 
 
     // Show options for updating or deleting an article
@@ -391,12 +531,27 @@ public class InstructorsArticlePage extends Application {
             contextMenu.hide(); // Hide the context menu after action
         });
 
+        // Create the Update Article menu item
+        MenuItem viewItem = new MenuItem("View Article");
+        viewItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        viewItem.setOnAction(e -> {
+            try {
+                showArticleDetails(article);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+            contextMenu.hide(); // Hide the context menu after action
+        });
+
+
         // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem, updateItem);
+        contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
 
         // Show the context menu relative to the clicked 3-dots button
         contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
     }
+
+
 
     private void showCreateGroup(VBox sidebar,Stage primaryStage) {
         // Create a new Stage (window) for the pop-up
@@ -414,6 +569,9 @@ public class InstructorsArticlePage extends Application {
         groupNameField.setPromptText("Enter Group Name");  // Set placeholder text
         groupNameField.setPrefWidth(200);
 
+        // Create checkboxes for Special Group
+        CheckBox specialGroupCheckBox = new CheckBox("Special Group");
+
         // Create the "Create" button
         Button createButton = new Button("Create");
         createButton.setStyle("-fx-background-color: #333; -fx-text-fill: white;");
@@ -426,29 +584,29 @@ public class InstructorsArticlePage extends Application {
         createButton.setOnAction(event -> {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
-                // Handle group creation logic here
-                if(!GROUP_LIST.contains(groupName)) {
-                    GROUP_LIST.addGroup(groupName);
-                    System.out.println("Group Created: " + groupName);
-                    sidebar.getChildren().add(createGroupButton(groupName,primaryStage));
+
+                if (!GROUP_LIST.contains(groupName)) {
+                    GROUP_LIST.addGroup(new Group(groupName,specialGroupCheckBox.isSelected()));
+                    System.out.println("Group created - "+groupName+"-"+specialGroupCheckBox.isSelected());
+                    sidebar.getChildren().add(createGroupButton(groupName, primaryStage));
+
                     // Close the pop-up after creation
                     popupStage.close();
+                } else {
+                    errorLabel.setText("Group " + groupName + " already exists");
                 }
-
-                errorLabel.setText("Group " + groupName + " already exists");
-
-
             } else {
-                // You can show an alert or error message if the field is empty
+                // Show error message if the field is empty
                 errorLabel.setText("Group name cannot be empty.");
             }
         });
 
-        // Add the TextField and button to the layout
-        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField,errorLabel, createButton);
+        // Add the TextField, checkboxes, and button to the layout
+        popupLayout.getChildren().addAll(new Label("Group Name:"), groupNameField, specialGroupCheckBox,
+                errorLabel, createButton);
 
         // Create a Scene for the pop-up window and set it to the stage
-        Scene popupScene = new Scene(popupLayout, 300, 150);
+        Scene popupScene = new Scene(popupLayout, 300, 200);
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
@@ -482,21 +640,31 @@ public class InstructorsArticlePage extends Application {
             String groupName = groupNameField.getText();
             if (!groupName.isEmpty()) {
                 // Handle group deletion logic here
-                if(GROUP_LIST.contains(groupName) && !groupName.equalsIgnoreCase("General")) {
-                    GROUP_LIST.removeGroup(groupName); // Assuming removeGroup is a method in GROUP_LIST
-                    System.out.println("Group Deleted: " + groupName);
-                    // Remove the corresponding button from the sidebar
-                    sidebar.getChildren().removeIf(node -> {
-                        if (node instanceof Button) {
-                            Button button = (Button) node;
-                            return button.getText().equals(groupName); // Check if the button text matches
+                if(GROUP_LIST.contains(groupName)) {
+                    if(GROUP_LIST.getGroup(groupName).isSpecial())
+                    {
+                        if(GROUP_LIST.getGroup(groupName).isAdmin(CURRENT_USER.getUserName()))
+                        {
+                            GROUP_LIST.removeGroup(groupName); // Assuming removeGroup is a method in GROUP_LIST
+                            System.out.println("Group Deleted: " + groupName);
+                            // Remove the corresponding button from the sidebar
+                            sidebar.getChildren().removeIf(node -> {
+                                if (node instanceof HBox) {
+                                    HBox hBox = (HBox) node;
+                                    if (hBox.getChildren().get(0) instanceof Button) {
+                                        Button groupButton = (Button) hBox.getChildren().get(0);
+                                        return groupButton.getText().equals(groupName); // Check if the button text matches
+                                    }
+                                }
+                                return false;
+                            });
+                            // Close the pop-up after deletion
+                            popupStage.close();
                         }
-                        return false;
-                    });
-                    // Close the pop-up after deletion
-                    popupStage.close();
+                    }
+
                 } else {
-                    if(groupName.equalsIgnoreCase("General")) {
+                    if(GROUP_LIST.getGroup(groupName).isSpecial()) {
                         errorLabel.setText("Cannot delete " + groupName);
                     }
                     else{
@@ -518,10 +686,6 @@ public class InstructorsArticlePage extends Application {
         popupStage.setScene(popupScene);
         popupStage.showAndWait();  // Show the pop-up and wait until it is closed
     }
-
-
-
-
 
     private void showRestoreArticles(Stage primaryStage) {
         RestoreArticles restoreArticles = new RestoreArticles();
