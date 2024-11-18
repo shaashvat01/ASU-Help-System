@@ -34,68 +34,61 @@ public class InstructorPage extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        // Main content area with black border
-        mainContentArea = new VBox(); // Initialize mainContentArea
-        mainContentArea.setAlignment(Pos.CENTER);
-        mainContentArea.setPadding(new Insets(20));
-        mainContentArea.setStyle("-fx-border-color: black; -fx-border-width: 2; -fx-background-color: white;");
 
-        // Top bar with back button on the left and "Logout" button on the right
-        HBox topBar = new HBox();
-        topBar.setPadding(new Insets(10, 10, 10, 10));
-
-        // Create circular back button using ButtonStyleUtil
-        Button backButton = ButtonStyleUtil.createCircularBackButton();
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage)); // Back button logic
-
-        // Spacer to push the "Logout" button to the right
-        HBox spacer = new HBox();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // "Logout" button on the right
-        Button logoutButton = WindowUtil.createStyledButton("Logout");
-        logoutButton.setFont(WindowUtil.createStyledLabel("Logout", 18).getFont());
-
-        // Add the back button, spacer, and logout button to the top bar
-        topBar.getChildren().addAll(backButton, spacer, logoutButton);
-        topBar.setAlignment(Pos.CENTER);
-
-        // Sidebar buttons for "Articles" and "Messages"
-        Button articlesButton = createSidebarButtonWithIcon("Articles", "📄");
-        articlesButton.setOnAction(e -> showArticleScreen(primaryStage));
+        // Sidebar buttons for "Articles" and "Messages" with icons
+        Button articleButton = createSidebarButtonWithIcon("Articles", "📘");
+        articleButton.setOnAction(e -> showArticleScreen(primaryStage));
 
         Button messagesButton = createSidebarButtonWithIcon("Messages", "✉️");
-        messagesButton.setOnAction(e -> showMessagesScreen(primaryStage));
+        messagesButton.setOnAction(e -> showMessagesScreen(primaryStage)); // Link to Messages screen
 
         // Sidebar VBox with buttons
         VBox sidebar = new VBox(10);
         sidebar.setPadding(new Insets(20, 5, 10, 5));
         sidebar.setStyle("-fx-background-color: #333;");
         sidebar.setPrefWidth(160);
-        sidebar.getChildren().addAll(articlesButton, messagesButton);
+        sidebar.getChildren().addAll(articleButton, messagesButton); // Only "Articles" and "Messages" buttons
 
-        // Main content area
-        mainContentArea = new VBox(); // Initialize mainContentArea
-        mainContentArea.setAlignment(Pos.CENTER);
-        mainContentArea.setPadding(new Insets(20));
+        // Logout Button
+        Button logoutButton = new Button("Logout");
+        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        logoutButton.setFont(Font.font("Arial", 18));
+        logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
 
-        // Main layout with sidebar and main content area
-        HBox mainLayout = new HBox(sidebar, mainContentArea);
+        // Back Button using the ButtonStyleUtil class
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
-        // BorderPane root to include top bar and layout
+        // Top bar layout with Back and Logout button
+        HBox topBar = new HBox();
+        topBar.setPadding(new Insets(10, 10, 0, 10));
+        topBar.setSpacing(10);
+
+        HBox leftBox = new HBox(backButton);
+        leftBox.setAlignment(Pos.TOP_LEFT);
+
+        HBox rightBox = new HBox(logoutButton);
+        rightBox.setAlignment(Pos.TOP_RIGHT);
+
+        topBar.getChildren().addAll(leftBox, rightBox);
+        HBox.setHgrow(rightBox, Priority.ALWAYS);
+
+        // Main content area to show buttons dynamically
+        mainContentArea = new VBox();
+        mainContentArea.setAlignment(Pos.CENTER); // Center main content area in the middle of the screen
+
         BorderPane root = new BorderPane();
         root.setTop(topBar);
-        root.setCenter(mainLayout);
+        root.setLeft(sidebar);
+        root.setCenter(mainContentArea); // Place mainContentArea in the center of the BorderPane
         root.setStyle("-fx-background-color: #f8f5f3;");
 
-        // Scene settings
-        Scene scene = new Scene(root, 900, 700);
-        primaryStage.setTitle("Instructor Page");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene adminScene = new Scene(root, 900, 700);
 
-        // Set action for the logout button to show the SignIn screen
-        logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
+        primaryStage.setTitle("Instructor Dashboard");
+        primaryStage.setScene(adminScene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
     }
 
     private Button createSidebarButtonWithIcon(String text, String icon) {
