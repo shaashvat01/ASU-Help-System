@@ -598,6 +598,7 @@ public class AdminPage extends Application {
     }
 
 
+
     private void showAccountResetConfirmation(Stage primaryStage) {
         VBox confirmationLayout = new VBox(20);
         confirmationLayout.setPadding(new Insets(20));
