@@ -355,7 +355,7 @@ public class StudentArticle extends Application {
     }
 
     // Display articles in the "General" group
-    private void displayGeneralArticles() {
+    public void displayGeneralArticles() {
         System.out.println("Displaying General Articles");
         articleContainerVBox.getChildren().clear();
         int sequenceNumber = 0;
