@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleSearcher {
-    public static List<Article> searchArticles(List<Article> articles, String query) {
-        List<Article> matchingArticles = new ArrayList<>();
+    public static ArrayList<Article> searchArticles(ArrayList<Article> articles, String query) {
+        ArrayList<Article> matchingArticles = new ArrayList<>();
         boolean isNumericQuery = isNumeric(query);
 
         for (Article article : articles) {
