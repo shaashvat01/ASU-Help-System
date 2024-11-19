@@ -263,6 +263,9 @@ public class StudentArticle extends Application {
             }
         }
 
+        new Update_DB().storeSearch(searchText,selectedLevels,selectedGrps);
+        SEARCH_HISTORY.add("Search Request= "+searchText+"; Levels = "+selectedLevels+"; Groups = "+selectedGrps);
+
         System.out.println("Result articles - ");
         for (Article article : filteredResults) {
             System.out.println(article.getTitle() + "-" + article.getAbs());

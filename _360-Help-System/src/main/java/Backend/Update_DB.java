@@ -471,16 +471,16 @@ public class Update_DB {
 
     public void writeToMsgDB(String message) {
         try (FileWriter writer = new FileWriter(path_to_genericMsgDB, true)) {  // true enables append mode
-            writer.write(message + System.lineSeparator());  // Write message with a newline at the end
+            writer.write(CURRENT_USER.username+"-"+message + System.lineSeparator());  // Write message with a newline at the end
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
     }
 
-    public void storeSearch(String search)
+    public void storeSearch(String search,ArrayList<String> levelFilters, ArrayList<String> groupFilters)
     {
         try (FileWriter writer = new FileWriter(path_to_searchHistory, true)) {  // true enables append mode
-            writer.write(search + System.lineSeparator());  // Write message with a newline at the end
+            writer.write(search+"-"+levelFilters+"-"+groupFilters+ System.lineSeparator());  // Write message with a newline at the end
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
@@ -493,25 +493,47 @@ public class Update_DB {
         }
     }
 
-    public void saveSearchHistory(String message)
-    {
-        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_searchHistory));
-             FileWriter writer = new FileWriter(path_to_futureArticleDB, true)) {  // true enables append mode
-            writer.write("Help Message : "+message + System.lineSeparator());
-            writer.write("User's search history - "+ System.lineSeparator());
-            String line;
-            while ((line = reader.readLine()) != null) {
-                writer.write(line + System.lineSeparator());  // Append each line with a newline
+    public void writeToSpecificMsgDB(String message) {
+        try (FileWriter writer = new FileWriter(path_to_futureArticleDB, true)) {  // true enables append mode
+            writer.write(CURRENT_USER.username+"-"+message+"-");  // Write message with a newline at the end
+            if(SEARCH_HISTORY.size() > 1)
+            {
+                for(String search : SEARCH_HISTORY)
+                {
+                    writer.write("-"+search);
+                }
             }
-            writer.write("--------------------------------------------------------" + System.lineSeparator());
+            else{
+                writer.write(SEARCH_HISTORY.getFirst());
+            }
+            writer.write(System.lineSeparator());
+            SEARCH_HISTORY.clear();
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
     }
 
-    public void storeAccessRequest(User user,Article article) {
-        try (FileWriter writer = new FileWriter(path_to_requestsDB, true)) {  // true enables append mode
-            writer.write(user.username+"-"+article.getGroups().toString()+System.lineSeparator());  // Write message with a newline at the end
+    public void readSpecificMsg(ArrayList<String> lines) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_futureArticleDB))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    lines.add(line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Print stack trace if an error occurs
+        }
+    }
+
+    public void readGenericMsg(ArrayList<String> lines) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path_to_genericMsgDB))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    lines.add(line);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();  // Print stack trace if an error occurs
         }
