@@ -36,6 +36,7 @@ public class CreateAdminAccount extends Application {
     public static ArticleList ARTICLE_LIST = new ArticleList();
     public static GroupList GROUP_LIST = new GroupList();
     public static AccessList ACCESS_LIST = new AccessList();
+    public static ArrayList<String> SEARCH_HISTORY = new ArrayList<>();
     Update_DB UDB = new Update_DB();
     //DEBUG
 
@@ -165,7 +166,7 @@ public class CreateAdminAccount extends Application {
         UDB.loadArticleDB(ARTICLE_LIST);
         UDB.loadGrpDB(GROUP_LIST);
         UDB.loadRequestsDB();
-        UDB.clearSearchHistory();
+        SEARCH_HISTORY.clear();
     }
     // This method saves the databases when the application is closing.
     public void stop() {
@@ -175,7 +176,7 @@ public class CreateAdminAccount extends Application {
         UDB.saveArticleDB(ARTICLE_LIST);
         UDB.saveGrpDB(GROUP_LIST);
         UDB.saveRequestsDB();
-        UDB.clearSearchHistory();
+        SEARCH_HISTORY.clear();
         System.out.println("Databases saved successfully.");
     }
 }

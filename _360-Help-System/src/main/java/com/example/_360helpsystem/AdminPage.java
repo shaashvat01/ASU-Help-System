@@ -19,6 +19,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 import static com.example._360helpsystem.CreateAdminAccount.OTP_LIST;
 import static com.example._360helpsystem.CreateAdminAccount.USER_LIST;
 
@@ -103,67 +105,6 @@ public class AdminPage extends Application {
         primaryStage.show();
     }
 
-    private void showMessageDetailsScreen(Stage primaryStage, String messageType) {
-        // Predefined student name and message
-        String studentName = "Alice Johnson";
-        String message = (messageType.equalsIgnoreCase("Generic"))
-                ? "Please check your latest assignment!"
-                : "Your project submission has been reviewed.";
-
-        Text studentNameText = new Text("Student: " + studentName);
-        studentNameText.setFont(Font.font("Arial", 20));
-
-        Text messageText = new Text(messageType + " Message: " + message);
-        messageText.setFont(Font.font("Arial", 16));
-
-        VBox messageDetails = new VBox(10, studentNameText, messageText);
-        messageDetails.setAlignment(Pos.CENTER);
-
-        Button backButton = ButtonStyleUtil.createCircularBackButton();
-        backButton.setOnAction(e -> start(primaryStage));
-
-        BorderPane root = new BorderPane();
-        root.setTop(backButton);
-        root.setCenter(messageDetails);
-
-        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
-        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
-
-        Scene scene = new Scene(root, 900, 700);
-        primaryStage.setScene(scene);
-    }
-
-    private void showMessagesScreen(Stage primaryStage) {
-        // Create buttons for Generic Messages and Specific Messages
-        Button genericMessagesButton = new Button("Generic Messages");
-        genericMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
-        genericMessagesButton.setPadding(new Insets(10, 20, 10, 20));
-
-        Button specificMessagesButton = new Button("Specific Messages");
-        specificMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
-        specificMessagesButton.setPadding(new Insets(10, 20, 10, 20));
-
-        // Set actions for buttons
-        genericMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Generic"));
-        specificMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Specific"));
-
-        // VBox to hold the buttons
-        VBox messagesBox = new VBox(20, genericMessagesButton, specificMessagesButton); // Spacing between buttons
-        messagesBox.setAlignment(Pos.CENTER); // Center align buttons
-        messagesBox.setPadding(new Insets(20));
-
-        // Wrap the messagesBox in a VBox with a black border
-        VBox borderedBox = new VBox(messagesBox);
-        borderedBox.setStyle(" -fx-border-width: 2; -fx-padding: 20; -fx-background-color: white;");
-        borderedBox.setAlignment(Pos.CENTER); // Ensure the bordered box is centered
-        borderedBox.setPrefWidth(800);
-        borderedBox.setPrefHeight(600);
-
-
-        // Clear existing content in the main content area and add the bordered box
-        mainContentArea.getChildren().clear();
-        mainContentArea.getChildren().add(borderedBox);
-    }
 
 
     // Function to update the content when "User Account" is clicked
@@ -661,6 +602,128 @@ public class AdminPage extends Application {
 
         Scene resetScene = new Scene(root, 800, 600);
         primaryStage.setScene(resetScene);
+    }
+
+    private void showMessageDetailsScreen(Stage primaryStage, String messageType) {
+
+        ArrayList<String> messages = new ArrayList<>();
+        Update_DB UDB = new Update_DB();
+
+        ArrayList<String> search = new ArrayList<>();
+
+        VBox msgList = new VBox();
+
+        if(messageType.equalsIgnoreCase("Generic"))
+        {
+            UDB.readGenericMsg(messages);
+
+            for(String line : messages)
+            {
+                String[] parts = line.split("-");
+                VBox msg = new VBox(5);
+                msg.setPadding(new Insets(10));
+                msg.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                msg.setAlignment(Pos.TOP_LEFT);
+
+                HBox header = new HBox(10);
+
+
+                if (parts.length >= 2) {
+                    // Extract username and message
+                    String username = parts[0].trim();
+                    String message = parts[1].trim();
+
+                    Label messageLabel = new Label(username+" - "+message);
+
+                    header.getChildren().addAll(messageLabel);
+                    header.setAlignment(Pos.TOP_LEFT);
+
+                    msg.getChildren().addAll(header);
+                    msgList.getChildren().add(msg);
+                }
+            }
+        }
+        else{
+            UDB.readSpecificMsg(messages);
+
+            for(String line : messages)
+            {
+                String[] parts = line.split("-");
+                VBox msg = new VBox(5);
+                msg.setPadding(new Insets(10));
+                msg.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                msg.setAlignment(Pos.TOP_LEFT);
+
+                HBox header = new HBox(10);
+
+
+                if (parts.length >= 2) {
+                    // Extract username and message
+                    String username = parts[0].trim();
+                    String message = parts[1].trim();
+
+                    Label messageLabel = new Label(username+" - "+message);
+
+                    header.getChildren().addAll(messageLabel);
+                    header.setAlignment(Pos.TOP_LEFT);
+
+                    VBox searchBox = new VBox();
+                    // Add the remaining parts to the searchList
+                    for (int i = 2; i < parts.length; i++) {
+                        searchBox.getChildren().add(new Label(parts[i].trim()));
+                    }
+
+                    msg.getChildren().addAll(header, searchBox);
+                    msgList.getChildren().add(msg);
+                }
+            }
+        }
+
+
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> start(primaryStage));
+
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(msgList);
+
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
+        Scene scene = new Scene(root, 900, 700);
+        primaryStage.setScene(scene);
+    }
+
+    private void showMessagesScreen(Stage primaryStage) {
+        // Create buttons for Generic Messages and Specific Messages
+        Button genericMessagesButton = new Button("Generic Messages");
+        genericMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
+        genericMessagesButton.setPadding(new Insets(10, 20, 10, 20));
+
+        Button specificMessagesButton = new Button("Specific Messages");
+        specificMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
+        specificMessagesButton.setPadding(new Insets(10, 20, 10, 20));
+
+        // Set actions for buttons
+        genericMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Generic"));
+        specificMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Specific"));
+
+        // VBox to hold the buttons
+        VBox messagesBox = new VBox(20, genericMessagesButton, specificMessagesButton); // Spacing between buttons
+        messagesBox.setAlignment(Pos.CENTER); // Center align buttons
+        messagesBox.setPadding(new Insets(20));
+
+        // Wrap the messagesBox in a VBox with a black border
+        VBox borderedBox = new VBox(messagesBox);
+        borderedBox.setStyle(" -fx-border-width: 2; -fx-padding: 20; -fx-background-color: white;");
+        borderedBox.setAlignment(Pos.CENTER); // Ensure the bordered box is centered
+        borderedBox.setPrefWidth(800);
+        borderedBox.setPrefHeight(600);
+
+
+        // Clear existing content in the main content area and add the bordered box
+        mainContentArea.getChildren().clear();
+        mainContentArea.getChildren().add(borderedBox);
     }
 
 

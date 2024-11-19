@@ -15,6 +15,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import static com.example._360helpsystem.CreateAdminAccount.SEARCH_HISTORY;
+
 public class StudentHelp extends Application {
 
     @Override
@@ -110,6 +112,8 @@ public class StudentHelp extends Application {
     private void showMessageSentAlert(TextField textField, boolean isGenericMessage) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
+        String message = textField.getText();
+
         if(textField.getText().isEmpty()) {
             alert.setTitle("Error");
             alert.setHeaderText(null);
@@ -123,9 +127,11 @@ public class StudentHelp extends Application {
             alert.setContentText("Message has been sent.");
             alert.showAndWait(); // Displays the alert and waits for user to click "OK"
             textField.setText("");
-            if (!isGenericMessage) {
-                UDB.saveSearchHistory(textField.getText());
-                UDB.clearSearchHistory();
+            if (isGenericMessage) {
+                UDB.writeToMsgDB(message);
+            }
+            else{
+                UDB.writeToSpecificMsgDB(message);
             }
         }
 
