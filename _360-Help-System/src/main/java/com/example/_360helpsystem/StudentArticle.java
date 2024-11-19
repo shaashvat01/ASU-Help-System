@@ -51,7 +51,7 @@ public class StudentArticle extends Application {
         searchButton.setFont(Font.font("Arial", 15));
         searchButton.setPrefHeight(29);
 
-        searchButton.setOnAction(e -> performSearch(searchField.getText()));
+
 
         // Filter Button
         Button filterButton = new Button("Filter");
@@ -106,7 +106,11 @@ public class StudentArticle extends Application {
         mainContent.setStyle("-fx-background-color: #f8f5f3;");
 
         // Filter options panel (hidden initially)
-        VBox filterPanel = createFilterPanel();
+        ArrayList<CheckBox> grpFilters = new ArrayList<>();
+        ArrayList<CheckBox> levelFilters = new ArrayList<>();
+        VBox filterPanel = createFilterPanel(levelFilters, grpFilters);
+
+        searchButton.setOnAction(e -> performSearch(searchField.getText(),levelFilters,grpFilters));
 
         // StackPane to overlay filter panel on the main content
         StackPane root = new StackPane(mainContent, filterPanel);
@@ -140,7 +144,7 @@ public class StudentArticle extends Application {
         displayGeneralArticles();
     }
 
-    private VBox createFilterPanel() {
+    private VBox createFilterPanel(ArrayList<CheckBox> levelFilters, ArrayList<CheckBox> grpFilters) {
         // Filter options panel with Content Level and Group checkboxes
         VBox filterPanel = new VBox(20);
         filterPanel.setPadding(new Insets(20));
@@ -155,10 +159,16 @@ public class StudentArticle extends Application {
         contentLevelLabel.setStyle("-fx-font-weight: bold;");
 
         CheckBox allContentCheckBox = new CheckBox("All");
+        levelFilters.add(allContentCheckBox);
         CheckBox beginnerCheckBox = new CheckBox("Beginner");
+        levelFilters.add(beginnerCheckBox);
         CheckBox intermediateCheckBox = new CheckBox("Intermediate");
+        levelFilters.add(intermediateCheckBox);
         CheckBox advancedCheckBox = new CheckBox("Advanced");
+        levelFilters.add(advancedCheckBox);
         CheckBox expertCheckBox = new CheckBox("Expert");
+        levelFilters.add(expertCheckBox);
+
 
         VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
 
@@ -173,6 +183,7 @@ public class StudentArticle extends Application {
             CheckBox checkBox = new CheckBox(g.getName());
             checkBox.setFont(Font.font("Arial", 14));
             grpCheckBoxes.add(checkBox);
+            grpFilters.add(checkBox);
         }
 
 
@@ -180,18 +191,6 @@ public class StudentArticle extends Application {
         VBox groupOptions = new VBox(10);
         groupOptions.getChildren().addAll(grpCheckBoxes);
 
-        /**
-        // Search By heading and checkboxes
-        Label searchByLabel = new Label("Search By:");
-        searchByLabel.setFont(Font.font("Arial", 14));
-        searchByLabel.setStyle("-fx-font-weight: bold;");
-
-        CheckBox titleCheckBox = new CheckBox("Title");
-        CheckBox authorCheckBox = new CheckBox("Author");
-        CheckBox uidCheckBox = new CheckBox("UID");
-
-        VBox searchByOptions = new VBox(10, titleCheckBox, authorCheckBox, uidCheckBox);
-         **/
 
         // Buttons for clearing and saving filter selections
         Button clearButton = new Button("Clear");
@@ -209,15 +208,6 @@ public class StudentArticle extends Application {
             {
                 checkBox.setSelected(false);
             }
-            /**
-            allGroupCheckBox.setSelected(false);
-            javafxCheckBox.setSelected(false);
-            eclipseCheckBox.setSelected(false);
-            githubCheckBox.setSelected(false);
-            titleCheckBox.setSelected(false);
-            authorCheckBox.setSelected(false);
-            uidCheckBox.setSelected(false);
-             **/
         });
 
         Button saveButton = new Button("Save");
@@ -234,19 +224,57 @@ public class StudentArticle extends Application {
         return filterPanel;
     }
 
-    private void performSearch(String searchText) {
+    private void performSearch(String searchText, ArrayList<CheckBox> levelFilters, ArrayList<CheckBox> grpFilters) {
         articleContainerVBox.getChildren().clear();
 
-        List<Article> textResults = ArticleSearcher.searchArticles((List<Article>) ARTICLE_LIST, searchText);
+        ArrayList<String> selectedGrps = new ArrayList<>();
+        ArrayList<String> selectedLevels = new ArrayList<>();
+        boolean all = false;
+
+        // Extract selected levels
+        for (CheckBox checkBox : levelFilters) {
+            if (checkBox.isSelected()) {
+                selectedLevels.add(checkBox.getText());
+                if (checkBox.getText().equalsIgnoreCase("all")) { // Case-insensitive check for "all"
+                    all = true;
+                }
+            }
+        }
+        System.out.println("List of selected levels - " + selectedLevels);
+
+        // Extract selected groups
+        for (CheckBox checkBox : grpFilters) {
+            if (checkBox.isSelected()) {
+                selectedGrps.add(checkBox.getText());
+            }
+        }
+        System.out.println("List of selected groups - " + selectedGrps);
+
+        // Perform the article search
+        ArrayList<Article> textResults = ArticleSearcher.searchArticles(ARTICLE_LIST.getArticles(), searchText);
+        ArrayList<Article> filteredResults = new ArrayList<>();
+
+        for (Article article : textResults) {
+            boolean matchLevel = selectedLevels.contains(article.getLevel()) || selectedLevels.isEmpty();
+            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || all || selectedGrps.isEmpty();
+
+            if (matchLevel && matchGroup) {
+                filteredResults.add(article);
+            }
+        }
+
+        System.out.println("Result articles - ");
+        for (Article article : filteredResults) {
+            System.out.println(article.getTitle() + "-" + article.getAbs());
+        }
 
         // Display active group
-        String activeGroups = "";
-        Label groupLabel = new Label("Active Group: General");  // Example active group
+        Label groupLabel = new Label("Active Group: " + String.join(", ", selectedGrps));
         groupLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
         articleContainerVBox.getChildren().add(groupLabel);
 
         // Count articles by level and display
-        Map<String, Long> levelCounts = textResults.stream()
+        Map<String, Long> levelCounts = filteredResults.stream()
                 .collect(Collectors.groupingBy(Article::getLevel, Collectors.counting()));
 
         levelCounts.forEach((level, count) -> {
@@ -255,19 +283,17 @@ public class StudentArticle extends Application {
             articleContainerVBox.getChildren().add(levelLabel);
         });
 
-        // Display filtered articles in short form with consistent font style and "Request Access" button
-        int sequenceNumber = 0;
-        for (Article article : textResults) {
+        // Display filtered articles
+        int sequenceNumber = 1; // Start with 1 instead of 0
+        for (Article article : filteredResults) {
             VBox articleBox = new VBox(5);
             articleBox.setPadding(new Insets(10));
             articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
             articleBox.setAlignment(Pos.TOP_LEFT);
 
-            Label sequenceLabel = new Label(String.valueOf(sequenceNumber));
-
             Label titleLabel = new Label(sequenceNumber + ". Title: " + article.getTitle());
             titleLabel.setFont(Font.font("Arial", 14));
-            titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #8b0000;");  // Consistent font style
+            titleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #8b0000;");
 
             Label authorLabel = new Label("Author(s): " + article.getAuthor());
             authorLabel.setFont(Font.font("Arial", 14));
@@ -276,68 +302,39 @@ public class StudentArticle extends Application {
             abstractLabel.setWrapText(true);
             abstractLabel.setFont(Font.font("Arial", 14));
 
-            Button requestAccessButton = new Button("Request Access");
-            requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-            requestAccessButton.setFont(Font.font("Arial", 14));
-            requestAccessButton.setOnAction(e -> {
-                try {
-                    requestAccess(article,sequenceLabel);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-
-            Button viewArticle = new Button("View Article");
-            viewArticle.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-            viewArticle.setFont(Font.font("Arial", 14));
-            viewArticle.setOnAction(e -> {
-                try {
-                    showArticleDetails(article);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-
             HBox optionsBox = new HBox();
             optionsBox.setAlignment(Pos.TOP_RIGHT);
 
-            boolean hasAccess = false;
+            boolean hasAccess = article.getGroups().stream()
+                    .anyMatch(group -> GROUP_LIST.contains(group) &&
+                            GROUP_LIST.getGroup(group).getUsers().contains(CURRENT_USER.getUserName()));
 
-            if(article.getSecurity().equals("Protected"))
-            {
-                for(String g : article.getGroups())
-                {
-                    if(GROUP_LIST.contains(g) && GROUP_LIST.getGroup(g).getUsers().contains(CURRENT_USER.getUserName()))
-                    {
-                        hasAccess = true;
-                    }
-                }
-
-                if(hasAccess)
-                {
-                    optionsBox.getChildren().addAll(viewArticle);
-                }
-                else{
-                    optionsBox.getChildren().addAll(requestAccessButton);
-                }
-            }
-
-            if(article.getSecurity().equals("Public"))
-            {
-                for(String g : article.getGroups())
-                {
-                    if(GROUP_LIST.contains(g) && GROUP_LIST.getGroup(g).getUsers().contains(CURRENT_USER.getUserName()))
-                    {
-                        hasAccess = true;
-                    }
-                }
-
-                if(hasAccess)
-                {
-                    optionsBox.getChildren().addAll(viewArticle);
-                }
-                else{
-                    optionsBox.getChildren().addAll(requestAccessButton);
+            if ("Protected".equalsIgnoreCase(article.getSecurity()) || "Public".equalsIgnoreCase(article.getSecurity())) {
+                if (hasAccess) {
+                    Button viewArticle = new Button("View Article");
+                    viewArticle.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+                    viewArticle.setFont(Font.font("Arial", 14));
+                    viewArticle.setOnAction(e -> {
+                        try {
+                            showArticleDetails(article);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    });
+                    optionsBox.getChildren().add(viewArticle);
+                } else {
+                    Button requestAccessButton = new Button("Request Access");
+                    requestAccessButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+                    requestAccessButton.setFont(Font.font("Arial", 14));
+                    int finalSequenceNumber = sequenceNumber;
+                    requestAccessButton.setOnAction(e -> {
+                        try {
+                            requestAccess(article, finalSequenceNumber);
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    });
+                    optionsBox.getChildren().add(requestAccessButton);
                 }
             }
 
@@ -571,6 +568,43 @@ public class StudentArticle extends Application {
         detailStage.show();
 
     }
+
+    public void requestAccess(Article article,int sequence) throws Exception
+    {
+        Stage detailStage = new Stage();
+
+        VBox accessLayout = new VBox(10);
+        accessLayout.setPadding(new Insets(20));
+        accessLayout.setAlignment(Pos.CENTER);
+
+        Label messageLabel = new Label("Do you want to request access to article no - "+sequence+"?");
+        messageLabel.setFont(Font.font("Arial", 14));
+        messageLabel.setStyle("-fx-text-fill: #2c3e50;");
+
+        Button confirmButton = new Button("Yes");
+        confirmButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        confirmButton.setFont(Font.font("Arial", 14));
+        confirmButton.setOnAction(e -> {
+            // Add new access to the list
+            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            if(!ACCESS_LIST.getAccessList().contains(access))
+            {
+                ACCESS_LIST.addAccess(access);
+            }
+
+            detailStage.close();
+        });
+
+        accessLayout.getChildren().addAll(messageLabel,confirmButton);
+
+
+        // Create and set the scene
+        Scene detailScene = new Scene(accessLayout, 400, 200);
+        detailStage.setScene(detailScene);
+        detailStage.show();
+
+    }
+
 
     public static void main(String[] args) {
         launch(args);

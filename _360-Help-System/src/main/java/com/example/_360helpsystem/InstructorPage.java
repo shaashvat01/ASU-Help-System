@@ -9,8 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.util.Random;
 
 /*******
  * <p> HomePage Class </p>
@@ -25,68 +29,137 @@ import javafx.stage.Stage;
 
 public class InstructorPage extends Application {
 
+    private VBox mainContentArea; // Declare mainContentArea as a class-level variable
+
     @Override
     public void start(Stage primaryStage) {
-        // Top bar with "Home" label on the left and "Logout" button on the right
-        HBox topBar = new HBox();
-        topBar.setPadding(new Insets(10, 10, 10, 10));
 
-        // "Home" text on the left
-        Label homeText = WindowUtil.createStyledLabel("Home", 24);
-        topBar.getChildren().add(homeText);
-        HBox.setMargin(homeText, new Insets(0, 0, 0, 10));  // Extra padding for spacing
 
-        // Add spacer to push the "Logout" button to the right
-        HBox spacer = new HBox();
-        HBox.setHgrow(spacer, Priority.ALWAYS);  // Make the spacer grow to push the Logout button to the right
-        topBar.getChildren().add(spacer);
+        // Sidebar buttons for "Articles" and "Messages" with icons
+        Button articleButton = createSidebarButtonWithIcon("Articles", "📘");
+        articleButton.setOnAction(e -> showArticleScreen(primaryStage));
 
-        // "Logout" button on the right
-        Button logoutButton = WindowUtil.createStyledButton("Logout");
-        logoutButton.setFont(WindowUtil.createStyledLabel("Logout", 18).getFont());  // Consistent font
-        topBar.getChildren().add(logoutButton);
+        Button messagesButton = createSidebarButtonWithIcon("Messages", "✉️");
+        messagesButton.setOnAction(e -> showMessagesScreen(primaryStage)); // Link to Messages screen
 
-        // Align the top bar
-        topBar.setAlignment(Pos.CENTER);
+        // Sidebar VBox with buttons
+        VBox sidebar = new VBox(10);
+        sidebar.setPadding(new Insets(20, 5, 10, 5));
+        sidebar.setStyle("-fx-background-color: #333;");
+        sidebar.setPrefWidth(160);
+        sidebar.getChildren().addAll(articleButton, messagesButton); // Only "Articles" and "Messages" buttons
 
-        // Create the circular back button using ButtonStyleUtil
+        // Logout Button
+        Button logoutButton = new Button("Logout");
+        logoutButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
+        logoutButton.setFont(Font.font("Arial", 18));
+        logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
+
+        // Back Button using the ButtonStyleUtil class
         Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> showPreviousScreen(primaryStage));
 
-        // Handle back button action
-        backButton.setOnAction(e -> showPreviousScreen(primaryStage));  // Implement your back button logic here
+        // Top bar layout with Back and Logout button
+        HBox topBar = new HBox();
+        topBar.setPadding(new Insets(10, 10, 0, 10));
+        topBar.setSpacing(10);
 
-        // Create the main layout with the top bar and back button
+        HBox leftBox = new HBox(backButton);
+        leftBox.setAlignment(Pos.TOP_LEFT);
+
+        HBox rightBox = new HBox(logoutButton);
+        rightBox.setAlignment(Pos.TOP_RIGHT);
+
+        topBar.getChildren().addAll(leftBox, rightBox);
+        HBox.setHgrow(rightBox, Priority.ALWAYS);
+
+        // Main content area to show buttons dynamically
+        mainContentArea = new VBox();
+        mainContentArea.setAlignment(Pos.CENTER); // Center main content area in the middle of the screen
+
         BorderPane root = new BorderPane();
         root.setTop(topBar);
+        root.setLeft(sidebar);
+        root.setCenter(mainContentArea); // Place mainContentArea in the center of the BorderPane
+        root.setStyle("-fx-background-color: #f8f5f3;");
 
-        // Create a BorderPane to position the back button at the top left
-        BorderPane backButtonPane = new BorderPane();
-        backButtonPane.setTop(backButton);
+        Scene adminScene = new Scene(root, 900, 700);
 
-        // Align the back button to the top-left and set padding (gap of 5)
-        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
-        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));  // Gap of 5 from top and left
-
-        root.setLeft(backButtonPane);
-
-        // Create and style the "Articles" button
-        Button article = new Button("Articles");
-        article.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        article.setFont(Font.font("Arial", 18));
-        article.setPrefWidth(250);
-        article.setOnAction(e -> showArticleScreen(primaryStage));
-
-        // Add the article button to the center of the layout
-        root.setCenter(article);  // Set the button in the center of the layout
-
-        // Set the scene with the required window size
-        Scene scene = new Scene(root, 900, 700);  // Set to 600x600
-        primaryStage.setTitle("Home Page");
-        primaryStage.setScene(scene);
+        primaryStage.setTitle("Instructor Dashboard");
+        primaryStage.setScene(adminScene);
+        primaryStage.setResizable(false);
         primaryStage.show();
+    }
 
-        // Set action for the logout button to show the SignIn screen
-        logoutButton.setOnAction(e -> showSignInScreen(primaryStage));
+    private Button createSidebarButtonWithIcon(String text, String icon) {
+        Button button = new Button(icon + " " + text);
+        button.setStyle("-fx-background-color: #333; -fx-text-fill: white; -fx-font-size: 16px; -fx-alignment: CENTER_LEFT;");
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setPadding(new Insets(10, 10, 10, 10));
+        button.setAlignment(Pos.CENTER_LEFT);
+        return button;
+    }
+
+    private void showMessageDetailsScreen(Stage primaryStage, String messageType) {
+        // Predefined student name and message
+        String studentName = "Alice Johnson";
+        String message = (messageType.equalsIgnoreCase("Generic"))
+                ? "Please check your latest assignment!"
+                : "Your project submission has been reviewed.";
+
+        Text studentNameText = new Text("Student: " + studentName);
+        studentNameText.setFont(Font.font("Arial", 20));
+
+        Text messageText = new Text(messageType + " Message: " + message);
+        messageText.setFont(Font.font("Arial", 16));
+
+        VBox messageDetails = new VBox(10, studentNameText, messageText);
+        messageDetails.setAlignment(Pos.CENTER);
+
+        Button backButton = ButtonStyleUtil.createCircularBackButton();
+        backButton.setOnAction(e -> start(primaryStage));
+
+        BorderPane root = new BorderPane();
+        root.setTop(backButton);
+        root.setCenter(messageDetails);
+
+        BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));
+
+        Scene scene = new Scene(root, 900, 700);
+        primaryStage.setScene(scene);
+    }
+
+    private void showMessagesScreen(Stage primaryStage) {
+        // Create buttons for Generic Messages and Specific Messages
+        Button genericMessagesButton = new Button("Generic Messages");
+        genericMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
+        genericMessagesButton.setPadding(new Insets(10, 20, 10, 20));
+
+        Button specificMessagesButton = new Button("Specific Messages");
+        specificMessagesButton.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white; -fx-font-size: 16px;");
+        specificMessagesButton.setPadding(new Insets(10, 20, 10, 20));
+
+        // Set actions for buttons
+        genericMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Generic"));
+        specificMessagesButton.setOnAction(e -> showMessageDetailsScreen(primaryStage, "Specific"));
+
+        // VBox to hold the buttons
+        VBox messagesBox = new VBox(20, genericMessagesButton, specificMessagesButton); // Spacing between buttons
+        messagesBox.setAlignment(Pos.CENTER); // Center align buttons
+        messagesBox.setPadding(new Insets(20));
+
+        // Wrap the messagesBox in a VBox with a black border
+        VBox borderedBox = new VBox(messagesBox);
+        borderedBox.setStyle(" -fx-border-width: 2; -fx-padding: 20; -fx-background-color: white;");
+        borderedBox.setAlignment(Pos.CENTER); // Ensure the bordered box is centered
+        borderedBox.setPrefWidth(800);
+        borderedBox.setPrefHeight(600);
+
+
+        // Clear existing content in the main content area and add the bordered box
+        mainContentArea.getChildren().clear();
+        mainContentArea.getChildren().add(borderedBox);
     }
 
     private void showArticleScreen(Stage primaryStage) {
