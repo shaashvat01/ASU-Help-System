@@ -1,5 +1,17 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> InstructorsArticlePage Class </p>
+ *
+ * <p> Description: This class provides the UI for instructors to manage articles
+ * and groups in the help system. It includes functionalities for viewing,
+ * searching, filtering, creating, and updating articles, as well as managing groups. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.*;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;

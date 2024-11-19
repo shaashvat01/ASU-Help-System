@@ -1,5 +1,17 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> StudentPage Class </p>
+ *
+ * <p> Description: This class serves as the primary dashboard for students,
+ * providing options to navigate to Articles and Help sections. It also includes
+ * Logout functionality and a back button to return to the previous screen. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

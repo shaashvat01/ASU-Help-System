@@ -1,5 +1,16 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> StudentHelp Class </p>
+ *
+ * <p> Description: This class provides a user interface for students to send generic messages or
+ * specific messages to the support team. The messages are saved in the database for further processing. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;

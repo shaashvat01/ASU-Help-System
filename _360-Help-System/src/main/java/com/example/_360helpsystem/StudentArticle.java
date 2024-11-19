@@ -1,5 +1,17 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> StudentArticle Class </p>
+ *
+ * <p> Description: This class provides a user interface for students to view and interact with
+ * available articles. Students can search, filter, and request access to articles based on their
+ * access permissions. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.*;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;

@@ -3,7 +3,21 @@ package Backend;
 import java.util.ArrayList;
 import java.util.List;
 
+/*******
+ * <p> ArticleSearcher Class </p>
+ *
+ * <p> Description: This class provides functionality to search through a list of articles
+ * based on a query. It supports both numeric UID-based searches and case-insensitive
+ * text searches on fields like title, author, and abstract. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 public class ArticleSearcher {
+
+    // Searches for articles matching the given query
     public static ArrayList<Article> searchArticles(ArrayList<Article> articles, String query) {
         ArrayList<Article> matchingArticles = new ArrayList<>();
         boolean isNumericQuery = isNumeric(query);
@@ -28,8 +42,8 @@ public class ArticleSearcher {
         return matchingArticles;
     }
 
+    // Checks if the query can be parsed as a number
     private static boolean isNumeric(String query) {
-        // Check if the query can be parsed as a number
         try {
             Long.parseLong(query);
             return true;

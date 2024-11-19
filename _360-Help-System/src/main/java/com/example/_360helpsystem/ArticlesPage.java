@@ -1,5 +1,17 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> ArticlesPage Class </p>
+ *
+ * <p> Description: This class represents the main UI page for managing articles in the help system.
+ * It provides functionalities such as viewing, searching, filtering, creating, updating,
+ * and deleting articles, as well as managing groups associated with the articles. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.*;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;

@@ -1,5 +1,16 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> FilterOptions Class </p>
+ *
+ * <p> Description: This class provides the UI for selecting filter options,
+ * including content levels and groups. Users can clear or save their selections
+ * and navigate back to the previous screen. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
