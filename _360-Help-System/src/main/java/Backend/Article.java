@@ -44,7 +44,6 @@ public class Article {
 
         // Add each keyword to the ArrayList
         for (String keyword : splitKeywords) {
-            assert false;
             this.keywords.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
         }
         this.body = body;
@@ -53,7 +52,6 @@ public class Article {
 
         // Add each keyword to the ArrayList
         for (String keyword : splitGroups) {
-            assert false;
             this.groups.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
         }
     }

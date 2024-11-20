@@ -1,5 +1,16 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> StudentHelp Class </p>
+ *
+ * <p> Description: This class provides a user interface for students to send generic messages or
+ * specific messages to the support team. The messages are saved in the database for further processing. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -14,6 +25,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import static com.example._360helpsystem.CreateAdminAccount.SEARCH_HISTORY;
 
 public class StudentHelp extends Application {
 
@@ -110,6 +123,8 @@ public class StudentHelp extends Application {
     private void showMessageSentAlert(TextField textField, boolean isGenericMessage) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
+        String message = textField.getText();
+
         if(textField.getText().isEmpty()) {
             alert.setTitle("Error");
             alert.setHeaderText(null);
@@ -123,9 +138,11 @@ public class StudentHelp extends Application {
             alert.setContentText("Message has been sent.");
             alert.showAndWait(); // Displays the alert and waits for user to click "OK"
             textField.setText("");
-            if (!isGenericMessage) {
-                UDB.saveSearchHistory(textField.getText());
-                UDB.clearSearchHistory();
+            if (isGenericMessage) {
+                UDB.writeToMsgDB(message);
+            }
+            else{
+                UDB.writeToSpecificMsgDB(message);
             }
         }
 

@@ -1,5 +1,6 @@
 package com.example._360helpsystem;
 
+import Backend.Update_DB;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +15,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /*******
@@ -41,6 +43,7 @@ public class InstructorPage extends Application {
 
         Button messagesButton = createSidebarButtonWithIcon("Messages", "✉️");
         messagesButton.setOnAction(e -> showMessagesScreen(primaryStage)); // Link to Messages screen
+
 
         // Sidebar VBox with buttons
         VBox sidebar = new VBox(10);
@@ -101,27 +104,87 @@ public class InstructorPage extends Application {
     }
 
     private void showMessageDetailsScreen(Stage primaryStage, String messageType) {
-        // Predefined student name and message
-        String studentName = "Alice Johnson";
-        String message = (messageType.equalsIgnoreCase("Generic"))
-                ? "Please check your latest assignment!"
-                : "Your project submission has been reviewed.";
 
-        Text studentNameText = new Text("Student: " + studentName);
-        studentNameText.setFont(Font.font("Arial", 20));
+        ArrayList<String> messages = new ArrayList<>();
+        Update_DB UDB = new Update_DB();
 
-        Text messageText = new Text(messageType + " Message: " + message);
-        messageText.setFont(Font.font("Arial", 16));
+        ArrayList<String> search = new ArrayList<>();
 
-        VBox messageDetails = new VBox(10, studentNameText, messageText);
-        messageDetails.setAlignment(Pos.CENTER);
+        VBox msgList = new VBox();
+
+        if(messageType.equalsIgnoreCase("Generic"))
+        {
+            UDB.readGenericMsg(messages);
+
+            for(String line : messages)
+            {
+                String[] parts = line.split("-");
+                VBox msg = new VBox(5);
+                msg.setPadding(new Insets(10));
+                msg.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                msg.setAlignment(Pos.TOP_LEFT);
+
+                HBox header = new HBox(10);
+
+
+                if (parts.length >= 2) {
+                    // Extract username and message
+                    String username = parts[0].trim();
+                    String message = parts[1].trim();
+
+                    Label messageLabel = new Label(username+" - "+message);
+
+                    header.getChildren().addAll(messageLabel);
+                    header.setAlignment(Pos.TOP_LEFT);
+
+                    msg.getChildren().addAll(header);
+                    msgList.getChildren().add(msg);
+                }
+            }
+        }
+        else{
+            UDB.readSpecificMsg(messages);
+
+            for(String line : messages)
+            {
+                String[] parts = line.split("-");
+                VBox msg = new VBox(5);
+                msg.setPadding(new Insets(10));
+                msg.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
+                msg.setAlignment(Pos.TOP_LEFT);
+
+                HBox header = new HBox(10);
+
+
+                if (parts.length >= 2) {
+                    // Extract username and message
+                    String username = parts[0].trim();
+                    String message = parts[1].trim();
+
+                    Label messageLabel = new Label(username+" - "+message);
+
+                    header.getChildren().addAll(messageLabel);
+                    header.setAlignment(Pos.TOP_LEFT);
+
+                    VBox searchBox = new VBox();
+                    // Add the remaining parts to the searchList
+                    for (int i = 2; i < parts.length; i++) {
+                        searchBox.getChildren().add(new Label(parts[i].trim()));
+                    }
+
+                    msg.getChildren().addAll(header, searchBox);
+                    msgList.getChildren().add(msg);
+                }
+            }
+        }
+
 
         Button backButton = ButtonStyleUtil.createCircularBackButton();
         backButton.setOnAction(e -> start(primaryStage));
 
         BorderPane root = new BorderPane();
         root.setTop(backButton);
-        root.setCenter(messageDetails);
+        root.setCenter(msgList);
 
         BorderPane.setAlignment(backButton, Pos.TOP_LEFT);
         BorderPane.setMargin(backButton, new Insets(5, 0, 0, 5));

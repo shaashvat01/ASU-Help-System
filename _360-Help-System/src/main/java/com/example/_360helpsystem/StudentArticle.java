@@ -1,5 +1,17 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> StudentArticle Class </p>
+ *
+ * <p> Description: This class provides a user interface for students to view and interact with
+ * available articles. Students can search, filter, and request access to articles based on their
+ * access permissions. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.*;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -260,6 +272,9 @@ public class StudentArticle extends Application {
             }
         }
 
+        new Update_DB().storeSearch(searchText,selectedLevels,selectedGrps);
+        SEARCH_HISTORY.add("Search Request= "+searchText+"; Levels = "+selectedLevels+"; Groups = "+selectedGrps);
+
         System.out.println("Result articles - ");
         for (Article article : filteredResults) {
             System.out.println(article.getTitle() + "-" + article.getAbs());
@@ -352,7 +367,7 @@ public class StudentArticle extends Application {
     }
 
     // Display articles in the "General" group
-    private void displayGeneralArticles() {
+    public void displayGeneralArticles() {
         System.out.println("Displaying General Articles");
         articleContainerVBox.getChildren().clear();
         int sequenceNumber = 0;

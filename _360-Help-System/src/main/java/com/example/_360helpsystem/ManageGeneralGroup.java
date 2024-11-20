@@ -1,5 +1,17 @@
 package com.example._360helpsystem;
 
+/*******
+ * <p> ManageGeneralGroup Class </p>
+ *
+ * <p> Description: This class provides a user interface to manage a specific group in the help system.
+ * It includes functionalities to view articles, add/remove users, manage permissions, and handle access requests
+ * for the selected group. </p>
+ *
+ * @version 1.00, 2024-11-19
+ * @author Team - Th15
+ *
+ */
+
 import Backend.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
