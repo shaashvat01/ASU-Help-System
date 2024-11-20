@@ -22,6 +22,8 @@ public class Access {
     // Stores the list of groups the user has access to
     private ArrayList<String> groups;
 
+    private String articleTitle;
+
     // Initializes an Access object with a username and list of groups
     public Access(String username, ArrayList<String> groups) {
         this.username = username;
