@@ -356,13 +356,10 @@ public class ManageGeneralGroup extends Application {
                 usernameText.setFont(Font.font("Arial", 16));
 
                 // Article name and level
-                Text articleNameText = new Text("Random Article");
+                Text articleNameText = new Text(access.getArticleTitle());
                 articleNameText.setFont(Font.font("Arial", FontWeight.BOLD, 16));
                 articleNameText.setFill(Color.web("#8b0000"));
-                Text articleLevelText = new Text(" - Beginner");
-                articleLevelText.setFont(Font.font("Arial", 16));
-                articleLevelText.setFill(Color.web("#7f8c8d"));
-                HBox articleBox = new HBox(articleNameText, articleLevelText);
+                HBox articleBox = new HBox(articleNameText);
 
                 // Buttons
                 Button acceptButton = new Button("Accept");

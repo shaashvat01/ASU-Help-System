@@ -434,7 +434,7 @@ public class ArticlesPage extends Application {
                 // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage,groupName,false,null,null)); // Pass button reference
 
                 // Create HBox for title, level, and options button
                 HBox titleOptionsBox = new HBox();
@@ -449,58 +449,13 @@ public class ArticlesPage extends Application {
                 articleContainerVBox.getChildren().add(articleBox);
             }
 
-        }
-    }
-
-    public void displayArticlesForSearch(String searchText,Stage primaryStage)
-    {
-        articleContainerVBox.getChildren().clear();
-
-        for (Article article : ARTICLE_LIST) {
-            if(article.hasKeyword(searchText)) {
-                // Create VBox for each article with padding and border
-                VBox articleBox = new VBox(5);
-                articleBox.setPadding(new Insets(10));
-                articleBox.setStyle("-fx-border-color: lightgray; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
-                articleBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create HBox for title and level
-                HBox titleLevelBox = new HBox(10);
-                Label titleLabel = new Label(article.getTitle());
-                titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 17px; -fx-text-fill: #8b0000;");
-                titleLabel.setFont(Font.font("Arial", 17));
-
-                Label levelLabel = new Label("(" + article.getLevel() + ")");
-                levelLabel.setStyle("-fx-text-fill: gray; -fx-font-size: 14px;");
-                levelLabel.setFont(Font.font("Arial", 14));
-
-                titleLevelBox.getChildren().addAll(titleLabel, levelLabel);
-                titleLevelBox.setAlignment(Pos.TOP_LEFT);
-
-                // Create the 3-dots button for options
-                Button optionsButton = new Button("...");
-                optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
-
-                // Create HBox for title, level, and options button
-                HBox titleOptionsBox = new HBox();
-                titleOptionsBox.getChildren().addAll(titleLevelBox, optionsButton);
-                HBox.setHgrow(titleLevelBox, Priority.ALWAYS); // Make titleLevelBox grow horizontally
-                titleOptionsBox.setAlignment(Pos.TOP_RIGHT); // Align the options button to the right
-
-                // Add titleOptionsBox and abstract to articleBox (VBox)
-                articleBox.getChildren().addAll(titleOptionsBox, new Label(article.getAbs()));
-
-                // Add the articleBox (for each article) to the main VBox
-                articleContainerVBox.getChildren().add(articleBox);
-            }
         }
     }
 
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {
+    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage,String searchText, Boolean isSearch,ArrayList<CheckBox> levelFilters, ArrayList<CheckBox> groupFilters) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
@@ -509,7 +464,14 @@ public class ArticlesPage extends Application {
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
             ARTICLE_LIST.removeArticle(article);
-            displayArticlesForGroup("General",primaryStage);
+            if(isSearch)
+            {
+                performSearch(primaryStage,searchText,levelFilters,groupFilters);
+            }
+            else {
+                displayArticlesForGroup(searchText,primaryStage);
+            }
+
             contextMenu.hide(); // Hide the context menu after action
         });
 
@@ -794,8 +756,6 @@ public class ArticlesPage extends Application {
         contentLevelLabel.setFont(Font.font("Arial", 14));
         contentLevelLabel.setStyle("-fx-font-weight: bold;");
 
-        CheckBox allContentCheckBox = new CheckBox("All");
-        levelFilters.add(allContentCheckBox);
         CheckBox beginnerCheckBox = new CheckBox("Beginner");
         levelFilters.add(beginnerCheckBox);
         CheckBox intermediateCheckBox = new CheckBox("Intermediate");
@@ -806,7 +766,7 @@ public class ArticlesPage extends Application {
         levelFilters.add(expertCheckBox);
 
 
-        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+        VBox contentLevelOptions = new VBox(10, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
 
         // Groups heading and checkboxes
         Label groupLabel = new Label("Groups:");
@@ -835,7 +795,6 @@ public class ArticlesPage extends Application {
         clearButton.setPrefWidth(100);
         clearButton.setOnAction(e -> {
             // Clear all checkboxes
-            allContentCheckBox.setSelected(false);
             beginnerCheckBox.setSelected(false);
             intermediateCheckBox.setSelected(false);
             advancedCheckBox.setSelected(false);
@@ -892,7 +851,7 @@ public class ArticlesPage extends Application {
 
         for (Article article : textResults) {
             boolean matchLevel = selectedLevels.contains(article.getLevel()) || selectedLevels.isEmpty();
-            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || all || selectedGrps.isEmpty();
+            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || selectedGrps.isEmpty();
 
             if (matchLevel && matchGroup) {
                 filteredResults.add(article);
@@ -957,7 +916,7 @@ public class ArticlesPage extends Application {
                     // Create the 3-dots button for options
                     Button optionsButton = new Button("...");
                     optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                    optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                    optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage,searchText,true,levelFilters,grpFilters)); // Pass button reference
 
                     optionsBox.getChildren().add(optionsButton);
                 } else {
@@ -1000,7 +959,7 @@ public class ArticlesPage extends Application {
         confirmButton.setFont(Font.font("Arial", 14));
         confirmButton.setOnAction(e -> {
             // Add new access to the list
-            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            Access access = new Access(CURRENT_USER.getUserName(), article.getTitle() ,article.getGroups());
             if(!ACCESS_LIST.getAccessList().contains(access))
             {
                 ACCESS_LIST.addAccess(access);

@@ -25,8 +25,9 @@ public class Access {
     private String articleTitle;
 
     // Initializes an Access object with a username and list of groups
-    public Access(String username, ArrayList<String> groups) {
+    public Access(String username,String title ,ArrayList<String> groups) {
         this.username = username;
+        this.articleTitle = title;
         this.groups = groups;
     }
     // Retrieves the username of the user
@@ -40,5 +41,8 @@ public class Access {
     // Retrieves the list of groups the user has access to
     public ArrayList<String> getGroups() {
         return groups;
+    }
+    public String getArticleTitle() {
+        return articleTitle;
     }
 }
