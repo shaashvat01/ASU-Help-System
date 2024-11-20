@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 public class Access {
     private String username;
+    private String articleTitle;
     private ArrayList<String> groups;
 
-    public Access(String username, ArrayList<String> groups) {
+    public Access(String username,String title, ArrayList<String> groups) {
         this.username = username;
+        this.articleTitle = title;
         this.groups = groups;
     }
     public String getUsername() {
@@ -21,5 +23,9 @@ public class Access {
     {
         return groups;
     }
+    public String getArticleTitle() {
+        return articleTitle;
+    }
+
 
 }

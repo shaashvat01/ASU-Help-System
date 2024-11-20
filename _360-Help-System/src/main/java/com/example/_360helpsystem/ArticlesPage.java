@@ -382,7 +382,7 @@ public class ArticlesPage extends Application {
                 // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage,groupName,false)); // Pass button reference
 
                 // Create HBox for title, level, and options button
                 HBox titleOptionsBox = new HBox();
@@ -428,7 +428,7 @@ public class ArticlesPage extends Application {
                 // Create the 3-dots button for options
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage,searchText,true)); // Pass button reference
 
                 // Create HBox for title, level, and options button
                 HBox titleOptionsBox = new HBox();
@@ -448,7 +448,7 @@ public class ArticlesPage extends Application {
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {
+    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage,String grpName,boolean isSearch) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
@@ -457,7 +457,13 @@ public class ArticlesPage extends Application {
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
             ARTICLE_LIST.removeArticle(article);
-            displayArticlesForGroup("General",primaryStage);
+            if(isSearch) {
+                displayArticlesForSearch(grpName, primaryStage);
+            }
+            else{
+                displayArticlesForGroup(grpName,primaryStage);
+            }
+
             contextMenu.hide(); // Hide the context menu after action
         });
 
