@@ -216,7 +216,8 @@ public class Update_DB {
                 }
 
                 String username = parts[0].trim();
-                String groupsString = parts[1].trim();
+                String title = parts[1].trim();
+                String groupsString = parts[2].trim();
 
                 // Remove square brackets and split by commas
                 String cleanGroupsString = groupsString.replace("[", "").replace("]", "");
@@ -231,7 +232,7 @@ public class Update_DB {
                 }
 
                 // Add the Access object to ACCESS_LIST (assuming status is true by default)
-                ACCESS_LIST.addAccess(new Access(username, groups));
+                ACCESS_LIST.addAccess(new Access(username,title ,groups));
             }
         } catch (IOException e) {
             System.out.println("Error loading Requests database: " + e.getMessage());
@@ -327,6 +328,7 @@ public class Update_DB {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path_to_requestsDB, false))) { // Set append to false
             for (Access access  : ACCESS_LIST) { // Accessing OTP_LIST directly from OTPList class
                 writer.write(access.getUsername());
+                writer.write("-"+access.getArticleTitle());
                 writer.write("-"+access.getGroups().toString());
                 writer.newLine(); // Add a new line after each OTP
             }
@@ -427,7 +429,7 @@ public class Update_DB {
                 {
                     if(GROUP_LIST.contains(grp))
                     {
-                        if(GROUP_LIST.getGroup(grp).isAdmin(CURRENT_USER.getUserName()))
+                        if(GROUP_LIST.getGroup(grp).isAdmin(CURRENT_USER.getUserName()) || CURRENT_USER.isAdmin())
                         {
                         }
                         else{

@@ -310,7 +310,7 @@ public class InstructorsArticlePage extends Application {
 
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage,groupName,false,null,null));
 
                 HBox titleOptionsBox = new HBox(titleLevelBox);
                 HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
@@ -472,7 +472,7 @@ public class InstructorsArticlePage extends Application {
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {
+    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage,String searchText, Boolean isSearch,ArrayList<CheckBox> levelFilters, ArrayList<CheckBox> groupFilters) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
@@ -481,7 +481,13 @@ public class InstructorsArticlePage extends Application {
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
             ARTICLE_LIST.removeArticle(article);
-            displayArticlesForGroup("General",primaryStage);
+            if(isSearch)
+            {
+                performSearch(primaryStage,searchText,levelFilters,groupFilters);
+            }
+            else {
+                displayArticlesForGroup(searchText,primaryStage);
+            }
             contextMenu.hide(); // Hide the context menu after action
         });
 
@@ -690,8 +696,6 @@ public class InstructorsArticlePage extends Application {
         contentLevelLabel.setFont(Font.font("Arial", 14));
         contentLevelLabel.setStyle("-fx-font-weight: bold;");
 
-        CheckBox allContentCheckBox = new CheckBox("All");
-        levelFilters.add(allContentCheckBox);
         CheckBox beginnerCheckBox = new CheckBox("Beginner");
         levelFilters.add(beginnerCheckBox);
         CheckBox intermediateCheckBox = new CheckBox("Intermediate");
@@ -702,7 +706,7 @@ public class InstructorsArticlePage extends Application {
         levelFilters.add(expertCheckBox);
 
 
-        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+        VBox contentLevelOptions = new VBox(10, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
 
         // Groups heading and checkboxes
         Label groupLabel = new Label("Groups:");
@@ -731,7 +735,6 @@ public class InstructorsArticlePage extends Application {
         clearButton.setPrefWidth(100);
         clearButton.setOnAction(e -> {
             // Clear all checkboxes
-            allContentCheckBox.setSelected(false);
             beginnerCheckBox.setSelected(false);
             intermediateCheckBox.setSelected(false);
             advancedCheckBox.setSelected(false);
@@ -788,7 +791,7 @@ public class InstructorsArticlePage extends Application {
 
         for (Article article : textResults) {
             boolean matchLevel = selectedLevels.contains(article.getLevel()) || selectedLevels.isEmpty();
-            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || all || selectedGrps.isEmpty();
+            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || selectedGrps.isEmpty();
 
             if (matchLevel && matchGroup) {
                 filteredResults.add(article);
@@ -851,7 +854,7 @@ public class InstructorsArticlePage extends Application {
             // Create the 3-dots button for options
             Button optionsButton = new Button("...");
             optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-            optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage)); // Pass button reference
+            optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage,searchText,true,levelFilters,grpFilters)); // Pass button reference
 
             optionsBox.getChildren().add(optionsButton);
 
