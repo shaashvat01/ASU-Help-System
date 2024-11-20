@@ -2,7 +2,7 @@ package Backend;
 
 import java.util.ArrayList;
 
-/*******
+/******
  * <p> Access Class </p>
  *
  * <p> Description: This class manages user access to specific groups in the system.
