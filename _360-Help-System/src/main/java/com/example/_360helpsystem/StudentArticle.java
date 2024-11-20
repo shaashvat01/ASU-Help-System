@@ -170,8 +170,6 @@ public class StudentArticle extends Application {
         contentLevelLabel.setFont(Font.font("Arial", 14));
         contentLevelLabel.setStyle("-fx-font-weight: bold;");
 
-        CheckBox allContentCheckBox = new CheckBox("All");
-        levelFilters.add(allContentCheckBox);
         CheckBox beginnerCheckBox = new CheckBox("Beginner");
         levelFilters.add(beginnerCheckBox);
         CheckBox intermediateCheckBox = new CheckBox("Intermediate");
@@ -182,7 +180,7 @@ public class StudentArticle extends Application {
         levelFilters.add(expertCheckBox);
 
 
-        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+        VBox contentLevelOptions = new VBox(10, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
 
         // Groups heading and checkboxes
         Label groupLabel = new Label("Groups:");
@@ -211,7 +209,6 @@ public class StudentArticle extends Application {
         clearButton.setPrefWidth(100);
         clearButton.setOnAction(e -> {
             // Clear all checkboxes
-            allContentCheckBox.setSelected(false);
             beginnerCheckBox.setSelected(false);
             intermediateCheckBox.setSelected(false);
             advancedCheckBox.setSelected(false);
@@ -565,7 +562,7 @@ public class StudentArticle extends Application {
         confirmButton.setFont(Font.font("Arial", 14));
         confirmButton.setOnAction(e -> {
             // Add new access to the list
-            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            Access access = new Access(CURRENT_USER.getUserName(), article.getTitle(), article.getGroups());
             if(!ACCESS_LIST.getAccessList().contains(access))
             {
                 ACCESS_LIST.addAccess(access);
@@ -601,7 +598,7 @@ public class StudentArticle extends Application {
         confirmButton.setFont(Font.font("Arial", 14));
         confirmButton.setOnAction(e -> {
             // Add new access to the list
-            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            Access access = new Access(CURRENT_USER.getUserName(), article.getTitle(),article.getGroups());
             if(!ACCESS_LIST.getAccessList().contains(access))
             {
                 ACCESS_LIST.addAccess(access);

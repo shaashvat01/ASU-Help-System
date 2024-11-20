@@ -310,7 +310,7 @@ public class InstructorsArticlePage extends Application {
 
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage));
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage,groupName,false));
 
                 HBox titleOptionsBox = new HBox(titleLevelBox);
                 HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
@@ -472,7 +472,7 @@ public class InstructorsArticlePage extends Application {
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage) {
+    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage,String grpName,boolean isSearch) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
@@ -481,7 +481,12 @@ public class InstructorsArticlePage extends Application {
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
             ARTICLE_LIST.removeArticle(article);
-            displayArticlesForGroup("General",primaryStage);
+            if(isSearch) {
+                displayArticlesForSearch(grpName, primaryStage);
+            }
+            else{
+                displayArticlesForGroup(grpName,primaryStage);
+            }
             contextMenu.hide(); // Hide the context menu after action
         });
 
