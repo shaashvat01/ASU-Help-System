@@ -30,8 +30,8 @@ public class Article {
     private ArrayList<String> groups;
 
 
-    //Unique identifier for the article.
-    public Article(long UID, String title, String author, String level, String security, String abs, String keywords, String body, String links, String groups) {
+    public Article(long UID, String title, String author, String level, String security,
+                   String abs, String keywords, String body, String links, String groups) {
         this.keywords = new ArrayList<>();
         this.groups = new ArrayList<>();
         this.UID = UID;
@@ -40,21 +40,24 @@ public class Article {
         this.level = level;
         this.security = security;
         this.abs = abs;
-        String[] splitKeywords = keywords.split(",");
 
-        // Add each keyword to the ArrayList
-        for (String keyword : splitKeywords) {
-            assert false;
-            this.keywords.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
+        // Split and add keywords
+        if (keywords != null && !keywords.isEmpty()) {
+            String[] splitKeywords = keywords.split(",");
+            for (String keyword : splitKeywords) {
+                this.keywords.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
+            }
         }
+
         this.body = body;
         this.links = links;
-        String[] splitGroups = groups.split(",");
 
-        // Add each keyword to the ArrayList
-        for (String keyword : splitGroups) {
-            assert false;
-            this.groups.add(keyword.trim()); // Use trim() to remove any leading/trailing spaces
+        // Split and add groups
+        if (groups != null && !groups.isEmpty()) {
+            String[] splitGroups = groups.split(",");
+            for (String group : splitGroups) {
+                this.groups.add(group.trim()); // Use trim() to remove any leading/trailing spaces
+            }
         }
     }
 

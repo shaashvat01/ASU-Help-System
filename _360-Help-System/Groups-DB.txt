@@ -1,0 +1,3 @@
+Eclipse-[mm, mt, ww, kk]-[mm, kk]-false
+JavaFx-[mt]-[]-true
+GitHub-[mm, mt, ww, kk]-[mm, kk]-false
