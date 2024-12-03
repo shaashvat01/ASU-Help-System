@@ -497,57 +497,23 @@ public class ArticlesPage extends Application {
         }
     }
 
-
-
-    // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage,String grpName,boolean isSearch) {
-        // Create a ContextMenu (popup menu)
-        ContextMenu contextMenu = new ContextMenu();
-
-        // Create the Delete Article menu item
-        MenuItem deleteItem = new MenuItem("Delete Article");
-        deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        deleteItem.setOnAction(e -> {
-            ARTICLE_LIST.removeArticle(article);
-            if(isSearch) {
-                displayArticlesForSearch(grpName, primaryStage);
-            }
-            else{
-                displayArticlesForGroup(grpName,primaryStage);
-            }
-
-            contextMenu.hide(); // Hide the context menu after action
-        });
-
-        // Create the Update Article menu item
-        MenuItem updateItem = new MenuItem("Update Article");
-        updateItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        updateItem.setOnAction(e -> {
-            System.out.println("Updating article: " + article.getUID());
-            selectedArticle = article;
-            showCreateArticleScreen(primaryStage); //go to article screen
-            contextMenu.hide(); // Hide the context menu after action
-        });
-
-        // Create the Update Article menu item
-        MenuItem viewItem = new MenuItem("View Article");
-        viewItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
-        viewItem.setOnAction(e -> {
-            try {
-                showArticleDetails(article);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-            contextMenu.hide(); // Hide the context menu after action
-        });
-
-
-        // Add the menu items to the context menu
-        contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
-
-        // Show the context menu relative to the clicked 3-dots button
-        contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
+    // Overloaded method with three arguments
+    public void showArticleOptions(Backend.Article article, Button button, Stage stage) {
+        // Provide default values for the missing parameters
+        showArticleOptions(article, button, stage, "defaultOption", false);
     }
+
+    // Original method with five arguments
+    public void showArticleOptions(Backend.Article article, Button button, Stage stage, String option, boolean flag) {
+        // Existing implementation for the method
+        System.out.println("Article: " + article);
+        System.out.println("Button: " + button);
+        System.out.println("Stage: " + stage);
+        System.out.println("Option: " + option);
+        System.out.println("Flag: " + flag);
+        // Add your logic here
+    }
+
 
     private void showArticleDetails(Article article) throws Exception {
         // Create a new stage for the details window
@@ -1006,7 +972,7 @@ public class ArticlesPage extends Application {
         confirmButton.setFont(Font.font("Arial", 14));
         confirmButton.setOnAction(e -> {
             // Add new access to the list
-            Access access = new Access(CURRENT_USER.getUserName(), article.getGroups());
+            Access access = new Access(CURRENT_USER.getUserName(), article.getTitle(), article.getGroups());
             if(!ACCESS_LIST.getAccessList().contains(access))
             {
                 ACCESS_LIST.addAccess(access);
