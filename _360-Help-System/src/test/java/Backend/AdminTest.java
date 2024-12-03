@@ -49,4 +49,62 @@ class AdminTest {
         // Verify that the password reset was unsuccessful
         assertFalse(result, "Password reset should fail for non-existent user");
     }
+
+    @Test
+    void testDeleteUserAccount_UserExists() {
+        Admin admin = new Admin(); // Create an Admin object
+        UserList userList = new UserList(); // Create a UserList object
+
+        // Add a test user to the UserList
+        User user = new User("testUser", "password123", "test@example.com",
+                "First", "Middle", "Last", "Preferred");
+        userList.addUser(user); // Add the user to the list
+
+        // Delete the user account
+        admin.deleteUserAccount(user, userList);
+
+        // Verify that the user has been removed
+        assertEquals(0, userList.getUserCount(), "User should be removed from UserList");
+        assertNull(userList.findUser("testUser"), "User should no longer exist in UserList");
+    }
+
+    /**
+     * Test case: Verify that addRoleToUser assigns the correct role
+     * to the specified user.
+     */
+    @Test
+    void testAddRoleToUser_AssignRoles() {
+        Admin admin = new Admin(); // Create an Admin object
+        User user = new User("testUser", "password123", "test@example.com",
+                "First", "Middle", "Last", "Preferred");
+
+        // Assign roles to the user
+        admin.addRoleToUser(user, "Student");
+        admin.addRoleToUser(user, "Instructor");
+
+        // Verify that the roles were assigned correctly
+        assertTrue(user.isStudent(), "User should have the Student role");
+        assertTrue(user.isInstructor(), "User should have the Instructor role");
+    }
+
+    /**
+     * Test case: Verify that removeRoleFromUser removes the correct role
+     * from the specified user.
+     */
+    @Test
+    void testRemoveRoleFromUser_RemoveRoles() {
+        Admin admin = new Admin(); // Create an Admin object
+        User user = new User("testUser", "password123", "test@example.com",
+                "First", "Middle", "Last", "Preferred");
+
+        // Assign roles to the user and then remove them
+        admin.addRoleToUser(user, "Student");
+        admin.addRoleToUser(user, "Instructor");
+        admin.removeRoleFromUser(user, "Student");
+        admin.removeRoleFromUser(user, "Instructor");
+
+        // Verify that the roles were removed correctly
+        assertFalse(user.isStudent(), "User should no longer have the Student role");
+        assertFalse(user.isInstructor(), "User should no longer have the Instructor role");
+    }
 }
