@@ -310,7 +310,8 @@ public class InstructorsArticlePage extends Application {
 
                 Button optionsButton = new Button("...");
                 optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage,groupName,false,null,null));
+                optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage, "defaultOption", true));
+
 
                 HBox titleOptionsBox = new HBox(titleLevelBox);
                 HBox.setHgrow(titleLevelBox, Priority.ALWAYS);
@@ -472,78 +473,45 @@ public class InstructorsArticlePage extends Application {
 
 
     // Show options for updating or deleting an article
-    private void showArticleOptions(Article article, Button optionsButton,Stage primaryStage,String searchText, Boolean isSearch,ArrayList<CheckBox> levelFilters, ArrayList<CheckBox> groupFilters) {
+    private void showArticleOptions(Backend.Article article, Button button, Stage stage, String option, boolean flag) {
         // Create a ContextMenu (popup menu)
         ContextMenu contextMenu = new ContextMenu();
 
-        // Create the Delete Article menu item
+        // Define menu items
         MenuItem deleteItem = new MenuItem("Delete Article");
         deleteItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         deleteItem.setOnAction(e -> {
+            // Example delete logic
             ARTICLE_LIST.removeArticle(article);
-            if(isSearch)
-            {
-                performSearch(primaryStage,searchText,levelFilters,groupFilters);
-            }
-            else {
-                displayArticlesForGroup(searchText,primaryStage);
-            }
-            contextMenu.hide(); // Hide the context menu after action
+            System.out.println("Deleted article: " + article.getTitle());
+            contextMenu.hide();
         });
 
-        // Create the Update Article menu item
         MenuItem updateItem = new MenuItem("Update Article");
         updateItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         updateItem.setOnAction(e -> {
-            System.out.println("Updating article: " + article.getUID());
-            selectedArticle = article;
-            showCreateArticleScreen(primaryStage); //go to article screen
-            contextMenu.hide(); // Hide the context menu after action
+            System.out.println("Updating article: " + article.getTitle());
+            showCreateArticleScreen(stage);
+            contextMenu.hide();
         });
 
-        // Create the Update Article menu item
         MenuItem viewItem = new MenuItem("View Article");
         viewItem.setStyle("-fx-background-color: #8b0000; -fx-text-fill: white;");
         viewItem.setOnAction(e -> {
-            try {
-                showArticleDetails(article);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-            contextMenu.hide(); // Hide the context menu after action
+            System.out.println("Viewing article: " + article.getTitle());
+            showArticleDetails(article);
+            contextMenu.hide();
         });
 
-
-
-        boolean hasAdminAccess = false;
-        boolean hasReadAccess = false;
-        for(String grp : article.getGroups())
-        {
-            if(GROUP_LIST.contains(grp) && GROUP_LIST.getGroup(grp).isAdmin(CURRENT_USER.getUserName()))
-            {
-                hasAdminAccess = true;
-            }
-            if(GROUP_LIST.contains(grp) && GROUP_LIST.getGroup(grp).getUsers().contains(CURRENT_USER.getUserName()))
-            {
-                hasReadAccess = true;
-            }
-        }
-
-        if(hasAdminAccess)
-        {
-            // Add the menu items to the context menu
+        // Add menu items based on conditions
+        if (flag) {
             contextMenu.getItems().addAll(deleteItem, updateItem, viewItem);
-        }
-        else {
-            if(hasReadAccess)
-            {
-                contextMenu.getItems().addAll(viewItem);
-            }
-
+        } else {
+            contextMenu.getItems().add(viewItem);
         }
 
-        // Show the context menu relative to the clicked 3-dots button
-        contextMenu.show(optionsButton, Side.BOTTOM, 0, 0);
+        // Show the context menu relative to the button
+        contextMenu.show(button, Side.BOTTOM, 0, 0);
     }
 
 
@@ -696,6 +664,8 @@ public class InstructorsArticlePage extends Application {
         contentLevelLabel.setFont(Font.font("Arial", 14));
         contentLevelLabel.setStyle("-fx-font-weight: bold;");
 
+        CheckBox allContentCheckBox = new CheckBox("All");
+        levelFilters.add(allContentCheckBox);
         CheckBox beginnerCheckBox = new CheckBox("Beginner");
         levelFilters.add(beginnerCheckBox);
         CheckBox intermediateCheckBox = new CheckBox("Intermediate");
@@ -706,7 +676,7 @@ public class InstructorsArticlePage extends Application {
         levelFilters.add(expertCheckBox);
 
 
-        VBox contentLevelOptions = new VBox(10, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
+        VBox contentLevelOptions = new VBox(10, allContentCheckBox, beginnerCheckBox, intermediateCheckBox, advancedCheckBox, expertCheckBox);
 
         // Groups heading and checkboxes
         Label groupLabel = new Label("Groups:");
@@ -735,6 +705,7 @@ public class InstructorsArticlePage extends Application {
         clearButton.setPrefWidth(100);
         clearButton.setOnAction(e -> {
             // Clear all checkboxes
+            allContentCheckBox.setSelected(false);
             beginnerCheckBox.setSelected(false);
             intermediateCheckBox.setSelected(false);
             advancedCheckBox.setSelected(false);
@@ -791,7 +762,7 @@ public class InstructorsArticlePage extends Application {
 
         for (Article article : textResults) {
             boolean matchLevel = selectedLevels.contains(article.getLevel()) || selectedLevels.isEmpty();
-            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || selectedGrps.isEmpty();
+            boolean matchGroup = selectedGrps.stream().anyMatch(article::hasGroup) || all || selectedGrps.isEmpty();
 
             if (matchLevel && matchGroup) {
                 filteredResults.add(article);
@@ -854,7 +825,7 @@ public class InstructorsArticlePage extends Application {
             // Create the 3-dots button for options
             Button optionsButton = new Button("...");
             optionsButton.setStyle("-fx-background-color: transparent; -fx-font-size: 20px;");
-            optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton,primaryStage,searchText,true,levelFilters,grpFilters)); // Pass button reference
+            optionsButton.setOnAction(e -> showArticleOptions(article, optionsButton, primaryStage, "defaultOption", true));
 
             optionsBox.getChildren().add(optionsButton);
 
