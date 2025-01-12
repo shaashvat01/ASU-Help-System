@@ -1,7 +1,7 @@
-# CSE 360 Help System
+# Adaptive Learning Support Platform
 
 ## Overview
-The **CSE 360 Help System** is an adaptive learning support platform designed to aid students, instructors, and administrators in the CSE 360 course at Arizona State University. This system provides secure, role-based assistance tailored to individual user needs, enhancing accessibility and personalization in a diverse learning environment.
+The **Adaptive Learning Support Platform** is an adaptive learning support platform designed to aid students, instructors, and administrators in the CSE 360 course at Arizona State University. This system provides secure, role-based assistance tailored to individual user needs, enhancing accessibility and personalization in a diverse learning environment.
 
 ## Features
 ### Core Functionalities
